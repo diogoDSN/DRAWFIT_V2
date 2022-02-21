@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html class="fw-eleven breadcrumbs-visible landscape ready th-black-dark device-desktop product-sports unauthenticated" data-domain=".bwin.pt" lang="pt">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+  <title>
+   Bwin
+  </title>
+  <meta content="Bwin" name="apple-mobile-web-app-title"/>
+  <meta name="description"/>
+  <script async="" src="//www.googletagmanager.com/gtm.js?id=GTM-N48RN3R">
+  </script>
+  <script>
+   function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+        }
+        function boot() {
+            const lang = getCookie('lang') || 'en';
+            return fetch(`/${lang}/api/clientconfig`, {
+                cache: 'no-store',
+                headers: {
+                    'x-bwin-browser-url': location.href,
+                    'x-bwin-browser-referrer': document.referrer
+                },
+                credentials: 'same-origin'
+            })
+            .then(res => res.json())
+                .then(config => window['clientConfig'] = config)
+            .catch(err => console.error(err));
+        }
+        window['_boot'] = boot();
+        window.script_load = (function () {
+            var that = this;
+            that.mapping = {};
+            that.startTime = Date.now();
+            return {
+                timings: {},
+                start: function (id) {
+                    that.mapping[id] = Date.now();
+                },
+                onEnd: function (script) {
+                    var startTime = that.mapping[script.id];
+                    if (startTime) {
+                        this.timings[script.src] = Date.now() - startTime;
+                        delete that.mapping[script.id];
+                    }
+                }
+            }
+        })();
+  </script>
+  <style>
+   .embed-overlay-popup .theme-bg-popup .egv-pop-btn-left {
+ cursor:pointer;
+}
+
+.embed-overlay-popup .theme-bg-popup .egv-pop-btn-right {
+    cursor:pointer;
+
+}
+  </style>
+  <meta content="2pvukioy2iy9maqxwthe6lhzi2a0ad" name="facebook-domain-verification"/>
+  <style>
+   .game-tile-wrapper .game.icon-2 {
+    overflow: hidden !important;
+    border-radius: 4px;
+}
+  </style>
+  <!-- Hotjar Tracking Code for https://www.bwin.pt -->
+  <script>
+   (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:1926920,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+  </script>
+  <script async="" src="https://static.hotjar.com/c/hotjar-1926920.js?sv=6">
+  </script>
+  <!-- User Tracking -->
+  <script id="HotJar user Tracking">
+   try
+{
+	window['_boot'].then((clientConf) => 
+	{
+		if (window.hj !== undefined)
+		{
+			if(clientConfig && clientConfig.vnClaims)
+			{
+				var userId = clientConfig.vnClaims["http://api.bwin.com/v3/user/pg/nameidentifier"] || "NA";
+				//var email = clientConfig.vnClaims["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/email"] || "NA";
+				var accountName = "NA"; //clientConfig.vnClaims["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"] || "NA";
+				
+					window.hj('identify', userId, {
+						'accountName' : accountName
+					});
+			}
+		}
+	});
+}	
+catch(err) 
+{
+	console.err = "Hotjar Tracking Error | " + err.message;
+}
+  </script>
+  <script type="text/javascript">
+   var storeJumioRibbonLastUrl = function()
+{
+     var loc= window.location.href;
+     var d = new Date();
+     var currentDomain = "";
+     d.setTime(d.getTime() + (1*24*60*60*1000));
+     var expires = 'expires='+ d.toUTCString();
+	 if(window.clientConfig.m2Page !== undefined)
+	 {
+	 currentDomain = window.clientConfig.m2Page.domain;
+	 }
+	 else {
+	 currentDomain = window.clientConfig.vnPage.domain;
+	 }
+     document.cookie = 'jumioRibbonPrevLoc= '+ loc + ';'+ expires +';path=/; domain='+ currentDomain;
+     return true;
+}
+  </script>
+  <link href="https://scmedia.itsfogo.com/$-$/1b6f81b97c234caa9ff2208ee121faaa.css" rel="stylesheet"/>
+  <style>
+   slick .md-teaser-content .title {
+        font-family: "Druk Wide LCG Web";
+        font-size:18px;
+        font-style:normal;
+        text-align:left;
+        text-transform:none;
+        font-weight: 500;
+    }
+    slick  .md-teaser-content .subtitle {
+        font-style:normal;
+        text-align:left;
+        text-transform:none;
+        font-size:14px;
+    }
+
+
+.pc-teaser section h3{
+ display:block;
+ position:static;
+ margin:0;
+ padding:0;
+ color:#fff;
+ text-align:left;
+ font-family: "Druk Wide LCG Web";
+  font-style:normal;
+        text-transform:none;
+     
+}
+
+.pc-teaser section h3 span{
+    display:block;
+    color:#ffcc00;
+
+}
+
+.pc-teaser section .overlay h4{
+    display:block;
+    background:none;
+    color:#fff;
+    position:static;
+    margin:0;
+    padding:0;
+    font-style:normal;
+        text-align:left;
+        text-transform:none;
+font-size: 0.9em;
+}
+
+@media only screen and (max-width: 479px){
+    .pc-teaser section h3,
+    slick  .md-teaser-content .title {
+        font-size:18px; 
+    }
+    .pc-teaser section h4,
+    slick  .md-teaser-content .subtitle {
+        font-size:14px;
+    }
+}
+
+
+@media only screen and (min-width:480px) and (max-width: 767px) {
+    .pc-teaser section h3,
+    slick  .md-teaser-content .title {
+        font-size:24px; 
+    }
+    .pc-teaser section h4,
+    slick  .md-teaser-content .subtitle {
+        font-size:18px;
+    }
+}
+  </style>
+  <style>
+   .showcase-container .showcase-media-mobile .tab-bar span.title {display: none;}
+  </style>
+  <style>
+   .event-detail-header .header-content .alert-icon:not(.alert-enabled) {
+    display: none;
+}
+  </style>
+  <style>
+   .app__edit-bet-mode .smart-banner, .popup-on .smart-banner {
+display: none;
+}
+  </style>
+  <script type="text/javascript">
+   {
+document.cookie = "appinf=unknown; domain=bwin.pt; path=/";
+}
+  </script>
+  <script type="text/javascript">
+   window.external = window.external || {}
+  </script>
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link as="style" href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&amp;family=Roboto:wght@100;300;400;500;700;900&amp;display=swap" rel="preload"/>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@300;400;700&amp;family=Roboto:wght@100;300;400;500;700;900&amp;display=swap" rel="stylesheet"/>
+  <link as="font" crossorigin="" href="https://scmedia.itsfogo.com/$-$/702bf9f3c4744b7faedb214370008716.woff2" rel="preload" type="font/woff2"/>
+  <style>
+   @font-face {font-display: swap; font-family: 'Druk Wide LCG Web'; font-style: normal;  font-weight: 400;  src: url('https://scmedia.itsfogo.com/$-$/702bf9f3c4744b7faedb214370008716.woff2') format('woff2'); }
+  </style>
+  <style>
+   @media screen and (orientation:portrait) { 
+  .slick-slide > .ng-scope{
+    height: auto!important;
+    padding-bottom: 0!important;
+    position: relative;
+  }
+  .slick-slide .teaser-image{
+    height: auto!important;
+  }
+  .slick-slide .terms{
+    bottom: 120px;
+  }  
+}
+  </style>
+  <script>
+   function DisplayNoneById(id) {
+        document.getElementById(id).style.display = "none";
+    }
+  </script>
+  <style>
+   .ptb .ptb-info-dialog {
+  max-width: 300px !important;
+}
+
+.ptb .ptb-info-dialog .link-element::before {
+  line-height: 1.5em !important;
+} 
+
+
+.games-list-bspin.games-mobile {
+    display: inline-block;
+    width: 110px;
+    margin-bottom: 20px;
+}
+
+.ptb .spin-result-dialog .winningIcon img {
+    margin-top: 15px;
+    width: 60px !important;
+    height: 60px !important;
+}
+.ptb .spin-result-dialog .winningIcon {
+background-color: #000;
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.footer a.btn-l3 {
+    background-color: #ffcc00;
+    border-radius: 4px;
+    padding: 7px 20px;
+    text-decoration: none;
+    margin-top: 4px;
+}
+
+.ptb .spin-result-dialog .footer .btn {
+    margin: 0 !important;
+    height: auto;
+    line-height: 31px;
+}
+
+#main-content .games-list-bspin.games-mobile {
+    display: block;
+    width: 100%;
+}
+.product-promo .content-pickabox .significant-terms {
+   color: #fff;
+}
+@media (min-width: 420px) {
+    .product-promo .content-pickabox .button-action.button-mobile, .games-list.games-mobile  {
+        display: none !important;
+    }
+}
+@media (max-width: 420px) {
+    .product-promo .content-pickabox .button-action.button-desktop, .games-list.games-desktop  {
+        display: none !important;
+    }
+}
+  </style>
+  <script type="text/javascript">
+   {
+var imsgdt = new Date();
+imsgdt.setTime(imsgdt.getTime()+14400000);
+document.cookie = 'trackingAffiliate=5207417; expires=' + imsgdt.toGMTString() + '; domain=bwin.pt; path=/';
+imsgdt.setTime(imsgdt.getTime()+2577600000);
+document.cookie = 'trackerId=5207417; expires=' + imsgdt.toGMTString() + '; domain=bwin.pt; path=/';
+imsgdt.setTime(imsgdt.getTime()-31536000000);
+document.cookie = 'bonus-min=%2Fen%2Fsignupbonus%3F5207417%3D0000000; expires=' + imsgdt.toGMTString() + '; domain=bwin.pt; path=/';
+}
+  </script>
+  <style>
+   .pc-banner-tile .pc-t-h-cont p.txt-xtr-small{ display:none;}
+
+.pc-banner-tile .pc-t-h-cont p.txt-xtr-small span{display:none!important;}
+
+mc-seoboxes p{max-height:none!important; min-height:auto!important;}
+
+.pc-txt mc-seoboxes h1, .pc-txt mc-seoboxes h2, .pc-txt mc-seoboxes h3{margin:15px 0 10px 0!important;}
+
+.footer-menu-section-title{ font-size:14px; font-weight:700; margin-bottom:0.75rem;}
+
+.footer-nav-seo-container .menu-item{display:block; width:170px;}
+
+mc-seoboxes .pc-txt p{max-height: none!important;}
+
+.portal-wrapper-fw .portal-center-wrapper{max-width:1080px!important;}
+
+footer .content-message .partners img, footer .content-message .payment-methods-content img, footer .content-message .social-content img, .footer-nav-logos .footer-nav-link:not(.btn) img{height:30px!important;}
+
+#mypromotions-page .header-ctrl-light-ph{ margin:0;}
+
+@media screen and (min-width: 300px) and (max-width: 768px) {
+    .big-campaign-top-msg em{text-shadow:1px 1px #000; color:#fc0;}
+    .big-campaign-top-msg .reg-big-campaign_message .inner-text {  width:130px; right:30px;}
+    .big-campaign-top-msg .small-tnc{font-size:10px!important;}
+    }
+
+.content-message.portugal{color:#333;}
+
+.rules-header-image .rules-header-image-section .rules-image-title{margin-top:90px; display:none;}
+
+
+@media screen and (min-width: 320px){
+   .tabs .rules-sec:before, .rules-sec:before{top:26%!important;}
+.casino-sr-card-widget{background: linear-gradient(rgba(117,117,117,1) 0%, rgba(0,0,0,1) 71%)!important;}
+}
+
+
+
+@media screen and (min-width:720px){
+   .tabs .rules-sec:before{top:30%!important;}
+.casino-sr-card-widget{background: linear-gradient(rgba(117,117,117,1) 0%, rgba(0,0,0,1) 71%)!important;}
+}
+
+.sr-card-container-bottom{background:#000000!important;}
+
+.sr-card-container-bottom .sr-card-placeholder{background: none!important;}
+
+.casino-sr-sub-wrapper .casino-wrapper-sr .sr1-card-leaderboard .casino-sr-card-wrapper-non-touch .casino-sr-card-widget,
+.casino-sr-card-wrapper-non-touch .casino-sr-card-widget,
+.casino-race-info-container .casino-sr-card-widget
+
+{background: rgba(117,117,117)!important; background: linear-gradient(rgba(117,117,117,1) 0%, rgba(0,0,0,1) 71%)!important;}
+
+
+.points-panel .total-points .total-points-value{background: rgba(0, 0, 0, .6)!important; color:#fff!important;}
+  </style>
+  <link href="//www.googletagmanager.com" rel="dns-prefetch"/>
+  <link href="//fonts.gstatic.com" rel="dns-prefetch"/>
+  <link href="//fonts.googleapis.com" rel="dns-prefetch"/>
+  <link href="//www.facebook.com" rel="dns-prefetch"/>
+  <link href="//connect.facebook.net" rel="dns-prefetch"/>
+  <link href="//sdk-cdn.optimove.net" rel="dns-prefetch"/>
+  <link href="//gvctracksdk.optimove.net" rel="dns-prefetch"/>
+  <link href="//media.itsfogo.com" rel="dns-prefetch"/>
+  <link href="//scmedia.itsfogo.com" rel="dns-prefetch"/>
+  <meta content="telephone=no" name="format-detection"/>
+  <style id="css-overrides" type="text/css">
+   @media (min-width: 600px) {
+        .am-wrapper .am-items.am-footer {
+              padding-bottom: 64px;
+         }
+}
+.h-product-nav .tab-nav-link {
+    --vn-menu-item-align-items: flex-end !important;
+}
+
+footer .footer-top-links .footer-nav-link:not(.btn) {
+    margin-bottom: var(--site-spacer-tiny);
+    margin-top: var(--site-spacer-tiny);
+}
+:root {
+    --color-betboo:         #ca3b1b;
+    --color-borgata:        #000;
+    --color-bwin:           #000;
+    --color-casinoclub:     #5d0102;
+    --color-cheekybingo:    #b31172;
+    --color-coral:          #084d8d;
+    --color-foxybingo:      #412175;
+    --color-foxygames:      #000a8c;
+    --color-galabingo:      #082ba6;
+    --color-galacasino:     #222;
+    --color-galaspins:      #2b3151;
+    --color-gamebookers:    #343236;
+    --color-ladbrokes:      #f01e28;
+    --color-partycasino:    #211551;
+    --color-partypoker:     #0f0f10;
+    --color-sportingbet:    #0988d1;
+   --color-vistabet: #000000;
+   --color-partysports: #0f0f10;
+   --color-ninjacasino: #1e2225;
+}
+.app-root {
+display: block !important
+}
+.vn-player-break-panel .generic-modal-content-wrapper .play-break-livechat-container {
+    display: none;
+}
+.toast-container button.theme-ex {
+    background: transparent;
+    border: 0;
+    color: #acacac;
+    cursor: pointer;
+    float: right;
+    font-size: 0.75rem;
+    padding: 0;
+    position: relative;
+    right: -0.3rem;
+    top: -0.3rem;
+}
+#rtmsNotify .real-time-toast .close-btn:before {
+    color: #acacac;
+}
+.toast-container button.theme-ex > span[class^='ng-tns-'] {
+    display: none;
+}
+.content-message.theme-success-i,
+.content-message.theme-check::before,
+.content-message-lg.theme-success-i,
+.content-message-lg.theme-check::before {
+  background: var(--color-white);
+  border-radius: 50%;
+  color: var(--theme-success);
+  font-size: 14px;
+  padding: 2px;
+}
+.message-panel > div.theme-success-i, .message-panel > div.theme-check {
+  background: var(--theme-success);
+  border-color: var(--theme-success);
+  color: var(--color-white);
+}
+.message-panel > div.theme-success-i .cms-container h3, .message-panel > div.theme-check .cms-container h3 {
+  color: var(--color-white);
+}
+.message-panel > div.theme-success-i a:not(.btn):not(.link-element), .message-panel > div.theme-check a:not(.btn):not(.link-element) {
+  color: var(--color-white);
+}
+.message-panel > div.theme-success-i.link-external, .message-panel > div.theme-check.link-external {
+  color: var(--color-white);
+}
+.message-panel > div.theme-success-i::before, .message-panel > div.theme-check::before {
+  color: var(--color-white);
+}
+.brand-logo {
+        background: url('https://scmedia.itsfogo.com/$-$/b823fa8dc20f4c3ba4a4469d694907b3.svg') no-repeat center transparent;
+        background-size: contain;
+}
+
+
+
+.grecaptcha-badge { visibility: hidden; }
+#onetrust-consent-sdk a,
+#onetrust-consent-sdk a:focus,
+#onetrust-consent-sdk button,
+#onetrust-consent-sdk button:focus,
+#onetrust-consent-sdk .ot-cat-item:focus,
+#onetrust-consent-sdk .category-menu-switch-handler:focus,
+#onetrust-pc-sdk .ot-chkbox input:focus+label:before {
+    outline-width: 0 !important;
+}
+
+#onetrust-pc-sdk .ot-hlst-cntr .ot-link-btn,
+#onetrust-pc-sdk .ot-hlst-cntr .ot-link-btn:hover,
+#onetrust-pc-sdk a.category-host-list-handler,
+#onetrust-pc-sdk a.category-host-list-handler:hover {
+    text-decoration: underline;
+}
+
+#onetrust-pc-sdk .pc-header,
+#onetrust-pc-sdk .ot-pc-header {
+    background: #000 !important;
+}
+
+#onetrust-pc-sdk .pc-header #pc-title,
+#onetrust-pc-sdk .ot-pc-header #ot-pc-title { 
+    color: #FFF !important;
+}
+
+#onetrust-pc-sdk #close-pc-btn-handler.pc-close-button.ot-close-icon,
+#onetrust-pc-sdk #close-pc-btn-handler.ot-close-icon {
+    filter: invert(1);
+    background-color: transparent !important;
+}
+
+#onetrust-pc-sdk .pc-logo,
+#onetrust-pc-sdk .ot-pc-logo {
+    background: url('https://scmedia.itsfogo.com/$-$/b823fa8dc20f4c3ba4a4469d694907b3.svg') !important;
+    background-size: 50% !important;
+    background-position: left center !important;
+    background-repeat: no-repeat !important;
+}
+
+#onetrust-consent-sdk #onetrust-pc-sdk #pc-title:after,
+#onetrust-consent-sdk #onetrust-pc-sdk #ot-pc-title:after {
+    background-color: transparent !important;
+}
+
+#onetrust-consent-sdk #onetrust-pc-sdk .active-group,
+#onetrust-consent-sdk #onetrust-pc-sdk .ot-active-menu {
+    border-color: #fc0 !important;
+}
+
+#onetrust-banner-sdk #onetrust-accept-btn-handler,
+#onetrust-banner-sdk #onetrust-reject-all-handler,
+#onetrust-consent-sdk #onetrust-pc-sdk button:not(.ot-link-btn):not(.ot-host-box):not(.ot-close-icon):not(#clear-filters-handler),
+#onetrust-consent-sdk #onetrust-pc-sdk .ot-leg-btn-container .ot-active-leg-btn {
+    background-color: #fc0 !important;
+    border-color: #fc0 !important;
+    color: #000 !important;
+}
+
+#onetrust-pc-sdk .toggle .checkbox input:checked+label:after,
+#onetrust-pc-sdk .ot-toggle .checkbox input:checked+label:after {
+    background: #fc0 !important;
+}
+
+#onetrust-pc-sdk .ot-tgl input:checked+.ot-switch .ot-switch-nob:before {
+    background: #fc0 !important;
+}
+
+#onetrust-pc-sdk .ot-desc-cntr {
+    outline: none !important;
+}
+
+#onetrust-pc-sdk .ot-pc-footer-logo {
+  display: none;
+}
+
+@media (max-width: 640px) {
+#onetrust-pc-sdk.otPcTab #ot-content {
+        height: calc(100% - 208px) !important;
+    }
+}
+
+@media (max-width: 425px) {
+    #onetrust-pc-sdk .ot-always-active-group .ot-tgl-cntr {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 640px) {
+    #onetrust-pc-sdk .ot-pc-header .ot-title-cntr {
+        width: 85%
+    }
+    #onetrust-pc-sdk .ot-pc-header #ot-pc-title {
+        font-size: 1em;
+        padding-right: 1.5em;
+    }
+    #onetrust-pc-sdk .ot-pc-header .ot-pc-logo {
+        background-size: contain !important;
+        min-width: 60px;
+    }
+}
+
+#onetrust-pc-sdk .ot-pc-header #ot-pc-title:before {
+    content: none;
+}
+vn-am-list-layout > .am-menu-items:before {
+    display: none;
+}
+
+.ch-account-menu-v3__wrapper .am-wrapper .am-menu-items.ui-icon {
+    padding: 0;
+}
+
+.earlypayout-activation-modal .conditions-list:nth-child(3) {
+display : none !important;
+}
+
+
+.event-animation.betradar-animation{
+height: auto !important;
+max-height: unset !important;
+}
+
+
+	@font-face {
+		font-family: 'sportsicons-lottery';
+		src: url(data:application/x-font-woff;charset=utf-8;base64,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)
+			format('woff');
+		font-style: normal;
+		font-weight: 400;
+	}
+
+	.sports-icon.sports-98, .sport-icon.sports-98, .icon .sports-98 {
+		font-family: sportsicons-lottery !important;
+	}
+
+	.sports-98::before {
+		content: '\e900' !important;
+	}
+  </style>
+  <link href="https://scmedia.itsfogo.com/$-$/c27fbce4bdf84700990ff0544e003b23.png" rel="apple-touch-icon" sizes="180x180"/>
+  <link href="https://scmedia.itsfogo.com/$-$/7377673791a642239bcbc8a5091351e6.png" rel="icon" sizes="32x32" type="image/png"/>
+  <link href="https://scmedia.itsfogo.com/$-$/2dafa44408d74c6b96531b5b135bb360.png" rel="icon" sizes="16x16" type="image/png"/>
+  <link crossorigin="use-credentials" href="/site.webmanifest" rel="manifest"/>
+  <link color="#000000" href="https://scmedia.itsfogo.com/$-$/373b77e42f8a4617a38902b4f5cdf2cd.svg" rel="mask-icon"/>
+  <link href="https://scmedia.itsfogo.com/$-$/947e0034cbd8481b992cf07f728a09b8.ico" rel="shortcut icon"/>
+  <meta content="#ffcc00" name="msapplication-TileColor"/>
+  <meta content="/browserconfig.xml" name="msapplication-config"/>
+  <meta content="#000000" name="theme-color"/>
+  <link href="https://sports.bwin.pt/pt/sports/futebol-4/apostar/it%c3%a1lia-20/s%c3%a9rie-b-102848" rel="canonical"/>
+  <meta content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/>
+  <meta content="on" http-equiv="cleartype"/>
+  <base href="/"/>
+  <link as="font" crossorigin="anonymous" href="/ClientDist/assets/fonts/sportsicons.jg64y.woff2" rel="preload"/>
+  <script type="text/javascript">
+   window.__zone_symbol__BLACK_LISTED_EVENTS = ['requestAnimationFrame', 'message', 'scroll', 'mousemove', 'mouseup', 'pointermove'];
+	window.__Zone_disable_requestAnimationFrame = true;
+	window.prerenderReady = false;
+		
+	var preloadPagePrefix = "/pt/sports";
+	var preloadGroupingUrl = "https://cds-api.bwin.pt/offer-grouping/grid-view/all?x-bwin-accessid=YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx&lang=pt&country=PT&usercountry=PT";
+  </script>
+  <style>
+   .splash,.splash-loading-spinner{position:absolute;z-index:9999;left:0}.betstation-inactivity-screen{display:none}.theme-coral-betstation .betstation-inactivity-screen,.theme-ladbrokes-betstation .betstation-inactivity-screen{display:flex}.splash{--splash-bg:#000;--splash-spinner-top:calc(50% + 35vh / 2);background:var(--splash-bg);height:100%;opacity:1;overflow:hidden;top:0;width:100%}.splash-loading-wrapper{align-items:center;display:flex;flex-direction:column;height:100%;justify-content:center;text-align:center;width:100%}.splash-loading-logo{height:35vh;max-width:500px;width:90vw}.splash-loading-spinner,.splash-loading-spinner:after{border-radius:50%;width:3rem;height:3rem}.splash-loading-spinner{margin:auto;border:.5rem solid rgba(255,204,0,.2);border-left-color:#fc0;outline:1px solid rgba(255,255,255,0);transform:translateZ(0);animation:loadingspinnerrotate 1.1s linear infinite;bottom:0;box-sizing:border-box;right:0;top:var(--splash-spinner-top)}.splash-loading-spinner.alt-loading-spinner{border-color:rgba(0,0,0,.5) rgba(0,0,0,.5) rgba(0,0,0,.5) #000}@media (max-width:959.98px){.splash{--splash-spinner-top:calc(50% + 55vh / 2)}.splash .splash-loading-wrapper{justify-content:flex-start!important}.splash .splash-loading-wrapper .splash-loading-logo{height:30vh;max-width:200px;width:40vw}.splash .splash-loading-wrapper .splash-loading-spinner{border:.2rem solid rgba(255,204,0,.2);border-left:.2em solid #fc0;height:2.5em;width:2.5em}}.app-root{display:none}@keyframes loadingspinnerrotate{0%{transform:rotate(0)}to{transform:rotate(1turn)}}.splash.splash-x-product{--splash-bg:#141414;--splash-spinner-top:0}
+  </style>
+  <style type="text/css">
+   /*
+  @angular/flex-layout - workaround for possible browser quirk with mediaQuery listeners
+  see http://bit.ly/2sd4HMP
+*/
+@media screen and (min-width: 600px), screen and (min-width: 960px), screen and (min-width: 1280px), screen and (min-width: 1600px), screen and (min-width: 1920px), screen and (min-width: 1920px), (max-height: 479px), (min-height: 480px), screen and (min-width: 1920px) and (max-width: 4999.98px), screen and (max-width: 1919.98px), screen and (min-width: 1280px) and (max-width: 1919.98px), screen and (min-width: 1600px) and (max-width: 1919.9px), screen and (max-width: 1599.9px), screen and (max-width: 1279.98px), screen and (min-width: 1280px) and (max-width: 1599.9px), screen and (max-width: 1279.9px), screen and (min-width: 960px) and (max-width: 1279.98px), screen and (max-width: 959.98px), screen and (min-width: 600px) and (max-width: 959.98px), screen and (max-width: 599.98px), screen and (min-width: 0px) and (max-width: 599.98px), print {.fx-query-test{ }}
+  </style>
+  <link href="/ClientDist/themes-black-dark-theme.30c613f15f0819be18aa.css" rel="stylesheet" type="text/css"/>
+  <link href="/ClientDist/themes-black-dark-theme-media-min-width-600.d9befccae7e006750bf7.css" media="screen and (min-width: 600px)" rel="stylesheet" type="text/css"/>
+  <link href="/ClientDist/themes-black-dark-sports.7729419441d42ff57877.css" rel="stylesheet" type="text/css"/>
+  <link href="/ClientDist/themes-black-dark-authentication.3b8ee379fe0851c656e0.css" rel="stylesheet" type="text/css"/>
+  <link href="/ClientDist/themes-black-dark-navigation-layout.51b9f619d1975a3e03b7.css" rel="stylesheet" type="text/css"/>
+  <link href="/ClientDist/themes-black-dark-lazy.182a21a9b58a73b760c3.css" rel="stylesheet" type="text/css"/>
+  <style>
+   .ngxp__container{display:none;position:absolute;border-radius:3px;border:1px solid grey;box-shadow:0 0 2px rgba(0,0,0,.5);padding:10px}.ngxp__container.ngxp__animation{-webkit-animation:150ms ease-out ngxp-fadeIn;animation:150ms ease-out ngxp-fadeIn}.ngxp__container>.ngxp__arrow{border-color:grey;width:0;height:0;border-style:solid;position:absolute;margin:5px}.ngxp__container[x-placement^=bottom],.ngxp__container[x-placement^=left],.ngxp__container[x-placement^=right],.ngxp__container[x-placement^=top]{display:block}.ngxp__container[x-placement^=top]{margin-bottom:5px}.ngxp__container[x-placement^=top]>.ngxp__arrow{border-width:5px 5px 0;border-right-color:transparent;border-bottom-color:transparent;border-left-color:transparent;bottom:-5px;left:calc(50% - 5px);margin-top:0;margin-bottom:0}.ngxp__container[x-placement^=top]>.ngxp__arrow.__force-arrow{border-right-color:transparent!important;border-bottom-color:transparent!important;border-left-color:transparent!important}.ngxp__container[x-placement^=bottom]{margin-top:5px}.ngxp__container[x-placement^=bottom]>.ngxp__arrow{border-width:0 5px 5px;border-top-color:transparent;border-right-color:transparent;border-left-color:transparent;top:-5px;left:calc(50% - 5px);margin-top:0;margin-bottom:0}.ngxp__container[x-placement^=bottom]>.ngxp__arrow.__force-arrow{border-top-color:transparent!important;border-right-color:transparent!important;border-left-color:transparent!important}.ngxp__container[x-placement^=right]{margin-left:5px}.ngxp__container[x-placement^=right]>.ngxp__arrow{border-width:5px 5px 5px 0;border-top-color:transparent;border-bottom-color:transparent;border-left-color:transparent;left:-5px;top:calc(50% - 5px);margin-left:0;margin-right:0}.ngxp__container[x-placement^=right]>.ngxp__arrow.__force-arrow{border-top-color:transparent!important;border-bottom-color:transparent!important;border-left-color:transparent!important}.ngxp__container[x-placement^=left]{margin-right:5px}.ngxp__container[x-placement^=left]>.ngxp__arrow{border-width:5px 0 5px 5px;border-top-color:transparent;border-bottom-color:transparent;border-right-color:transparent;right:-5px;top:calc(50% - 5px);margin-left:0;margin-right:0}.ngxp__container[x-placement^=left]>.ngxp__arrow.__force-arrow{border-top-color:transparent!important;border-bottom-color:transparent!important;border-right-color:transparent!important}@-webkit-keyframes ngxp-fadeIn{0%{display:none;opacity:0}1%{display:block;opacity:0}100%{display:block;opacity:1}}@keyframes ngxp-fadeIn{0%{display:none;opacity:0}1%{display:block;opacity:0}100%{display:block;opacity:1}}
+  </style>
+ </head>
+ <body>
+  <script type="text/javascript">
+   var dataLayer = [];
+  </script>
+  <script>
+   (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='//www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})
+(window,document,'script','dataLayer','GTM-N48RN3R');
+  </script>
+  <noscript>
+   <iframe height="0" src="//www.googletagmanager.com/ns.html?id=GTM-N48RN3R" style="display:none;visibility:hidden" width="0">
+   </iframe>
+  </noscript>
+  <vn-app class="app-root" ng-version="12.1.1">
+   <vn-dynamic-layout-single-slot class="slot slot-single slot-banner" slot="banner">
+    <!-- -->
+   </vn-dynamic-layout-single-slot>
+   <vn-dynamic-layout-multi-slot class="slot slot-single slot-messages" slot="messages">
+    <vn-header-messages>
+     <vn-content-messages class="content-messages-top" closedcookiekey="vn-t" cssclassforhtmlnode="has-header-messages">
+      <!-- -->
+     </vn-content-messages>
+     <!-- -->
+    </vn-header-messages>
+    <!-- -->
+    <!-- -->
+    <!-- -->
+   </vn-dynamic-layout-multi-slot>
+   <vn-dynamic-layout-single-slot class="slot slot-single slot-header" slot="header" vnelementkey="HEADER_SLOT">
+    <vn-responsive-header>
+     <header class="header">
+      <vn-content-messages class="content-messages-header-top" closedcookiekey="vn-ts">
+       <!-- -->
+      </vn-content-messages>
+      <vn-dynamic-layout-multi-slot class="slot slot-single slot-header_top_items" slot="header_top_items">
+       <!-- -->
+      </vn-dynamic-layout-multi-slot>
+      <!-- -->
+      <nav class="navbar navbar-expand-md">
+       <vn-header-section class="navbar-wrapper-left product-nav-wrapper">
+        <vn-h-logo>
+         <a alt="Início" class="h-logo navbar-logo-wrapper" href="https://sports.bwin.pt/pt/sports">
+          <div class="navbar-switch-logo brand-logo">
+          </div>
+         </a>
+        </vn-h-logo>
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+        <!-- -->
+       </vn-header-section>
+       <vn-header-section class="navbar-wrapper-right">
+        <vn-h-button>
+         <vn-menu-item class="menu-item" linkclass="header-btn btn" section="Header">
+          <a class="menu-item-link header-btn btn btn-header" href="https://www.bwin.pt/pt/labelhost/login" poppertrigger="none">
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <span class="menu-item-txt">
+            ENTRAR
+           </span>
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+          </a>
+          <!-- -->
+          <!-- -->
+          <vn-popper-content closetype="button" showcloselink="false">
+           <popper-content class="ngxp__tooltip tooltip-info">
+            <div aria-hidden="true" class="ngxp__container ngxp__animation" role="popper" style="display: none; opacity: 0;">
+             <!-- -->
+             <div class="ngxp__inner">
+              <span class="ui-icon ui-close theme-ex">
+              </span>
+              <!-- -->
+              <div>
+               <div>
+               </div>
+               <!-- -->
+              </div>
+              <div class="popper-buttons">
+               <!-- -->
+              </div>
+             </div>
+             <!-- -->
+             <div class="ngxp__arrow">
+             </div>
+            </div>
+           </popper-content>
+           <!-- -->
+          </vn-popper-content>
+          <!-- -->
+          <!-- -->
+          <!-- -->
+          <!-- -->
+         </vn-menu-item>
+        </vn-h-button>
+        <!-- -->
+        <!-- -->
+        <vn-h-button>
+         <vn-menu-item class="menu-item" linkclass="header-btn btn" section="Header">
+          <a class="menu-item-link header-btn btn btn-primary" href="https://www.bwin.pt/pt/mobileportal/register" poppertrigger="none">
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <span class="menu-item-txt">
+            Registar
+           </span>
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+           <!-- -->
+          </a>
+          <!-- -->
+          <!-- -->
+          <vn-popper-content closetype="button" showcloselink="false">
+           <popper-content class="ngxp__tooltip tooltip-info">
+            <div aria-hidden="true" class="ngxp__container ngxp__animation" role="popper" style="display: none; opacity: 0;">
+             <!-- -->
+             <div class="ngxp__inner">
+              <span class="ui-icon ui-close theme-ex">
+              </span>
+              <!-- -->
+              <div>
+               <div>
+               </div>
+               <!-- -->
+              </div>
+              <div class="popper-buttons">
+               <!-- -->
+              </div>
+             </div>
+             <!-- -->
+             <div class="ngxp__arrow">
+             </div>
+            </div>
+           </popper-content>
+           <!-- -->
+          </vn-popper-content>
+          <!-- -->
+          <!-- -->
+          <!-- -->
+          <!-- -->
+         </vn-menu-item>
+        </vn-h-button>
+        <!-- -->
+        <!-- -->
+        <!-- -->
+       </vn-header-section>
+       <!-- -->
+       <!-- -->
+      </nav>
+      <!-- -->
+      <vn-dynamic-layout-multi-slot class="slot slot-single slot-header_bottom_items" slot="header_bottom_items">
+       <ms-navigation>
+        <!-- -->
+        <div class="az-menu-container">
+        </div>
+       </ms-navigation>
+       <!-- -->
+       <!-- -->
+       <ms-breadcrumbs class="breadcrumb hidden">
+        <div class="breadcrumb-back">
+         <span class="breadcrumb-theme-left">
+          <i class="theme-left">
+          </i>
+         </span>
+        </div>
+        <!-- -->
+        <!-- -->
+        <!-- -->
+       </ms-breadcrumbs>
+       <!-- -->
+       <!-- -->
+       <ms-sub-navigation>
+        <!-- -->
+        <!-- -->
+       </ms-sub-navigation>
+       <!-- -->
+       <!-- -->
+       <!-- -->
+      </vn-dynamic-layout-multi-slot>
+      <!-- -->
+     </header>
+     <!-- -->
+     <vn-dynamic-layout-single-slot class="slot slot-single slot-header_subnav" slot="header_subnav">
+      <!-- -->
+     </vn-dynamic-layout-single-slot>
+    </vn-responsive-header>
+    <!-- -->
+    <!-- -->
+    <!-- -->
+   </vn-dynamic-layout-single-slot>
+   <vn-dynamic-layout-single-slot class="slot slot-single slot-menu" slot="menu">
+    <!-- -->
+   </vn-dynamic-layout-single-slot>
+   <vn-dynamic-layout-single-slot class="slot slot-single slot-main" slot="main">
+    <vn-main>
+     <main>
+      <div id="main-content">
+       <router-outlet>
+       </router-outlet>
+       <!-- -->
+       <vn-dynamic-layout-single-slot class="slot slot-single slot-background" slot="background">
+        <!-- -->
+       </vn-dynamic-layout-single-slot>
+      </div>
+     </main>
+    </vn-main>
+    <!-- -->
+    <!-- -->
+    <!-- -->
+   </vn-dynamic-layout-single-slot>
+   <vn-dynamic-layout-multi-slot class="slot slot-single slot-app" slot="app">
+    <ms-critical-error>
+     <!-- -->
+    </ms-critical-error>
+    <!-- -->
+    <!-- -->
+    <lh-chat>
+     <!-- -->
+     <div class="chat-container-trigger-area" hidden="" id="chartContainerBubble">
+     </div>
+    </lh-chat>
+    <!-- -->
+    <!-- -->
+    <vn-bottom-nav>
+     <!-- -->
+    </vn-bottom-nav>
+    <!-- -->
+    <!-- -->
+    <!-- -->
+   </vn-dynamic-layout-multi-slot>
+   <vn-dynamic-layout-single-slot class="slot slot-single slot-footer" slot="footer">
+    <!-- -->
+   </vn-dynamic-layout-single-slot>
+   <vn-loading-indicator>
+    <div class="loading">
+     <div>
+     </div>
+     <!-- -->
+     <span>
+      Por favor aguarda...
+     </span>
+    </div>
+   </vn-loading-indicator>
+   <vn-dynamic-layout-multi-slot class="slot slot-single slot-bottom" slot="bottom">
+    <vn-overlay>
+     <div hidden="" id="main-overlay" style="touch-action: pan-y; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+     </div>
+    </vn-overlay>
+    <!-- -->
+    <!-- -->
+    <!-- -->
+   </vn-dynamic-layout-multi-slot>
+  </vn-app>
+  <noscript>
+   &lt;p&gt;Esta aplica&amp;ccedil;&amp;atilde;o requer o uso de Javascript para a melhor funcionalidade e experi&amp;ecirc;ncia de utilizador. O seu browser ou dispositivo pode n&amp;atilde;o suportar Javascript ou ent&amp;atilde;o poder&amp;aacute; estar desligado.&lt;/p&gt;
+&lt;br /&gt;
+  </noscript>
+  <script type="text/javascript">
+   window.script_load.start('body-25')
+  </script>
+  <script id="body-25" onload="window.script_load.onEnd(this)" src="/ClientDist/preloader.bcebe6842b5e00f5e3bb.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-26')
+  </script>
+  <script id="body-26" onload="window.script_load.onEnd(this)" src="/ClientDist/runtime-es2015.3c41999ce052ee315d85.js" type="module">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-27')
+  </script>
+  <script id="body-27" onload="window.script_load.onEnd(this)" src="/ClientDist/polyfills-es2015.9083a8e475b58f0df171.js" type="module">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-28')
+  </script>
+  <script id="body-28" onload="window.script_load.onEnd(this)" src="/ClientDist/vendor-es2015.e7abc92bc575e05cd4c1.js" type="module">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-29')
+  </script>
+  <script id="body-29" onload="window.script_load.onEnd(this)" src="/ClientDist/main-es2015.26679f32b6ca2b0e8c38.js" type="module">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-30')
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-31')
+  </script>
+  <script defer="" id="body-31" nomodule="" onload="window.script_load.onEnd(this)" src="/ClientDist/runtime-es5.3c41999ce052ee315d85.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-32')
+  </script>
+  <script defer="" id="body-32" nomodule="" onload="window.script_load.onEnd(this)" src="/ClientDist/polyfills-es5.9083a8e475b58f0df171.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-33')
+  </script>
+  <script defer="" id="body-33" nomodule="" onload="window.script_load.onEnd(this)" src="/ClientDist/vendor-es5.e7abc92bc575e05cd4c1.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-34')
+  </script>
+  <script defer="" id="body-34" nomodule="" onload="window.script_load.onEnd(this)" src="/ClientDist/main-es5.26679f32b6ca2b0e8c38.js" type="text/javascript">
+  </script>
+  <script type="text/javascript">
+   window.script_load.start('body-35')
+  </script>
+  <script defer="" id="body-35" nomodule="" onload="window.script_load.onEnd(this)" src="/ClientDist/locales/pt-es5.d8072032f1174001c7a6.js" type="text/javascript">
+  </script>
+  <script defer="" id="zendes" src="https://scmedia.itsfogo.com/$-$/3c86b8342e8d47488909150ca7bebb58.js">
+  </script>
+  <script defer="" id="dynacon-alloy-js" src="//scmedia.itsfogo.com/$-$/f3055fec74cf4ab4840084b9b11d6a99.js">
+  </script>
+  <script defer="" id="dynacon-at-js" src="//scmedia.itsfogo.com/$-$/31d5a768e2c4428a807409bb99665488.js">
+  </script>
+  <script type="text/javascript">
+   window.afterViewInitScripts = {};
+  </script>
+  <!-- Rendered: 2022-02-17T19:03:14.4718141Z -->
+  <script type="text/javascript">
+   window.__rendered = new Date('2022-02-17T19:03:14.4718141Z')
+  </script>
+  <div aria-atomic="true" aria-live="polite" class="cdk-live-announcer-element cdk-visually-hidden">
+  </div>
+ </body>
+</html>
