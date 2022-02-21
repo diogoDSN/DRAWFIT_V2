@@ -3,8 +3,8 @@ import requests as r
 from datetime import datetime 
 import json
 
-REGION_ID = '134'
-COMPETITION_ID = '2129'
+REGION_ID = '20'
+COMPETITION_ID = '102848'
 
 
 def buildQuery(regionID='20', competitionID='102848'):
@@ -95,10 +95,8 @@ def updateDataBase(newOdds):
     #TODO
 
 
-
-
 # Creates the request url
-bwin_url = "https://cds-api.bwin.pt/bettingoffer/fixtures?" + buildQuery(REGION_ID, COMPETITION_ID)
+bwin_url = "https://cds-api.bwin.pt/bettingoffer/fixtures?" + buildQuery(competitionID=COMPETITION_ID, regionID=REGION_ID)
 
 # Makes request to api
 request = r.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
