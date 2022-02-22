@@ -7,7 +7,7 @@ REGION_ID = '20'
 COMPETITION_ID = '102848'
 
 
-def buildQuery(regionID='20', competitionID='102848'):
+def buildUrl(regionID='20', competitionID='102848'):
     query = {}
     query['x-bwin-accessid'] = 'YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx'
     query['lang'] = 'pt'
@@ -25,7 +25,7 @@ def buildQuery(regionID='20', competitionID='102848'):
     query['take'] = '50'
     query['sortBy'] = 'tags'
     
-    return u.parse.urlencode(query)
+    return "https://cds-api.bwin.pt/bettingoffer/fixtures?" + u.parse.urlencode(query)
 
 
 def getOddsLeague(leagueInfo):
@@ -96,7 +96,7 @@ def updateDataBase(newOdds):
 
 
 # Creates the request url
-bwin_url = "https://cds-api.bwin.pt/bettingoffer/fixtures?" + buildQuery(competitionID=COMPETITION_ID, regionID=REGION_ID)
+bwin_url =  buildUrl(competitionID=COMPETITION_ID, regionID=REGION_ID)
 
 # Makes request to api
 request = r.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})

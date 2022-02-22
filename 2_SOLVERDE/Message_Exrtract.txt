@@ -1,0 +1,23 @@
+Send: ["CONNECT\nprotocol-version:1.5\naccept-version:1.1,1.0\nheart-beat:10000,10000\n\n\u0000"]
+Recv: a["CONNECTED\nversion:1.1\nheart-beat:10000,10000\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/user/request-response\ndestination:/user/request-response\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/user/error\ndestination:/user/error\n\n\u0000"]
+Recv: a["MESSAGE\ntype:READY\ndestination:/user/request-response\ncontent-type:text/plain;charset=UTF-8\nsubscription:/user/request-response\nmessage-id:ssorwnik-30597814\ncontent-length:0\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/items/list/cms-coupons-soccer\ndestination:/api/items/list/cms-coupons-soccer\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/eventgroups/soccer-price-boosted-events\ndestination:/api/eventgroups/soccer-price-boosted-events\nlocale:pt\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/pt/promotions/desktop\ndestination:/api/pt/promotions/desktop\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/eventgroups/soccer-it-sb_type_19328-all-match-events-grouped-by-type\ndestination:/api/eventgroups/soccer-it-sb_type_19328-all-match-events-grouped-by-type\nlocale:pt\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/items/list/soccer-classes-with-match-events\ndestination:/api/items/list/soccer-classes-with-match-events\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/items/list/soccer-soccer-it-types-with-match-events\ndestination:/api/items/list/soccer-soccer-it-types-with-match-events\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/systeminformation/initialisation\ndestination:/api/systeminformation/initialisation\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/allsports/all-sports-with-events\ndestination:/api/allsports/all-sports-with-events\nlocale:pt\n\n\u0000"]
+Recv: a["MESSAGE\nid:/api/items/list/cms-coupons-soccer\ndestination:/user/request-response\ntype:FULL\ncontent-type:application/json\nsubscription:/user/request-response\nmessage-id:ssorwnik-30597815\ncontent-length:228\n\n{\"id\":\"cms-coupons-soccer\",\"valid\":true,\"lastTouched\":\"2022-02-22T21:42:22.758+00:00\",\"versionTag\":1,\"lastModified\":\"2022-02-22T02:02:23.010+00:00\",\"itemIds\":[{\"id\":\"cms-coupons-soccer-267908-all-match-events-grouped-by-type\"}]}\u0000"]
+Send: ["SUBSCRIBE\nid:/api/eventgroups/cms-coupons-soccer-267908-all-match-events-grouped-by-type\ndestination:/api/eventgroups/cms-coupons-soccer-267908-all-match-events-grouped-by-type\nlocale:pt\n\n\u0000"]
+
+
+
+
+Needed Comunication:
+Send: ["CONNECT\nprotocol-version:1.5\naccept-version:1.1,1.0\nheart-beat:10000,10000\n\n\u0000"]
+Recv: a["CONNECTED\nversion:1.1\nheart-beat:10000,10000\n\n\u0000"]
+Send: ["SUBSCRIBE\nid:/api/eventgroups/soccer-it-sb_type_19328-all-match-events-grouped-by-type\ndestination:/api/eventgroups/soccer-it-sb_type_19328-all-match-events-grouped-by-type\nlocale:pt\n\n\u0000"]

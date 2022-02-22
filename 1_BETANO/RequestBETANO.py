@@ -3,29 +3,14 @@ import requests as r
 from datetime import datetime 
 import json
 
-REGION_ID = '20'
-COMPETITION_ID = '102848'
+LEAGUE_ID = '10210'
 
 
-def buildQuery(regionID='20', competitionID='102848'):
+def buildUrl(leagueID='10210'):
     query = {}
-    query['x-bwin-accessid'] = 'YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx'
-    query['lang'] = 'pt'
-    query['country'] = 'PT'
-    query['userCountry'] = 'PT'
-    query['fixtureTypes'] = 'Standard'
-    query['state'] = 'Latest'
-    query['offerMapping'] = 'Filtered'
-    query['offerCategories'] = 'Gridable'
-    query['fixtureCategories'] = 'Gridable,NonGridable,Other'
-    query['sportIds'] = '4'
-    query['regionIds'] = regionID
-    query['competitionIds'] = competitionID
-    query['skip'] = '0'
-    query['take'] = '50'
-    query['sortBy'] = 'tags'
-    
-    return u.parse.urlencode(query)
+    query['req'] = 'la,s,tn,stnf,c,mb'
+
+    return "https://www.betano.pt/api/sport/futebol/ligas/" + leagueID + "r/?" + u.parse.urlencode(query)
 
 
 def getOddsLeague(leagueInfo):
@@ -96,13 +81,17 @@ def updateDataBase(newOdds):
 
 
 # Creates the request url
-bwin_url = "https://cds-api.bwin.pt/bettingoffer/fixtures?" + buildQuery(competitionID=COMPETITION_ID, regionID=REGION_ID)
+betano_url = buildUrl(LEAGUE_ID)
 
+print(betano_url)
 # Makes request to api
-request = r.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
+request = r.get(betano_url, headers={"User-Agent": "Mozilla/5.0"})
 
 # Turn json into data
 info = json.loads(request.text)
+
+print(info)
+'''
 
 # Gets the odds from the info
 odds = getOddsLeague(info)
@@ -111,3 +100,4 @@ odds = getOddsLeague(info)
 # Print the odds colected in an orderly manner
 for odd in odds:
     print(odd)
+'''
