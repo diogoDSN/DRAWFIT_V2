@@ -1,0 +1,15 @@
+Dictionary with keys:
+
+    data - actual data. Contains the keys:
+        sport
+        markets
+        blocks
+        leaguesList
+        breadcrumb
+        metaData
+        seoTranslations
+        
+    structureComponents
+    user
+    languages
+    companyId
