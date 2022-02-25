@@ -1,6 +1,12 @@
 import asyncio
 import websockets as ws
 import json
+from datetime import datetime
+
+
+# Information to define a league
+COUNTRY_CODE='it'
+LEAGUE_ID='19328'
 
 
 # Types of STOMP Messages to send
@@ -22,6 +28,7 @@ def create_stomp_msg(comd="", headers={}, content=""):
     return result
 
 def parse_stomp_msg(msg):
+
 
     if len(msg) < 10:
         return {}
@@ -53,18 +60,70 @@ def msg_dict():
     return result
 
 
-def league_game_query(ID=19328):
+def league_query(ID=19328, country_code='it'):
 
-    id_destination = "/api/eventgroups/soccer-it-sb_type_" + ID + "-all-match-events-grouped-by-type"
+    id_destination = "/api/eventgroups/soccer-" + country_code + "-sb_type_" + str(ID) + "-all-match-events-grouped-by-type"
     return create_stomp_msg("SUBSCRIBE", {"id":id_destination, "destination":id_destination, "locale":"pt"})
 
-def extract_odds(info):
+def game_query(ID=4914891889):
+
+    id_destination = "/api/events/" + str(ID)
+    return create_stomp_msg("SUBSCRIBE", {"id":id_destination, "destination":id_destination, "locale":"pt"})
 
 
-async def main_comm(leagueID=19328):
+
+
+def market_query(ID=4914893549):
+
+    id_destination = "/api/markets/" + str(ID)
+    return create_stomp_msg("SUBSCRIBE", {"id":id_destination, "destination":id_destination, "locale":"pt"})
+
+def extract_odds(market):
+
+    for bet in market['selectionMap']:
+        if market['selectionMap'][bet]['shortName'] == 'X':
+            return market['selectionMap'][bet]['prices'][0]['decimalLabel']
+
+# info' date format: "2022-02-20T17:00:00Z"
+def gameHasPassed(datetimeInfo):
+    # Create time vector
+    now = datetime.now()
+    curr_times = (now.year, now.month, now.day, now.hour, now.minute, now.second)
+
+    aux_str = ""
+    i = 0
+    for c in datetimeInfo:
+        if c not in ('-', ':', 'T', 'Z'):
+            if aux_str == "" and c == '0':
+                continue
+
+            aux_str += c
+
+        else:
+            if aux_str == "":
+                aux_str = "0"
+            game_time = eval(aux_str)
+
+            # Game time is before current time
+            if game_time < curr_times[i]:
+                return True
+            
+            # Game time is after current time
+            elif game_time > curr_times[i]:
+                return False
+
+            # This current and game time component coincide [for example both in the same year]
+            i += 1
+            aux_str = ""
+
+    return False
+
+
+async def main_comm(leagueID=19328, cc='it'):
 
     messages = msg_dict()
 
+    odds = []
 
     async with ws.connect("wss://apostas.solverde.pt/api/374/0iiv1wey/websocket") as websocket:
 
@@ -81,17 +140,25 @@ async def main_comm(leagueID=19328):
         answer = await websocket.recv()
 
         # Subscribe to league api and obtain event codes
-        await websocket.send(league_game_query(leagueID))
+        await websocket.send(league_query(leagueID, cc))
         events = parse_stomp_msg(await websocket.recv())
 
-        # note: this structures also contains start times
-        odds = []
+        # Extract odds of all games in league
         for event in events["groups"][0]["events"]:
-            await websocket.send(league_game_query(event['id']))
-            answer = parse_stomp_msg(await websocket.recv())
+            if gameHasPassed(event['startTime']):
+                continue
+            await websocket.send(game_query(event['id']))
+            game = parse_stomp_msg(await websocket.recv())
+            
 
-            odds = extract_odds(answer) 
+            await websocket.send(market_query(game['marketTypesToIds']['1'][0]))
+            market = parse_stomp_msg(await websocket.recv())
+                    
+            odds += [(game['name'], extract_odds(market), event['startTime'])]
 
-    return
+    return odds
 
-asyncio.run(main_comm())
+result = asyncio.run(main_comm(LEAGUE_ID, COUNTRY_CODE))
+
+for odd in result:
+    print(odd)
