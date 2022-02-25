@@ -1,6 +1,7 @@
 import urllib as u
 import requests as r
 from datetime import datetime 
+from time import localtime, strftime
 import json
 
 LEAGUE_ID = '10210'
@@ -13,24 +14,25 @@ def buildUrl(leagueID='10210'):
     return "https://www.betano.pt/api/sport/futebol/ligas/" + leagueID + "r/?" + u.parse.urlencode(query)
 
 
-def getOddsLeague(leagueInfo):
-    oddsList = [] #TODO
-    # Fixtures are information packages on specific games
-    for game in leagueInfo['fixtures']:
-        # Test if game has passed [started]
-        if gameHasPassed(game['startDate']):
-            continue
+def getOddsLeague(leaguesInfo):
+    oddsList = []
 
-        # optionMarkets are the available markets to bet on for this game
-        for market in game['optionMarkets']:
-            if market['name']['value'] == 'Resultado do jogo':
-                # Options contains the multiles bet options in this market
-                for bet in market['options']:
-                    if bet['name']['value'] == 'X':
-                        # Append tupple (game, odd) to the list off obtained odds
-                        oddsList.append((game['name']['value'], bet['price']['odds']))
-    
+    for league in leaguesInfo["data"]["blocks"]:
+        for event in league["events"]:
+            if gameHasPassed(betanoEpochConverter(event["startTime"])):
+                continue
+            for market in event["markets"]:
+                if market["name"] == "Resultado Final":
+                    for bet in market["selections"]:
+                        if bet["name"] == "X":
+                            oddsList += [(event["name"],bet["price"],betanoEpochConverter(event["startTime"]))]
+                            break
+                    break
     return oddsList
+
+
+def betanoEpochConverter(epochTime):
+    return strftime('%Y-%m-%dT%H:%M:%SZ', localtime(epochTime))
 
 
 # info' date format: "2022-02-20T17:00:00Z"
@@ -83,21 +85,15 @@ def updateDataBase(newOdds):
 # Creates the request url
 betano_url = buildUrl(LEAGUE_ID)
 
-print(betano_url)
 # Makes request to api
 request = r.get(betano_url, headers={"User-Agent": "Mozilla/5.0"})
 
 # Turn json into data
 info = json.loads(request.text)
 
-print(info)
-'''
 
-# Gets the odds from the info
 odds = getOddsLeague(info)
-
 
 # Print the odds colected in an orderly manner
 for odd in odds:
     print(odd)
-'''

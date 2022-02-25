@@ -1,12 +1,12 @@
 ----------------------------------------------
 SITES:
 (ordem prioridade)
-bwin
-betano
-solverde - (pode ser mais difícil, odds no flashscore q n estao ainda no site)
-moosh
+bwin - Done
+betano - Done
+solverde - Done
+moosh - Done
 betway
-betclic
+betclic - Done
 
 ----------------------------------------------
 LIGAS:

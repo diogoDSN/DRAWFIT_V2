@@ -4,6 +4,8 @@ import json
 from datetime import datetime
 
 
+LEAGUE_NAME="Itália - Série B"
+
 def build_url():
 
     return "wss://sbapi.sbtech.com/mooshpt/sportscontent/sportsbook/v1/Websocket?jwt=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJTZXNzaW9uSVAiOiIxNzYuNzguMjYuMTMwIiwiU2l0ZUlkIjoxNTEsIlZlcnNpb24iOiIyIiwiU2Vzc2lvbklkIjoiZTQ1ZTFmNzctNjg0OS00NmVmLTgzYTQtM2IwZDc5NzQ4YzE5IiwibmJmIjoxNjQ1Nzg5MDA3LCJleHAiOjE2NDYzOTM4MzcsImlhdCI6MTY0NTc4OTAzNywiaXNzIjoiQXN5bW1ldHJpY1Rva2VuTWFuYWdlciJ9.LdMjqv34g_F1gCHics_7lk7YL6c_22yYiMc2lmLkaIdIyNsUx8Nd5wDdHGbd9jqipjtxET3pFc1yrdhcTrvyIDwf-EyCMLtk3S_2pVxucNPl4-cUxB-75bJasRMFacyGPw2gJj0eL_OVn2nc5j-rB1HtONCx6GVjIQa-_IXbds1ffIzYmKM0FK_iszouCOganneKjJWLIFkaWta8D8X8D5ox2fgbfbhTAE4mSQktSjhf6Ae0jZr3bfp8r0TymMGXNdaYN7lk71bGsFLsXtYpScVQdUQvd4XqzGZ_L_yBOZ-4qeKbtRi6r35kbVeroQpaaqr4sGwUVkKzTV739Vtt-Q&locale=pt-pt"
@@ -35,7 +37,7 @@ def prepEventsRequest(sportID="1", leagueID="42884", ptID=180):
     res={}
     res["jsonrpc"] = "2.0"
     res["params"] = {"eventState": "Mixed", "eventTypes": [], "ids":[], "regionIds":[], "pagination":{}, "marketTypeRequests":[]}
-    res["method"] = "GetEventsByLeague"
+    res["method"] = "GetEventsByLeagueId"
     res["meta"] = {"blockId": "eventsWrapper-Center_LeagueViewResponsiveBlock_20002"}
     res["id"] = "7204af80-f77c-4c9a-8fb6-637983a4377a"
 
@@ -44,21 +46,22 @@ def prepEventsRequest(sportID="1", leagueID="42884", ptID=180):
     res["params"]["regionIds"] += [ptID]
     res["params"]["pagination"]["top"] = 100
     res["params"]["pagination"]["skip"] = 0
-    res["params"]["marketTypeRequests"] += {"sportIds": [sportID], "marketTypeIds":["1_0"], "statement": "Include"}
+    res["params"]["marketTypeRequests"] += [{"sportIds": [sportID], "marketTypeIds":["1_0"], "statement": "Include"}]
+
 
 
     return json.dumps(res)
 
 
 def getSportID(info):
-    info = json.decoder(info)
+    info = json.loads(info)
 
     for sport in info["result"]["sports"]:
         if sport["name"] == "Futebol":
             return sport["id"]
 
 def getLeaguePTID(info, leagueName="Itália - Série B"):
-    info = json.decoder(info)
+    info = json.loads(info)
     leagueID = ""
     regionID = ""
     for league in info["result"]["leagues"]:
@@ -74,8 +77,22 @@ def getLeaguePTID(info, leagueName="Itália - Série B"):
     return leagueID, regionID
 
 def getLeagueOdds(info):
-    info = json.decoder(info)
-    for market in 
+    odds = []
+    info = json.loads(info)
+    events = info["result"]["events"]
+    markets = info["result"]["markets"]
+
+    for i in range(len(events)):
+        
+        if gameHasPassed(events[i]["startEventDate"]):
+            continue
+
+        for bet in markets[i]["selections"]:
+            if bet["name"] == "Empate":
+                odd = bet["displayOdds"]["decimal"]
+        odds += [(events[i]["eventName"], odd, events[i]["startEventDate"])]
+    
+    return odds
 
 
 
@@ -114,18 +131,22 @@ def gameHasPassed(datetimeInfo):
     return False
 
 
-async def main_comm():
-
-    odds = []
+async def main_comm(leagueName="Itália - Série B"):
 
     async with ws.connect(build_url()) as websocket:
 
         await websocket.send(prepSportsRequest())
-        print(await websocket.recv())
+        sportID = getSportID(await websocket.recv())
+
+        await websocket.send(prepLeaguesRequest(sportID))
+        leagueID, ptID = getLeaguePTID(await websocket.recv(), leagueName)
+
+        await websocket.send(prepEventsRequest(sportID, leagueID, ptID))
+        odds = getLeagueOdds(await websocket.recv())
 
     return odds
 
-result = asyncio.run(main_comm())
+result = asyncio.run(main_comm(LEAGUE_NAME))
 
 for odd in result:
     print(odd)
