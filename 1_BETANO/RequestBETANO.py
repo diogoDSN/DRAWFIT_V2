@@ -14,7 +14,7 @@ def buildUrl(leagueID='10210'):
 
 
 def getOddsLeague(leagueInfo):
-    oddsList = []
+    oddsList = [] #TODO
     # Fixtures are information packages on specific games
     for game in leagueInfo['fixtures']:
         # Test if game has passed [started]

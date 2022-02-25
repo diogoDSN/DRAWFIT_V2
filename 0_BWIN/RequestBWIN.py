@@ -43,7 +43,7 @@ def getOddsLeague(leagueInfo):
                 for bet in market['options']:
                     if bet['name']['value'] == 'X':
                         # Append tupple (game, odd) to the list off obtained odds
-                        oddsList.append((game['name']['value'], bet['price']['odds']))
+                        oddsList.append((game['name']['value'], bet['price']['odds'], game['startDate']))
     
     return oddsList
 
@@ -82,17 +82,6 @@ def gameHasPassed(datetimeInfo):
 
     return False
 
-def updateDataBase(newOdds):
-    # Opens database for updating
-    database = open("Bwin_data.json", '+')
-
-    # Reads full database
-    oldDataJson = database.read(None)
-
-    # Parses json
-    oldData = json.loads(oldDataJson)
-
-    #TODO
 
 
 # Creates the request url
