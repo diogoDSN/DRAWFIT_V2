@@ -69,31 +69,14 @@ def gameHasPassed(datetimeInfo):
 
     return False
 
-def updateDataBase(newOdds):
-    # Opens database for updating
-    database = open("Bwin_data.json", '+')
+def BETANO_Odds(leagueID=LEAGUE_ID):
+    # Creates the request url
+    betano_url = buildUrl(leagueID)
 
-    # Reads full database
-    oldDataJson = database.read(None)
+    # Makes request to api
+    request = r.get(betano_url, headers={"User-Agent": "Mozilla/5.0"})
 
-    # Parses json
-    oldData = json.loads(oldDataJson)
+    # Turn json into data
+    info = json.loads(request.text)
 
-    #TODO
-
-
-# Creates the request url
-betano_url = buildUrl(LEAGUE_ID)
-
-# Makes request to api
-request = r.get(betano_url, headers={"User-Agent": "Mozilla/5.0"})
-
-# Turn json into data
-info = json.loads(request.text)
-
-
-odds = getOddsLeague(info)
-
-# Print the odds colected in an orderly manner
-for odd in odds:
-    print(odd)
+    return getOddsLeague(info)

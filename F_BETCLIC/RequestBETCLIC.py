@@ -69,21 +69,18 @@ def gameHasPassed(datetimeInfo):
 
     return False
 
+def BETCLIC_Odds(leagueID=LEAGUE_ID):
 
-# Creates the request url
-betclic_url = buildUrl(LEAGUE_ID)
+    # Creates the request url
+    betclic_url = buildUrl(leagueID)
 
-# Makes request to api
-request = r.get(betclic_url, headers={"User-Agent": "Mozilla/5.0"})
+    # Makes request to api
+    request = r.get(betclic_url, headers={"User-Agent": "Mozilla/5.0"})
 
-# Turn json into data
-info = json.loads(request.text)
+    # Turn json into data
+    info = json.loads(request.text)
 
 
-odds = getOddsLeague(info)
-
-# Print the odds colected in an orderly manner
-for odd in odds:
-    print(odd)
+    return getOddsLeague(info)
 
 

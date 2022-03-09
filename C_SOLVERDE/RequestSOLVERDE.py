@@ -160,10 +160,6 @@ async def main_comm(leagueID=19328, cc='it'):
     return odds
 
 
+def SOLVERDE_Odds(leagueID=LEAGUE_ID, countryCode=COUNTRY_CODE):
 
-
-result = asyncio.run(main_comm(LEAGUE_ID, COUNTRY_CODE))
-
-
-for odd in result:
-    print(odd)
+    return asyncio.run(main_comm(leagueID, countryCode))

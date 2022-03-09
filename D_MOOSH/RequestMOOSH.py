@@ -150,7 +150,6 @@ async def main_comm(leagueName="Itália - Série B"):
 
     return odds
 
-result = asyncio.run(main_comm(LEAGUE_NAME))
 
-for odd in result:
-    print(odd)
+def MOOSH_Odds(leagueName=LEAGUE_NAME):
+    return asyncio.run(main_comm(leagueName))

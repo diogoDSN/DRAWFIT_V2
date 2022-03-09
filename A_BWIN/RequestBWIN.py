@@ -83,20 +83,18 @@ def gameHasPassed(datetimeInfo):
     return False
 
 
+def BWIN_Odds(competitionID=COMPETITION_ID, regionID=REGION_ID):
 
-# Creates the request url
-bwin_url =  buildUrl(competitionID=COMPETITION_ID, regionID=REGION_ID)
+    # Creates the request url
+    bwin_url =  buildUrl(competitionID=competitionID, regionID=regionID)
 
-# Makes request to api
-request = r.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
+    # Makes request to api
+    request = r.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
 
-# Turn json into data
-info = json.loads(request.text)
+    # Turn json into data
+    info = json.loads(request.text)
 
-# Gets the odds from the info
-odds = getOddsLeague(info)
+    # Gets the odds from the info
+    odds = getOddsLeague(info)
 
-
-# Print the odds colected in an orderly manner
-for odd in odds:
-    print(odd)
+    return odds
