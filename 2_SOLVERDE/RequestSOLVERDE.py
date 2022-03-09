@@ -119,6 +119,7 @@ def gameHasPassed(datetimeInfo):
     return False
 
 
+ 
 async def main_comm(leagueID=19328, cc='it'):
 
     messages = msg_dict()
@@ -158,7 +159,11 @@ async def main_comm(leagueID=19328, cc='it'):
 
     return odds
 
+
+
+
 result = asyncio.run(main_comm(LEAGUE_ID, COUNTRY_CODE))
+
 
 for odd in result:
     print(odd)
