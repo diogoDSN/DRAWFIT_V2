@@ -1,5 +1,6 @@
 import asyncio
 import websockets as ws
+import requests as r
 import json
 from datetime import datetime
 
@@ -8,7 +9,10 @@ LEAGUE_NAME="Itália - Série B"
 
 def build_url():
 
-    return "wss://sbapi.sbtech.com/betwaypt/sportscontent/sportsbook/v1/Websocket?jwt=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJTZXNzaW9uSVAiOiIxNDQuNjQuMTg1LjU4IiwiU2l0ZUlkIjoxOTQsIlZlcnNpb24iOiIyIiwiU2Vzc2lvbklkIjoiZWNhYjIwMjItM2NmNS00N2FmLTg5ZDQtOGUxMTBiOWZmMDkxIiwibmJmIjoxNjQ1ODA4Njg0LCJleHAiOjE2NDY0MTM1MTQsImlhdCI6MTY0NTgwODcxNCwiaXNzIjoiQXN5bW1ldHJpY1Rva2VuTWFuYWdlciJ9.TeCIOJ7cLPKuPn4iOA1jAWde_1Q1uVsS-Uqxe3fmMPfVQpEnLOKW9HyCJqczZMdf3A2XHlWKPjCEt1JKSbPa5ts0n-CLSLS7oBABor06bu5A9SWEQFcOWqdQAP6lh_RPhLwtj50cUZSdxOo6jIWsbUDqjzfmZLSjJEqx9Pu14YMFnkOyWhvRtXYtIRjRDh6pcVyt9m0guE8Gf9Iidjfn6FYQ0bt21U-A5sySABd5KYBezR3aEX_wBBYmuKike6Y_CAdxp5g0YSXY3rtLtc8Omr5eLrvha6wwAohhzypEy64k57k9b2qyjbdhAM4MXfFVE7lUku6LWM3V2w1EGrqFnw&locale=pt"
+    raw_info = r.get(url="https://api.play-gaming.com/auth/v2/GetTokenBySiteId/194", headers={"User-Agent": "Mozilla/5.0"})
+    WebToken = (json.loads(raw_info.text))["token"]
+
+    return "wss://sbapi.sbtech.com/betwaypt/sportscontent/sportsbook/v1/Websocket?jwt=" + WebToken + "&locale=pt"
 
 
 def prepSportsRequest():

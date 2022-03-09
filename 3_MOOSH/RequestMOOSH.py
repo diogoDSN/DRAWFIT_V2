@@ -1,5 +1,6 @@
 import asyncio
 import websockets as ws
+import requests as r
 import json
 from datetime import datetime
 
@@ -8,7 +9,10 @@ LEAGUE_NAME="Itália - Série B"
 
 def build_url():
 
-    return "wss://sbapi.sbtech.com/mooshpt/sportscontent/sportsbook/v1/Websocket?jwt=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJTZXNzaW9uSVAiOiI4MS44NC4xNzAuMjI2IiwiU2l0ZUlkIjoxNTEsIlZlcnNpb24iOiIyIiwiU2Vzc2lvbklkIjoiZmU5MDljMGItMmUxNy00NzIwLThkZjMtNzc1ZTk3NDZlY2U5IiwibmJmIjoxNjQ2ODQzNDcwLCJleHAiOjE2NDc0NDgzMDAsImlhdCI6MTY0Njg0MzUwMCwiaXNzIjoiQXN5bW1ldHJpY1Rva2VuTWFuYWdlciJ9.US7xvlWQYKftgPLndXwe1-HP6XfZMC9z4lXVNyBa1J-hF9n2CxH1WASTbrCEzNLrqgvGN1k7wibbtl9R8LwvKpMVcnK_yntMwxgY50poN4fR1bs2gNpb9H0unnpqavhe9wjg6GAtsOrdgQ0Qzwpn0N31nEMmknTllgzhqEPsn96O3a5psUDNsBilRhDiaQUPhG8oV42QMSeEibZBtKVqxFP67WRWmRCoWsZA-SMqRZKkvDP4nn7vPYpotsIdVSFd_dZLqInVQtW-mh6NE1Xj8hPFLzBX6SSZ8LOfkE4wsxb37i-de02P4Le9noBtVVzaLRWIFUX7cNfZ9XX4Nvvvpw&locale=pt-pt"
+    raw_info = r.get(url="https://kong.sbtech.com/auth/v2/GetTokenBySiteId/151", headers={"User-Agent": "Mozilla/5.0"})
+    WebToken = (json.loads(raw_info.text))["token"]
+
+    return "wss://sbapi.sbtech.com/mooshpt/sportscontent/sportsbook/v1/Websocket?jwt=" + WebToken + "&locale=pt-pt"
 
 
 def prepSportsRequest():
@@ -145,8 +149,6 @@ async def main_comm(leagueName="Itália - Série B"):
         odds = getLeagueOdds(await websocket.recv())
 
     return odds
-
-print(prepEventsRequest())
 
 result = asyncio.run(main_comm(LEAGUE_NAME))
 
