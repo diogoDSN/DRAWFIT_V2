@@ -9,7 +9,7 @@ COMPETITION_ID = '102848'
 
 def buildUrl(regionID='20', competitionID='102848'):
     query = {}
-    query['x-bwin-accessid'] = 'YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx'
+    query['x-bwin-accedsid'] = 'YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx'
     query['lang'] = 'pt'
     query['country'] = 'PT'
     query['userCountry'] = 'PT'
