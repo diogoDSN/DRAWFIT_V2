@@ -1,14 +1,15 @@
-from sys import path
+import sys
 from os.path import dirname, abspath
 
-#path.append(dirname(abspath(__path__)))
+sys.path.append(dirname(dirname(abspath(__file__))) + '/main')
 
-from main.updates.A_BWIN.RequestBWIN import BWIN_Odds
-from main.updates.B_BETANO.RequestBETANO import BETANO_Odds
-from main.updates.C_SOLVERDE.RequestSOLVERDE import SOLVERDE_Odds
-from main.updates.D_MOOSH.RequestMOOSH import MOOSH_Odds
-from main.updates.E_BETWAY.RequestBETWAY import BETWAY_Odds
-from main.updates.F_BETCLIC.RequestBETCLIC import BETCLIC_Odds
+
+from updates.A_BWIN.RequestBWIN import BWIN_Odds
+from updates.B_BETANO.RequestBETANO import BETANO_Odds
+from updates.C_SOLVERDE.RequestSOLVERDE import SOLVERDE_Odds
+from updates.D_MOOSH.RequestMOOSH import MOOSH_Odds
+from updates.E_BETWAY.RequestBETWAY import BETWAY_Odds
+from updates.F_BETCLIC.RequestBETCLIC import BETCLIC_Odds
 
 
 

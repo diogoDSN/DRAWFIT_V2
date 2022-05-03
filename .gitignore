@@ -1,5 +1,12 @@
+# dot files
+.*
+
 # mac pip install utility
 get-pip.py
 
 # Pycharm folder
-/.idea/*
+.idea/
+
+# Pycache
+__pycache__/
+

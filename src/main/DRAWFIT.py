@@ -1,41 +1,39 @@
-from sys import path
+import sys
 from os.path import dirname, abspath
 
-path.append(dirname(abspath(__path__)))
+sys.path.append(dirname(abspath(__file__)))
 
-
-import threading
 import asyncio
-
 import discord
-from updates import UpdateHandler
-from commands import CommandHandler
-
+from updates.UpdateHandler import UpdateHandler
+from commands.CommandHandler import CommandHandler
+from domain.DomainStore import DomainStore
 
 
 bot = discord.Client()
 
-def handleCommands():
-    handler = CommandHandler()
-    handler.run()
 
-def handleUpdates():
+async def handleCommands(bot, store):
+    handler = CommandHandler(bot, store)
+    await handler.run()
+
+async def handleUpdates():
     handler = UpdateHandler()
-    handler.run()
+    await handler.run()
+
 
 
 @bot.event
 async def on_ready():
 
-    # Create thread to handle discord commands
-    commandHandler = threading.Thread(target=handleCommands, name="Thread-1(handleCommands)", daemon=None)
-    commandHandler.start()
+    # Create DomainStore
+    store = DomainStore()
 
-    # Start update routine
-    handleUpdates()
+    # Gather tasks to run the bot
+    await asyncio.gather(handleCommands(bot, store), handleUpdates())
 
 def main():
-    TOKEN = ""
+    TOKEN = "OTUxOTEzMzQzNDk1NTY5NDY4.YiuYYg.gCo2OSLi-u86EWGY47yY9MkmdB0"
     bot.run(TOKEN)
 
 
