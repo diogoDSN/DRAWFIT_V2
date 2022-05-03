@@ -1,5 +1,5 @@
-from domain.Team import Team
-from domain.Team import Game
+from domain.classes.Team import Team
+from domain.classes.Team import Game
 
 
 class League:

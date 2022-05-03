@@ -1,5 +1,5 @@
-from data.domain.Sites import Sites
-from main.domain.Game import Game
+from domain.classes.Sites import Sites
+from domain.classes.Game import Game
 
 
 class Team:

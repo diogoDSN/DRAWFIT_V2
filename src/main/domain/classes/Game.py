@@ -1,6 +1,6 @@
-from domain.Sites import Sites
-from domain.Team import Team
-from domain.Odd import Odd
+from domain.classes.Sites import Sites
+from domain.classes.Team import Team
+from domain.classes.Odd import Odd
 
 from datetime import datetime
 

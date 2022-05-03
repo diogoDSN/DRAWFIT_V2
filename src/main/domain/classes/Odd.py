@@ -1,4 +1,4 @@
-from domain.Game import Game
+from domain.classes.Game import Game
 
 from datetime import datetime
 
