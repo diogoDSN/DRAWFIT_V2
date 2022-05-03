@@ -4,7 +4,7 @@ from domain.Team import Game
 
 class League:
 
-    def __init__(self, name: str, leagueCodes: list[str]):
+    def __init__(self, name: str, leagueCodes: list):
         
         self.name = name
         self.leagueCodes = leagueCodes
@@ -17,9 +17,9 @@ class League:
         return self.active
     
     @property
-    def currentGames(self) -> list[Game]:
+    def currentGames(self) -> list:
         return self.currentGames
 
     @property
-    def followedTeams(self) -> list[Team]:
+    def followedTeams(self) -> list:
         return self.followedTeams

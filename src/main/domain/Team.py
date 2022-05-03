@@ -1,10 +1,10 @@
-from data.domain.Sites import Sites
-from main.domain.Game import Game
+from domain.Sites import Sites
+from domain.Game import Game
 
 
 class Team:
 
-    def __init__(self, name: str, knownSearchNames: list[str]):
+    def __init__(self, name: str, knownSearchNames: list):
         
         self.name = name
         self.knowSearchNames = knownSearchNames
@@ -17,7 +17,7 @@ class Team:
             self.knownNames.append(None)
     
     @property
-    def games(self) -> list[Game]:
+    def games(self) -> list:
         return self.games
     
     @property

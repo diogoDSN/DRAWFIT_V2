@@ -29,7 +29,7 @@ class Game:
         return self.date
     
     @property
-    def teams(self) -> list[Team]:
+    def teams(self) -> list:
         return [self.team1, self.team2]
 
     @property
