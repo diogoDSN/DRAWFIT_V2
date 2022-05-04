@@ -1,11 +1,11 @@
 from discord.ext import commands
 
-from bot.messages import NoPermission, addLeagueUsage
+from bot.messages import NoPermission, removeLeagueUsage
 from bot.commands.utils import isCommand, hasPermission, checkAnyArguments
 from bot.permissions import Permissions
 
 @commands.command()
-async def addLeague(ctx: commands.Context, *, arguments = ''):
+async def removeLeague(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
         return
@@ -14,9 +14,8 @@ async def addLeague(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
     
-    checkAnyArguments(arguments, addLeagueUsage())
+    checkAnyArguments(arguments, removeLeagueUsage())
     
-    ctx.bot.store.addLeague(arguments)
-    await ctx.send(f'New league: `{arguments}` added!')
+    ctx.bot.store.removeLeague(arguments)
+    await ctx.send(f'League `{arguments}` removed!')
     
-

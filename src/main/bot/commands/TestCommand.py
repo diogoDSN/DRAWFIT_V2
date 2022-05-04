@@ -1,18 +1,21 @@
 import asyncio
 from discord.ext import commands
 
-from bot.Messages import NoPermission
-from bot.converters.NArguments import NArguments
-from bot.commands.utils import isCommand
+from bot.messages import NoPermission, EmptyArgument
+from bot.commands.utils import isCommand, hasPermission, checkEmptyArguments
+from bot.permissions import Permissions
 
 @commands.command()
-async def test(ctx: commands.Context, *, arguments: NArguments([]) = ''):
+async def test(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
         return
 
-    if str(ctx.author) != 'Pistache#2173':
+    if not hasPermission(ctx, Permissions.NOGUEIRA):
         await ctx.send(NoPermission('Nogueira Level'))
-    else:
-        await ctx.send('This test was successful!')
+        return
+    
+    checkEmptyArguments(arguments, 'test')
+
+    await ctx.send('This test was successful!')
     

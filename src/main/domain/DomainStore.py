@@ -1,3 +1,4 @@
+import asyncio
 from typing import NoReturn
 
 from domain.classes.Sites import Sites
@@ -12,15 +13,27 @@ class DomainStore:
         self.n_sites = len(Sites.__members__)
 
     def addLeague(self, leagueName: str) -> NoReturn:
+
         if list(filter(lambda league: league.name == leagueName, self.knownLeagues)) == []:
             self.knownLeagues.append(League(leagueName))
     
 
-    def removeLeague(self, leagueName: str) -> NoReturn:
+    def removeLeague(self, leagueId: str) -> NoReturn:
+
         try:
-            self.knownLeagues.remove(next(league for league in self.knownLeagues if league.name == leagueName))
-        except StopIteration:
-            pass
+            index = int(leagueId)-1
+            
+            if index >= len(self.knownLeagues):
+                return
+
+            self.knownLeagues.pop(index)
+            
+        except ValueError:
+            try:
+                self.knownLeagues.remove(next(league for league in self.knownLeagues if league.name == leagueId))
+            except StopIteration:
+                pass
+            
 
 
     def changeLeagueCode(self, leagueName: str, index: int, newCode: str):
@@ -30,7 +43,9 @@ class DomainStore:
                 return
 
             league = next(league for league in self.knownLeagues if league.name == leagueName)
+
             league.leagueCodes[index] = newCode
+
 
         except StopIteration:
             pass
@@ -53,6 +68,4 @@ class DomainStore:
 
         except StopIteration:
             return []
-
-        
 

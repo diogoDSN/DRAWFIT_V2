@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import asyncio
-
-
-class UpdateHandler:
-    def __init__(self):
-        pass
-
-    async def run(self):
-        while(True):
-            print("Reached UpdateHandler")
-=======
 import asyncio
 
 from domain.DomainStore import DomainStore
@@ -22,5 +10,4 @@ class UpdateHandler:
     async def run(self):
         while(True):
             print("Reached UpdateHandler")
->>>>>>> TestCommandsLibrary
             await asyncio.sleep(3600)

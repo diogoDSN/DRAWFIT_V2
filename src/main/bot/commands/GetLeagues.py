@@ -1,18 +1,21 @@
 from discord.ext import commands
 
-from bot.Messages import NoPermission
-from bot.converters.NArguments import NArguments
-from bot.commands.utils import isCommand
+from bot.messages import NoPermission
+from bot.commands.utils import isCommand, hasPermission, checkEmptyArguments
+from bot.permissions import Permissions
+
 
 @commands.command()
-async def getLeagues(ctx: commands.Context, *, arguments: NArguments([]) = ''):
+async def getLeagues(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
         return
 
-    if str(ctx.author) != 'Pistache#2173':
-        await ctx.send(NoPermission('Nogueira Level'))
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
+    
+    checkEmptyArguments(arguments, 'getLeagues')
     
     leagueDtos = ctx.bot.store.getLeagues()
 
