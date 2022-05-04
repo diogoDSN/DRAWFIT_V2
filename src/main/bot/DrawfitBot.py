@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 
 import discord
 from discord.ext import commands
@@ -50,8 +51,15 @@ class DrawfitBot(commands.Bot):
         await handler.run()
 
     async def on_command_error(self, ctx, error):
-        await ctx.send(error)
+        if error.__class__ == commands.BadArgument:
+            await ctx.send(error)
+        raise error
 
     def configureCommands(self):
         from bot.commands.TestCommand import test
+        from bot.commands.AddLeague import addLeague
+        from bot.commands.GetLeagues import getLeagues 
+
         self.add_command(test)
+        self.add_command(addLeague)
+        self.add_command(getLeagues)

@@ -11,9 +11,9 @@ class DomainStore:
         self.knownLeagues = []
         self.n_sites = len(Sites.__members__)
 
-    def addLeague(self, leagueName: str, leagueCodes: list[str]) -> NoReturn:
-        if len(leagueCodes) == self.n_sites and list(filter(lambda league: league.name == leagueName, self.knownLeagues)) == []:
-            self.knownLeagues.append(League(leagueName, leagueCodes))
+    def addLeague(self, leagueName: str) -> NoReturn:
+        if list(filter(lambda league: league.name == leagueName, self.knownLeagues)) == []:
+            self.knownLeagues.append(League(leagueName))
     
 
     def removeLeague(self, leagueName: str) -> NoReturn:
@@ -36,7 +36,7 @@ class DomainStore:
             pass
 
 
-    def getLeagues(self) -> list[LeagueDto]:
+    def getLeagues(self) -> list:
 
         leagues = []
 
@@ -45,7 +45,7 @@ class DomainStore:
         
         return leagues
     
-    def getLeagueCodes(self, leagueName: str) -> list[str]:
+    def getLeagueCodes(self, leagueName: str) -> list:
         try:
 
             league = next(league for league in self.knownLeagues if league.name == leagueName)
