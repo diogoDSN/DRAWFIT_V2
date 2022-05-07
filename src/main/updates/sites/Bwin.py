@@ -1,41 +1,51 @@
+from ast import Dict
+from datetime import datetime
 import urllib as u
 
+from typing import Dict
+
+from requests_html import AsyncHTMLSession
+
 from updates.sites.Site import Site
+from updates.sites.utils import convertDate
+from dtos.OddDto import OddDto
+from domain.DomainStore import DomainStore
+
 
 class Bwin(Site):
 
     url = "https://cds-api.bwin.pt/bettingoffer/fixtures?"
 
-    def __init__(self):
-        self.last_odds = {}
+    def __init__(self, store: DomainStore):
+        pass
     
-
-    def update_odds
-
-    def BWIN_Odds(competitionID=COMPETITION_ID, regionID=REGION_ID):
-
+    async def getOddsLeague(self, session: AsyncHTMLSession, leagueId: Dict[str, str]) -> list:
+        """
+        Returns the odds of a given league.
+        Arguments:
+            session - the async session through which the request is made
+            leagueId - a dictionary with the following structure {"regionId" : id, "competitionId" : id}
+        """
         # Creates the request url
-        bwin_url =  buildUrl(competitionID=competitionID, regionID=regionID)
+        bwin_url = self.addQuery(regionID=leagueId["regionId"], competitionID=leagueId["competitionId"])
 
         # Makes request to api
-        request = r.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
-
-        # Turn json into data
-        info = json.loads(request.text)
+        request = await session.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
 
         # Gets the odds from the info
-        odds = getOddsLeague(info)
+        return self.getOddsLeague(request.json())
+    
 
-        return odds
-
-    def getOddsLeague(leagueInfo):
-        oddsList = []
+    def getOddsLeague(leagueInfo) -> list[OddDto]:
+        """
+        Extracts odds from a league's odd information.
+        leagueInfo - a json with the league's odd information
+        Throws ValueError if there was a failure reading data from the json
+        """
+        oddsList = {}
+        now = datetime.now()
         # Fixtures are information packages on specific games
         for game in leagueInfo['fixtures']:
-            # Test if game has passed [started]
-            if gameHasPassed(game['startDate']):
-                continue
-
             # optionMarkets are the available markets to bet on for this game
             for market in game['optionMarkets']:
                 if market['name']['value'] == 'Resultado do jogo':
@@ -43,7 +53,7 @@ class Bwin(Site):
                     for bet in market['options']:
                         if bet['name']['value'] == 'X':
                             # Append tupple (game, odd) to the list off obtained odds
-                            oddsList.append((game['name']['value'], bet['price']['odds'], game['startDate']))
+                            oddsList.append((game['name']['value'], bet['price']['odds'], convertDate(game['startDate']), now))
         
         return oddsList
 

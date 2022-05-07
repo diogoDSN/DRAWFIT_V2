@@ -42,7 +42,7 @@ def getOddsLeague(leagueInfo):
                 # Options contains the multiles bet options in this market
                 for bet in market['options']:
                     if bet['name']['value'] == 'X':
-                        # Append tupple (game, odd) to the list off obtained odds
+                        # Append tupple (game, odd, gameDate) to the list off obtained odds
                         oddsList.append((game['name']['value'], bet['price']['odds'], game['startDate']))
     
     return oddsList

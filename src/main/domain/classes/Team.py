@@ -13,7 +13,7 @@ class Team:
         # Set properties dependent of site
         self.knownNames = []
 
-        for site in Sites:
+        for _ in Sites:
             self.knownNames.append(None)
     
     @property

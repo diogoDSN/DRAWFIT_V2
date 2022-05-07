@@ -18,7 +18,7 @@ class Game:
         self.odds = []
         self.beingMonitored = []
 
-        for site in Sites:
+        for _ in Sites:
             self.odds.append([])
             self.beingMonitored.append(False)
             self.name.append(None)

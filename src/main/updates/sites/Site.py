@@ -1,13 +1,11 @@
 from abc import abstractmethod
 
+from requests_html import AsyncHTMLSession
 
 class Site:
 
-    def __init__(self):
-        self.last_odds = {}
-
     @abstractmethod
-    def updateOdds():
+    async def getOddsLeague(self, session: AsyncHtmlSession, leagueId: str) -> list:
         pass
 
 

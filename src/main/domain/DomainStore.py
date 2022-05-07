@@ -17,7 +17,6 @@ class DomainStore:
         if list(filter(lambda league: league.name == leagueName, self.knownLeagues)) == []:
             self.knownLeagues.append(League(leagueName))
     
-
     def removeLeague(self, leagueId: str) -> NoReturn:
 
         try:
@@ -34,8 +33,6 @@ class DomainStore:
             except StopIteration:
                 pass
             
-
-
     def changeLeagueCode(self, leagueName: str, index: int, newCode: str):
 
         try:
@@ -49,7 +46,6 @@ class DomainStore:
 
         except StopIteration:
             pass
-
 
     def getLeagues(self) -> list:
 
