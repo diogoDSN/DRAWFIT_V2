@@ -4,7 +4,7 @@ from datetime import datetime
 from time import localtime, strftime
 import json
 
-LEAGUE_ID = '10210'
+LEAGUE_ID = '1635'
 
 
 def buildUrl(leagueID='10210'):
@@ -19,8 +19,6 @@ def getOddsLeague(leaguesInfo):
 
     for league in leaguesInfo["data"]["blocks"]:
         for event in league["events"]:
-            if gameHasPassed(betanoEpochConverter(event["startTime"])):
-                continue
             for market in event["markets"]:
                 if market["name"] == "Resultado Final":
                     for bet in market["selections"]:
@@ -32,42 +30,8 @@ def getOddsLeague(leaguesInfo):
 
 
 def betanoEpochConverter(epochTime):
-    return strftime('%Y-%m-%dT%H:%M:%SZ', localtime(epochTime))
+    return datetime.fromtimestamp(epochTime/1000)  
 
-
-# info' date format: "2022-02-20T17:00:00Z"
-def gameHasPassed(datetimeInfo):
-    # Create time vector
-    now = datetime.now()
-    curr_times = (now.year, now.month, now.day, now.hour, now.minute, now.second)
-
-    aux_str = ""
-    i = 0
-    for c in datetimeInfo:
-        if c not in ('-', ':', 'T', 'Z'):
-            if aux_str == "" and c == '0':
-                continue
-
-            aux_str += c
-
-        else:
-            if aux_str == "":
-                aux_str = "0"
-            game_time = eval(aux_str)
-
-            # Game time is before current time
-            if game_time < curr_times[i]:
-                return True
-            
-            # Game time is after current time
-            elif game_time > curr_times[i]:
-                return False
-
-            # This current and game time component coincide [for example both in the same year]
-            i += 1
-            aux_str = ""
-
-    return False
 
 def BETANO_Odds(leagueID=LEAGUE_ID):
     # Creates the request url

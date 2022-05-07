@@ -9,7 +9,7 @@ COMPETITION_ID = '102848'
 
 def buildUrl(regionID='20', competitionID='102848'):
     query = {}
-    query['x-bwin-accedsid'] = 'YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx'
+    query['x-bwin-accessid'] = 'YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx'
     query['lang'] = 'pt'
     query['country'] = 'PT'
     query['userCountry'] = 'PT'
@@ -30,7 +30,6 @@ def buildUrl(regionID='20', competitionID='102848'):
 
 def getOddsLeague(leagueInfo):
     oddsList = []
-    print(leagueInfo)
     # Fixtures are information packages on specific games
     for game in leagueInfo['fixtures']:
         # Test if game has passed [started]
@@ -43,7 +42,7 @@ def getOddsLeague(leagueInfo):
                 # Options contains the multiles bet options in this market
                 for bet in market['options']:
                     if bet['name']['value'] == 'X':
-                        # Append tupple (game, odd) to the list off obtained odds
+                        # Append tupple (game, odd, gameDate) to the list off obtained odds
                         oddsList.append((game['name']['value'], bet['price']['odds'], game['startDate']))
     
     return oddsList

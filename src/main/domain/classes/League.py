@@ -15,7 +15,7 @@ class League:
         self.followedTeams = []
         self._active = True
 
-        for site in Sites:
+        for _ in Sites:
             self.leagueCodes.append(None)
 
     @property
