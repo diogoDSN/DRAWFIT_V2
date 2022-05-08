@@ -10,3 +10,5 @@ get-pip.py
 # Pycache
 __pycache__/
 
+# Virtual environment
+.venv

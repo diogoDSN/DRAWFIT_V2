@@ -1,10 +1,11 @@
 import asyncio
-from typing import NoReturn
+from typing import Dict, List, NoReturn
 
 from domain.classes.Sites import Sites
 from domain.classes.League import League
 
 from dtos.LeagueDto import LeagueDto
+from updates.sites.utils import OddSample
 
 class DomainStore:
 
@@ -47,7 +48,7 @@ class DomainStore:
         except StopIteration:
             pass
 
-    def getLeagues(self) -> list:
+    def getLeagues(self) -> List:
 
         leagues = []
 
@@ -56,7 +57,7 @@ class DomainStore:
         
         return leagues
     
-    def getLeagueCodes(self, leagueName: str) -> list:
+    def getLeagueCodes(self, leagueName: str) -> List:
         try:
 
             league = next(league for league in self.knownLeagues if league.name == leagueName)
@@ -65,3 +66,16 @@ class DomainStore:
         except StopIteration:
             return []
 
+    def getAllLeagueCodes(self) -> Dict[str, List[str]]:
+
+        result = {}
+
+        for league in self.knownLeagues:
+            result[league.name] = league.league_codes.copy()
+        
+        return result
+
+    def updateLeaguesOdds(self, results: Dict[str, List[List[OddSample]]]) -> NoReturn:
+        for league_id, odds_sample in results.items():
+            league = next(league for league in self.knownLeagues if league.name == league_id)
+            league.updateOdds(odds_sample)

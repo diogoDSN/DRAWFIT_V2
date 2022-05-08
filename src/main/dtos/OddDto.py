@@ -1,5 +1,3 @@
-from domain.classes.Game import Game
-
 from datetime import datetime
 
 class OddDto:

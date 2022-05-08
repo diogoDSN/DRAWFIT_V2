@@ -12,7 +12,7 @@ def convertDate(date: str):
     if not re.search('^2\\d{3}-[01]\\d-[0123]\\dT[012]\\d:[012345]\\d:[012345]\\dZ$', date):
         raise ValueError(message="Invalid date format \"" + date + "\"")
 
-    components = re.split('[-,:,T]', date[:-1])
+    components = list(map(int, re.split('[-,:,T]', date[:-1])))
 
     return datetime(components[0], components[1], components[2], components[3], components[4], components[5])
 
@@ -23,3 +23,14 @@ def convertMilisecondsEpoch(epochValue: int):
     Throws ValueError if the epoch is invalid
     """
     return datetime.fromtimestamp(epochValue/1000)
+
+class OddSample:
+
+    def __init__(self, gameId: str, odd: int, gameTime: datetime, sampleTime: datetime):
+        self.gameId = gameId
+        self.odd = odd
+        self.gameTime = gameTime
+        self.sampleTime = sampleTime
+    
+    def __str__(self) -> str:
+        return f'(Game: {self.gameId}; Value: {self.odd}; GameTime: {self.gameTime}; SampleTime: {self.sampleTime});'
