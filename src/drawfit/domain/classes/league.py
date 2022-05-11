@@ -1,13 +1,7 @@
-
-import domain.classes.Team as team
-import domain.classes.Game as game
-
-
 from typing import List, NoReturn
-from domain.classes.Sites import Sites
-from updates.sites.utils import OddSample
-from dtos.notifications.PossibleTeamNotification import PossibleTeamNotification
-from dtos.notifications.PossibleGameNotification import PossibleGameNotification
+
+from drawfit.domain import Team, Game
+from drawfit.utils import Sites, OddSample
 
 
 class League:
@@ -18,9 +12,9 @@ class League:
         self.league_codes: List[str] = []
         self.active: bool = True
 
-        self.current_games: List[game.Game] = []
+        self.current_games: List[Game] = []
 
-        self.followed_teams: List[team.Team] = []
+        self.followed_teams: List[Team] = []
 
         for _ in Sites:
             self.league_codes.append(None)
@@ -36,11 +30,11 @@ class League:
         self.active = True
 
     @property
-    def currentGames(self) -> List[game.Game]:
+    def currentGames(self) -> List[Game]:
         return self.current_games
 
     @property
-    def followedTeams(self) -> List[team.Team]:
+    def followedTeams(self) -> List[Team]:
         return self.followed_teams
 
 
@@ -87,18 +81,21 @@ class League:
 
         if possible_team1 is not None:
             possible_team1.addConsideredName(site, sample.team1)
-            return PossibleTeamNotification(possible_team.name, sample.team1, self.name, sample.game_id, site)
+            #TODO
+            #return PossibleTeamNotification(possible_team.name, sample.team1, self.name, sample.game_id, site)
         
         if possible_team2 is not None:
             possible_team1.addConsideredName(site, sample.team2)
-            return PossibleTeamNotification(possible_team.name, sample.team2, self.name, sample.game_id, site)
+            #TODO
+            #return PossibleTeamNotification(possible_team.name, sample.team2, self.name, sample.game_id, site)
 
         # test if the game could be an singled out inputed game
         possible_game = next((game for game in self.current_games if game.couldBeGame(sample.team1, sample.team2)), None)
 
         if possible_game is not None:
             possible_game.addConsideredGame(site, sample.team1, sample.team2)
-            return PossibleGameNotification(possible_game.name, sample.game_id, self.name, site)
+            #TODO
+            #return PossibleGameNotification(possible_game.name, sample.game_id, self.name, site)
         
         return None
 

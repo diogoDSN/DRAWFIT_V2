@@ -1,8 +1,8 @@
 from discord.ext import commands
 
-from bot.messages import NoPermission, addLeagueUsage
-from bot.commands.utils import isCommand, hasPermission, checkAnyArguments
-from bot.permissions import Permissions
+from drawfit.bot.messages import NoPermission, addLeagueUsage
+from drawfit.bot.utils import isCommand, hasPermission, checkAnyArguments
+from drawfit.bot import Permissions
 
 @commands.command()
 async def addLeague(ctx: commands.Context, *, arguments = ''):

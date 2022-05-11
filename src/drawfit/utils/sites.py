@@ -1,6 +1,6 @@
 from enum import IntEnum
 
-class Sites(Enum):
+class Sites(IntEnum):
 
     BWIN = 0
     '''

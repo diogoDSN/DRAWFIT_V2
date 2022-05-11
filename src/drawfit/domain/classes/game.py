@@ -1,15 +1,13 @@
+from datetime import datetime
 from typing import NoReturn, List
 
-from domain.classes.Sites import Sites
-import domain.classes.Team as team
-from domain.classes.Odd import Odd
-from updates.sites.utils import OddSample
+from drawfit.domain import Team, Odd
+from drawfit.utils import Sites, OddSample
 
-from datetime import datetime
 
 class Game:
 
-    def __init__(self, name: str, date: datetime, keywords: List[str] = [], team: team.Team = None):
+    def __init__(self, name: str, date: datetime, keywords: List[str] = [], team: Team = None):
 
         # Set universal undefined values
         self.name: str = name

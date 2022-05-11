@@ -1,11 +1,9 @@
 import asyncio
 from typing import Dict, List, NoReturn
 
-from domain.classes.Sites import Sites
-from domain.classes.League import League
-
-from dtos.LeagueDto import LeagueDto
-from updates.sites.utils import OddSample
+from drawfit.domain import League
+from drawfit.dtos import LeagueDto
+from drawfit.utils import Sites, OddSample
 
 class DomainStore:
 

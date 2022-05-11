@@ -1,6 +1,6 @@
 from typing import List, NoReturn
 
-from domain.classes.Sites import Sites
+from drawfit.utils import Sites
 
 
 class Team:

@@ -1,7 +1,7 @@
 from datetime import datetime
-from src.drawfit.domain.classes.Odd import Odd
+from drawfit.domain import Odd
 
-def test_odd():
+def test_oddConstructor():
 
     new_odd = Odd(10.0, datetime.now())
 

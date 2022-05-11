@@ -9,7 +9,7 @@ from discord.ext import commands
 
 from domain.classes.Sites import Sites
 from domain.DomainStore import DomainStore
-from bot.permissions import Permissions
+from drawfit.bot.permissions import Permissions
 from updates.UpdateHandler import UpdateHandler
 import updates.UpdateHandler as updates
 
@@ -103,10 +103,7 @@ class DrawfitBot(commands.Bot):
 
 
     def configureCommands(self):
-        from bot.commands.TestCommand import test
-        from bot.commands.AddLeague import addLeague
-        from bot.commands.RemoveLeague import removeLeague
-        from bot.commands.GetLeagues import getLeagues 
+        from drawfit.bot.commands import test, addLeague, removeLeague, getLeagues
 
         self.add_command(test)
         self.add_command(addLeague)

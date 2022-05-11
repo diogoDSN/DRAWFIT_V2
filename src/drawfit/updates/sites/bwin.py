@@ -1,18 +1,18 @@
-from ast import Dict
-from datetime import datetime
 import urllib as u
 
+from ast import Dict
+from datetime import datetime
 from typing import Dict, List, NoReturn
-from domain.classes.Sites import Sites
-from updates.exceptions.SiteError import SiteError
-from updates.sites.utils import OddSample
+
+from drawfit.domain import Sites
+from drawfit.updates.utils import OddSample, convertDate
+from drawfit.updates.exceptions import SiteError
 
 
 from requests_html import AsyncHTMLSession
 
-from updates.sites.Site import Site
-from updates.sites.utils import convertDate
-from dtos.OddDto import OddDto
+from drawfit.updates.sites import Site
+from drawfit.dtos import OddDto
 
 
 class Bwin(Site):

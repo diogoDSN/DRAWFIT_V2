@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import NoReturn, List
 from requests_html import AsyncHTMLSession
 
-from updates.sites.utils import OddSample
+from drawfit.utils import OddSample
 
 class Site:
 

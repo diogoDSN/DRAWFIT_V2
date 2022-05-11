@@ -1,9 +1,9 @@
 from ast import arguments
-from bot.DrawfitBot import DrawfitBot
+from drawfit.bot import DrawfitBot
 from discord.ext import commands
 import discord
-from bot.permissions import Permissions
-from bot.messages import EmptyArgument
+from drawfit.bot import Permissions
+from drawfit.bot.messages import EmptyArgument
 
 def isCommand(ctx: commands.Context):
 

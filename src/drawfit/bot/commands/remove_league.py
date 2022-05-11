@@ -1,8 +1,8 @@
 from discord.ext import commands
 
-from bot.messages import NoPermission, removeLeagueUsage
-from bot.commands.utils import isCommand, hasPermission, checkAnyArguments
-from bot.permissions import Permissions
+from drawfit.bot.messages import NoPermission, removeLeagueUsage
+from drawfit.bot.utils import isCommand, hasPermission, checkAnyArguments
+from drawfit.bot import Permissions
 
 @commands.command()
 async def removeLeague(ctx: commands.Context, *, arguments = ''):
@@ -16,6 +16,6 @@ async def removeLeague(ctx: commands.Context, *, arguments = ''):
     
     checkAnyArguments(arguments, removeLeagueUsage())
     
-    ctx.bot.store.removeLeague(arguments)
+    ctx.drawfit.bot.store.removeLeague(arguments)
     await ctx.send(f'League `{arguments}` removed!')
     
