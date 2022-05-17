@@ -1,11 +1,12 @@
 from discord.ext import commands
 
+from drawfit.bot.permissions import Permissions
 from drawfit.bot.messages import NoPermission, addLeagueUsage
 from drawfit.bot.utils import isCommand, hasPermission, checkAnyArguments
-from drawfit.bot import Permissions
 
+# $addLeague (name of new league)
 @commands.command()
-async def addLeague(ctx: commands.Context, *, arguments = ''):
+async def addLeague(ctx: commands.Context, arguments = ''):
 
     if not isCommand(ctx):
         return

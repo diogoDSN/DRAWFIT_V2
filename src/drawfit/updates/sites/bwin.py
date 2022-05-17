@@ -1,28 +1,25 @@
 import urllib as u
 
-from ast import Dict
 from datetime import datetime
 from typing import Dict, List, NoReturn
-
-from drawfit.domain import Sites
-from drawfit.updates.utils import OddSample, convertDate
-from drawfit.updates.exceptions import SiteError
-
-
 from requests_html import AsyncHTMLSession
 
-from drawfit.updates.sites import Site
+import drawfit.updates as updates
+
+from drawfit.updates.exceptions import SiteError
+from drawfit.updates.utils import convertDate
+from drawfit.utils import Sites, OddSample, BwinCode
 from drawfit.dtos import OddDto
 
 
-class Bwin(Site):
+class Bwin(updates.Site):
 
     url = "https://cds-api.bwin.pt/bettingoffer/fixtures?"
 
     def __init__(self) -> NoReturn:
         super().__init__(' - ')
     
-    async def getOddsLeague(self, session: AsyncHTMLSession, league_id: Dict[str, str]) -> List[OddSample]:
+    async def getOddsLeague(self, session: AsyncHTMLSession, league_id: BwinCode) -> List[OddSample]:
         """
         Returns the odds of a given league.
         Arguments:
@@ -36,7 +33,7 @@ class Bwin(Site):
             try:
 
                 # Creates the request url
-                bwin_url = self.addQuery(regionID=leagueId["regionId"], competitionID=leagueId["competitionId"])
+                bwin_url = self.addQuery(regionID=leagueId.region_id, competitionID=leagueId.competition_id)
 
                 # Makes request to api
                 request = await session.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})

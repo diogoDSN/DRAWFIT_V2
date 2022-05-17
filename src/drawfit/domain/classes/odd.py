@@ -4,21 +4,19 @@ from typing import NoReturn
 class Odd:
 
     def __init__(self, value: float, date: datetime) -> NoReturn:
-        self.value = value
-        self.date = date
+        self._value = value
+        self._date = date
 
     @property
     def value(self) -> float:
         return self._value
 
-    @value.setter
-    def value(self, value: float):
-        self._value = value
-
     @property
     def date(self) -> datetime:
         return self._date
 
-    @date.setter
-    def date(self, date: datetime):
-        self._date = date
+    def __eq__(self, o):
+        if o.__class__ == self.__class__:
+            return self.value == o.value and self.date == o.date
+
+        return False

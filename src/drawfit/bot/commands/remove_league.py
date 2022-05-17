@@ -1,9 +1,10 @@
 from discord.ext import commands
 
+from drawfit.bot.permissions import Permissions
 from drawfit.bot.messages import NoPermission, removeLeagueUsage
 from drawfit.bot.utils import isCommand, hasPermission, checkAnyArguments
-from drawfit.bot import Permissions
 
+# $removeLeague (name of new league)
 @commands.command()
 async def removeLeague(ctx: commands.Context, *, arguments = ''):
 

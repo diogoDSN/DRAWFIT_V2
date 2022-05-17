@@ -1,101 +1,164 @@
-from typing import List, NoReturn
+from typing import List, Tuple, NoReturn
+from datetime import datetime
 
-from drawfit.domain import Team, Game
-from drawfit.utils import Sites, OddSample
+
+import drawfit.domain as domain 
+
+from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCode, LeagueCodeError
 
 
 class League:
 
     def __init__(self, name: str):
         
-        self.name: str = name
-        self.league_codes: List[str] = []
-        self.active: bool = True
+        self._name: str = name
 
-        self.current_games: List[Game] = []
+        self._current_games: List[domain.Game] = []
 
-        self.followed_teams: List[Team] = []
+        self._followed_teams: List[domain.Team] = []
+        self._inactive_teams: List[domain.Team] = []
 
-        for _ in Sites:
-            self.league_codes.append(None)
+        self._league_codes: List[LeagueCode] = [None for _ in Sites]
 
     @property
-    def active(self) -> bool:
-        return self.active
+    def name(self) -> str:
+        return self._name
+
+    @property
+    def current_games(self) -> List[domain.Game]:
+        return self._current_games
+
+    @property
+    def followed_teams(self) -> List[domain.Team]:
+        return self._followed_teams
     
-    def deactivate(self) -> NoReturn:
-        self.active = False
+    @property
+    def inactive_teams(self) -> List[domain.Team]:
+        return self._inactive_teams
     
-    def activate(self) -> NoReturn:
-        self.active = True
-
     @property
-    def currentGames(self) -> List[Game]:
-        return self.current_games
+    def league_codes(self) -> List[LeagueCode]:
+        return self._league_codes
+    
+    def setCode(self, code: LeagueCode) -> NoReturn:
+        self._league_codes[code.getSite().value] = code
 
-    @property
-    def followedTeams(self) -> List[Team]:
-        return self.followed_teams
+    def registerGame(self, name: str, date: datetime = None) -> NoReturn:
+        new_game = domain.Game(name, date)
+        if new_game not in self.current_games:
+            self._current_games.append(new_game)
 
+    def registerTeam(self, name: str) -> bool:
 
-    def updateOdds(self, samples_by_site: List[List[OddSample]]) -> NoReturn:
+        new_team = domain.Team(name)
+        if new_team not in self._followed_teams and new_team not in self._inactive_teams:
+            self._followed_teams.append(new_team)
+            return True
+        
+        return False
+    
+    def addTeamKeywords(self, team_name: str, keywords: List[str]) -> bool:
 
-        results = [[] for _ in Sites]
+        team = next((team for tema in self.followed_teams if team.name == team_name), None)
+
+        if team is not None:
+            team.addKeywords(keywords)
+            return True
+        
+        team = next((team for tema in self.inactive_teams if team.name == team_name), None)
+
+        if team is not None:
+            team.addKeywords(keywords)
+            return True
+        
+        return False
+        
+
+    def deactivateTeam(self, team_name: str) -> NoReturn:
+        for index, team in enumerate(self.followed_teams):
+            if team.name == team_name:
+                self.inactive_teams.append(team)
+                self.followed_teams.pop(index)
+                break
+    
+    def activate_team(self, team_name: str) -> NoReturn:
+        for index, team in enumerate(self.inactive_teams):
+            if team.name == team_name:
+                self.followed_teams.append(team)
+                self.inactive_teams.pop(index)
+                break
+    
+    def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites) -> NoReturn:
+
+        team = next((team for team in self.followed_teams if team.name == team_name), None)
+        if team is not None:
+            team.setId(site, team_id)
+            return
+
+        team = next((team for team in self.inactive_teams if team.name == team_name), None)
+        if team is not None:
+            team.setId(site, team_id)
+
+    def setGameId(self, game_name: str, game_id: Tuple[str], site: Sites) -> NoReturn:
+        
+        game = next((game for game in self.current_games if game.name == game_name), None)
+        if game is not None:
+            game.setId(site, team_id)
+    
+    def updateOdds(self, samples_by_site: List[List[OddSample]]) -> List[domain.Notification]:
+
+        results = []
 
         for site in Sites:
 
             # site is not active or an error ocurred
             if samples_by_site[site.value] is None:
-                pass
+                continue
 
             for sample in samples_by_site[site.value]:
-                results[site.value].append(self.processSample(site, sample))
+                notification = self.processSample(site, sample)
+                if notification not in results:
+                    results.append(notificaion)
             
         return results
 
 
-    def processSample(self, site: Sites, sample: OddSample):
+    def processSample(self, site: Sites, sample: OddSample) -> domain.Notification:
 
-        # sample's game name is being monitored so the odd is added
-        game = next((game for game in self.current_games if game.names[site.value] == sample.gameId), None)
+        # 1 - sample's game name is being monitored so the odd is added
+        game = next((game for game in self.current_games if game.isId(site, sample.game_id)), None)
 
         if game is not None:
-            return game.addOdd(sample, site)
+            if game.addOdd(sample, site):
+                return domain.NewOddNotification(game)
+            return None
 
 
-        # test if the game has a team that is recognized
-        team = next((team for team in self.followed_teams if team.isTeam(site, sample.team1) or team.isTeam(site, sample.team2)), None)
+        # 2 - test if the game has a team that is recognized
+        team = next((team for team in self.followed_teams if team.isId(site, sample.team1_id) or team.isId(site, sample.team2_id)), None)
         
         if team is not None:
-            new_game = Game(sample.game_id, sample.game_time, team=team)
-            new_game.site_name(site, sample.game_id)
+            new_game = domain.Game(' vs '.join(sample.game_id), date=sample.game_id_time)
+            new_game.setId(site, sample.game_id)
             
-            self.current_games.append(new_game)
+            self._current_games.append(new_game)
+            new_game.addOdd(sample, site)
 
-            return new_game.addOdd(sample, site)
+            return domain.NewOddNotification(new_game)
 
+        # 3 - test if the game could belong to a followed team
+        for team_id in sample.game_id:
 
-        # test if the game could belong to a followed team
-        possible_team1 = next((team for team in self.followed_teams if team.couldBeTeam(site, sample.team1)), None)
-        possible_team2 = next((team for team in self.followed_teams if team.couldBeTeam(site, sample.team2)), None)
+            possible_team = next((team for team in self.followed_teams if team.couldBeId(site, team_id)), None)
 
-        if possible_team1 is not None:
-            possible_team1.addConsideredName(site, sample.team1)
-            #TODO
-            #return PossibleTeamNotification(possible_team.name, sample.team1, self.name, sample.game_id, site)
+            if possible_team is not None:
+                return domain.PossibleTeamNotification(possible_team, sample, site)
         
-        if possible_team2 is not None:
-            possible_team1.addConsideredName(site, sample.team2)
-            #TODO
-            #return PossibleTeamNotification(possible_team.name, sample.team2, self.name, sample.game_id, site)
-
-        # test if the game could be an singled out inputed game
-        possible_game = next((game for game in self.current_games if game.couldBeGame(sample.team1, sample.team2)), None)
+        # 4 - test if the game could be a singled out inputed game
+        possible_game = next((game for game in self.current_games if game.couldBeId(site, sample.game_id)), None)
 
         if possible_game is not None:
-            possible_game.addConsideredGame(site, sample.team1, sample.team2)
-            #TODO
-            #return PossibleGameNotification(possible_game.name, sample.game_id, self.name, site)
+            return domain.PossibleGameNotification(possible_game, sample, site)
         
         return None
 

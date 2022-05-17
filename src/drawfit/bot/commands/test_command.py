@@ -1,9 +1,9 @@
 import asyncio
 from discord.ext import commands
 
+from drawfit.bot.permissions import Permissions
 from drawfit.bot.messages import NoPermission, EmptyArgument
 from drawfit.bot.utils import isCommand, hasPermission, checkEmptyArguments
-from drawfit.bot import Permissions
 
 @commands.command()
 async def test(ctx: commands.Context, *, arguments = ''):

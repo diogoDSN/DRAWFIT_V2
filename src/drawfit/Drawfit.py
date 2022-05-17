@@ -3,7 +3,7 @@ from os.path import dirname, abspath
 
 sys.path.append(dirname(abspath(__file__)))
 
-from bot.DrawfitBot import DrawfitBot
+from drawfit.bot import DrawfitBot
 
 
 def main():

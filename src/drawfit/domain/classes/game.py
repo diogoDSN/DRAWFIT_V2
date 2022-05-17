@@ -1,63 +1,50 @@
 from datetime import datetime
-from typing import NoReturn, List
+from typing import NoReturn, List, Tuple
 
-from drawfit.domain import Team, Odd
+import drawfit.domain as domain
 from drawfit.utils import Sites, OddSample
 
 
-class Game:
+class Game(domain.Followable):
 
-    def __init__(self, name: str, date: datetime, keywords: List[str] = [], team: Team = None):
+    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = []):
+        
+        super().__init__(keywords)
 
         # Set universal undefined values
-        self.name: str = name
-        self.date: datetime = date
-        self.keywords: List[str] = keywords
-        self.team = team
-
-        # Set undefined values dependant on site
-        self.considered_games = []
-        self.site_names = []
-        self.odds = []
-
-        for _ in Sites:
-            self.site_names.append(None)
-            self.odds.append([0])
-            self.considered_games([])
+        self._name: str = name
+        self._date: datetime = date
+        self._odds = [[] for _ in Sites]
         
+
+    @property
+    def name(self) -> str:
+        return self._name.join
+
     @property
     def date(self) -> datetime:
-        return self.date
-
+        return self._date
+    
+    @date.setter
+    def date(self, date: datetime) -> NoReturn:
+        if self.date == None:
+            self._date = date
+    
     @property
-    def names(self) -> str:
-        return self.site_names
-    
-    def addConsideredGame(self, site: Sites, team1: str, team2: str) -> NoReturn:
-        self.considered_games[site.value].append((team1, team2))
-    
-    def removeConsideredGame(self, site: Sites, team1: str, team2: str) -> NoReturn:
-        self.considered_games[site.value].remove((team1, team2))
+    def odds(self) -> List[List[domain.Odd]]:
+        return self._odds
 
-    def couldBeGame(self, team1: str, team2: str, site: Sites) -> bool:
+    def __eq__(self, o):
+        if o.__class__ == self.__class__:
+            return self.name == o.name and self.date == o.date
+        return False       
 
-        if self.site_names[site.value] is not None or (team1, team2) in self.considered_games[site.value]:
-            return False
+    def addOdd(self, sample: OddSample, site: Sites) -> bool:
 
-        for keyword in self.keywords:
-            if keyword in team1 or team1 in keyword \
-            or keyword in team2 or team2 in keyword:
-                return True
+        if self.odds[site.value] == [] or self.odds[site.value][-1].value != sample.odd:
+            self.odds[site.value].append(domain.Odd(sample.odd, sample.sample_time))
+            return True
         
         return False
-                
-
-    def addOdd(self, sample: OddSample, site: Sites) -> Odd:
-
-        if self.odds[site.value][-1].value != sample.odd:
-            self.odds[site.value].append(Odd(sample.odd, sample.sample_time))
-            return self.odds[site.value][-1]
-        
-        return None
         
         

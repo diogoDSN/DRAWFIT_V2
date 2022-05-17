@@ -1,22 +1,21 @@
 import asyncio
 from typing import NoReturn, List
-from domain.classes.Sites import Sites
-from updates.sites.Bwin import Bwin
-from updates.sites.Site import Site
 from requests_html import AsyncHTMLSession
 
-from domain.DomainStore import DomainStore
+import drawfit.domain as domain
+import drawfit.updates as updates
 
+from drawfit.utils import Sites
 
 class UpdateHandler:
     
-    def __init__(self, store: DomainStore):
-        self.store: DomainStore = store
-        self.sites: List[Site] = [None for _ in Sites]
-        self.sites[Sites.BWIN.value] = Bwin()
+    def __init__(self, store: domain.DomainStore):
+        self.store: domain.DomainStore = store
+        self.sites: List[updates.Site] = [None for _ in Sites]
+        self.sites[Sites.BWIN.value] = updates.Bwin()
 
 
-    async def update(self) -> List:
+    async def update(self) -> List[domain.Notification]:
 
         codes_by_league = self.store.getAllLeagueCodes()
         session = AsyncHTMLSession()
