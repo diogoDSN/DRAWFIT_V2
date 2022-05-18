@@ -6,7 +6,6 @@ import discord
 from discord.ext import commands
 
 import drawfit.bot as bot
-import drawfit.bot.commands as cmd
 import drawfit.domain as domain
 import drawfit.updates as updates
 
@@ -55,11 +54,11 @@ class DrawfitBot(commands.Bot):
         return perms
     
     def configureCommands(self):
+        import drawfit.bot.commands as cmd
 
-        self.add_command(cmd.test)
-        self.add_command(cmd.addLeague)
-        self.add_command(cmd.removeLeague)
-        self.add_command(cmd.getLeagues)
+        for name, attribute in cmd.__dict__:
+            if callable(attribute):
+                self.add_command(attribute)
 
     async def greet(self):
 

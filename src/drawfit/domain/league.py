@@ -1,8 +1,7 @@
 from typing import List, Tuple, NoReturn
 from datetime import datetime
 
-
-import drawfit.domain as domain 
+from drawfit.domain.followables import Game, Team 
 
 from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCode, LeagueCodeError
 
@@ -13,10 +12,10 @@ class League:
         
         self._name: str = name
 
-        self._current_games: List[domain.Game] = []
+        self._current_games: List[Game] = []
 
-        self._followed_teams: List[domain.Team] = []
-        self._inactive_teams: List[domain.Team] = []
+        self._followed_teams: List[Team] = []
+        self._inactive_teams: List[Team] = []
 
         self._league_codes: List[LeagueCode] = [None for _ in Sites]
 
@@ -25,15 +24,15 @@ class League:
         return self._name
 
     @property
-    def current_games(self) -> List[domain.Game]:
+    def current_games(self) -> List[Game]:
         return self._current_games
 
     @property
-    def followed_teams(self) -> List[domain.Team]:
+    def followed_teams(self) -> List[Team]:
         return self._followed_teams
     
     @property
-    def inactive_teams(self) -> List[domain.Team]:
+    def inactive_teams(self) -> List[Team]:
         return self._inactive_teams
     
     @property
@@ -44,13 +43,13 @@ class League:
         self._league_codes[code.getSite().value] = code
 
     def registerGame(self, name: str, date: datetime = None) -> NoReturn:
-        new_game = domain.Game(name, date)
+        new_game = Game(name, date)
         if new_game not in self.current_games:
             self._current_games.append(new_game)
 
     def registerTeam(self, name: str) -> bool:
 
-        new_team = domain.Team(name)
+        new_team = Team(name)
         if new_team not in self._followed_teams and new_team not in self._inactive_teams:
             self._followed_teams.append(new_team)
             return True
@@ -138,7 +137,7 @@ class League:
         team = next((team for team in self.followed_teams if team.isId(site, sample.team1_id) or team.isId(site, sample.team2_id)), None)
         
         if team is not None:
-            new_game = domain.Game(' vs '.join(sample.game_id), date=sample.game_id_time)
+            new_game = Game(' vs '.join(sample.game_id), date=sample.game_id_time)
             new_game.setId(site, sample.game_id)
             
             self._current_games.append(new_game)
