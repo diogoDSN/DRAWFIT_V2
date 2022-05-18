@@ -3,35 +3,35 @@ from typing import Dict, List, Tuple, NoReturn
 
 import drawfit.domain.notifications as notf
 import drawfit.domain.league as l
-import drawfit.dtos as dtos
+from drawfit.dtos import LeagueDto
 
 from drawfit.utils import Sites, OddSample, LeagueCode
 
 class DomainStore:
 
     def __init__(self) -> NoReturn:
-        self.knownLeagues = []
+        self.known_leagues = []
         self.n_sites = len(Sites.__members__)
 
     def getLeague(self, league_id: str) -> l.League:
         try:
             index = int(league_id)-1
             
-            if index >= len(self.knownLeagues):
+            if index >= len(self.known_leagues):
                 return None
             
-            return self.knownLeagues(index)
+            return self.known_leagues(index)
 
         except ValueError:
-            return next((league for league in self.knownLeagues if league.name == league_id), None)
+            return next((league for league in self.known_leagues if league.name == league_id), None)
 
     
     def addLeague(self, league_name: str) -> NoReturn:
 
-        league = next((league for league in self.knownLeagues if league.name == league_name), None)
+        league = next((league for league in self.known_leagues if league.name == league_name), None)
 
         if league is None:
-            self.knownLeagues.append(l.League(league_name))
+            self.known_leagues.append(l.League(league_name))
 
 
     def removeLeague(self, league_id: str) -> NoReturn:
@@ -39,7 +39,7 @@ class DomainStore:
         league = self.getLeague(league_id)
 
         if league is not None:
-            self.knownLeagues.remove(league)
+            self.known_leagues.remove(league)
             
     def changeLeagueCode(self, league_id: str, site: Sites, newCode: str):
 
@@ -52,14 +52,14 @@ class DomainStore:
 
         leagues = []
 
-        for league in self.knownLeagues:
-            leagues.append(LeagueDto(league))
+        for league in self.known_leagues:
+            leagues.append(LeagueDto(league.name, league.active))
         
         return leagues
     
     def getLeagueCodes(self, leagueName: str) -> List:
 
-        league = next((league for league in self.knownLeagues if league.name == leagueName), None)
+        league = next((league for league in self.known_leagues if league.name == leagueName), None)
 
         if league is None:
             return []
@@ -70,8 +70,8 @@ class DomainStore:
 
         result = {}
 
-        for league in self.knownLeagues:
-            result[league.name] = league_codes.copy()
+        for league in self.known_leagues:
+            result[league.name] = league.codes.copy()
         
         return result
 
@@ -80,18 +80,18 @@ class DomainStore:
         notifications = []
 
         for league_id, odds_sample in results.items():
-            league = next(league for league in self.knownLeagues if league.name == league_id)
+            league = next(league for league in self.known_leagues if league.name == league_id)
             notifications.extend(league.updateOdds(odds_sample))
         
         return notifications
 
     def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
-        league = next((league for league in self.knownLeagues if league.name == league_name), None)
+        league = next((league for league in self.known_leagues if league.name == league_name), None)
         if league != None:
             league.setTeamId(team_name, team_id, site)
 
     def setGameId(self, game_name: str, game_id: Tuple[str], site: Sites, league_name: str):
-        league = next((league for league in self.knownLeagues if league.name == league_name), None)
+        league = next((league for league in self.known_leagues if league.name == league_name), None)
         if league != None:
             league.setGameId(game_name, game_id, site)
     
@@ -100,8 +100,8 @@ class DomainStore:
         try:
             league_number = int(league_name)-1
 
-            if league_number < len(self.knownLeagues):
-                self.knownLeagues[league_number].setCode(code)
+            if league_number < len(self.known_leagues):
+                self.known_leagues[league_number].setCode(code)
 
         except ValueError:
             league = next((league for league in self.known_leagues if league.name == league_name), None)

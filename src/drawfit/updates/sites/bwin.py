@@ -29,12 +29,12 @@ class Bwin(Site):
         Throws:
             SiteError - when an error during parsing ocurred
         """
-        if self.active and leagueId is not None:
+        if self.active and league_id is not None:
 
             try:
 
                 # Creates the request url
-                bwin_url = self.addQuery(regionID=leagueId.region_id, competitionID=leagueId.competition_id)
+                bwin_url = self.buildUrl(region_id=league_id.region_id, competition_id=league_id.competition_id)
 
                 # Makes request to api
                 request = await session.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
@@ -71,7 +71,7 @@ class Bwin(Site):
         return oddsList
 
 
-    def addQuery(self, region_id : str ='20', competition_id: str ='102848') -> str:
+    def buildUrl(self, region_id : str ='20', competition_id: str ='102848') -> str:
         query = {}
         query['x-bwin-accessid'] = 'YmQwNTFkNDAtNzM3Yi00YWIyLThkNDYtYWFmNGY2N2Y1OWIx'
         query['lang'] = 'pt'

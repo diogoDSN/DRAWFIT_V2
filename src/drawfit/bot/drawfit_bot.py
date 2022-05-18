@@ -42,9 +42,6 @@ class DrawfitBot(commands.Bot):
             
             current_perms = []
 
-            for member in self.get_all_members():
-                print(member)
-
             for user in self.get_all_members():
                 if str(user) in perms_list:
                     current_perms.append(user)
@@ -105,15 +102,21 @@ class DrawfitBot(commands.Bot):
         print("Reached Update Handler")
         while(True):
 
+            print("Update Started!")
+
             notifications = await handler.update()
+
+            print(f"Update Ended! With {len(notifications)} notifications pending!")
 
             for notification in notifications:
                 self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
             
             for task in self.notify_tasks:
                 await task
+            
+            print("All notification tasks created! Waiting next update!")
 
-            await asyncio.sleep(600)
+            await asyncio.sleep(30)
     
     
     def teamIdAccepted(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
@@ -135,7 +138,7 @@ class DrawfitBot(commands.Bot):
 
         if perm == Permissions.MODERATOR:
             users += self.perms[perm]
-            perm = Permissions.NORMAL
+            perm = Permissions.NOGUEIRA
 
         if perm == Permissions.NOGUEIRA:
             users += self.perms[perm]

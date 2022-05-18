@@ -30,7 +30,7 @@ class Notify:
     
     async def visitPossible(self, notification: notf.PossibleNotification) -> NoReturn:
 
-        notification.followable.addConsidered(notication.site, notification.possible_id)
+        notification.followable.addConsidered(notification.site, notification.possible_id)
 
         moderators = self.bot.getUsersWithPermission(Permissions.MODERATOR)
 

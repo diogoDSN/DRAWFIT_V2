@@ -1,7 +1,7 @@
 from discord.ext import commands
 
 from drawfit.bot.permissions import Permissions
-from drawfit.bot.messages import *
+from drawfit.bot.messages.commands import *
 from drawfit.bot.utils import hasPermission
 from drawfit.bot.utils.commands import *
 
@@ -25,7 +25,7 @@ async def test(ctx: commands.Context, *, arguments = ''):
 
 # $addLeague (name of new league)
 @commands.command()
-async def addLeague(ctx: commands.Context, arguments = ''):
+async def addLeague(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
         return
@@ -125,8 +125,8 @@ async def addTeam(ctx: commands.Context, *, arguments = ''):
     
     args = checkNNameArguments(arguments, 2, addTeamUsage())
 
-    if ctx.bot.store.addTeam(args[0], args[1]):
-        await ctx.send(f'New team: `{arguments}` added!')
+    if ctx.bot.store.registerTeam(args[0], args[1]):
+        await ctx.send(f'New team: `{args[1]}` added!')
     else:
         await ctx.send('Team couldn\'t be added')
 
@@ -141,7 +141,7 @@ async def addTeamKeywords(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
     
-    args = checkNNameArguments(arguments, 3, addTeamUsage())
+    args = checkNNameArguments(arguments, 3, addTeamKeywordsUsage())
 
     keywords = args[2].split(' ')
 

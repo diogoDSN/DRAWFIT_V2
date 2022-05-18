@@ -8,12 +8,13 @@ from drawfit.bot.messages.commands import EmptyArgument
 
 def isCommand(ctx: commands.Context) -> bool:
 
-    for guild in DrawfitBot.command_channels:
-        if guild == ctx.guild.name:
-            for channel in DrawfitBot.command_channels[guild]:
-                if channel == ctx.channel.name:
-                    return True
-            break
+    if ctx.guild:
+        for guild in DrawfitBot.command_channels:
+            if guild == ctx.guild.name:
+                for channel in DrawfitBot.command_channels[guild]:
+                    if channel == ctx.channel.name:
+                        return True
+                break
     
     return False
 

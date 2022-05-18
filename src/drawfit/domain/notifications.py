@@ -53,7 +53,7 @@ class PossibleNotification(Notification):
         pass
 
     async def accept(self, visitor: v.Notify):
-        await visitor.visitPossibleGame(self)
+        await visitor.visitPossible(self)
     
     def __eq__(self, o):
         if o.__class__ == self.__class__:
@@ -76,7 +76,9 @@ class PossibleGameNotification(PossibleNotification):
 
     
     def __str__(self):
-        return 'PossibleGameNotification'
+        return f'I may have found a match for the game `{game.name}` in the site `{self.site}`.\n Does this odd belong to the game you want to track?\n \
+                    Name: {self.sample.game_name}\n \
+                    Date: {self.sample.start_time}\n'
 
 class PossibleTeamNotification(PossibleNotification):
 
@@ -89,4 +91,6 @@ class PossibleTeamNotification(PossibleNotification):
         return self._team
 
     def __str__(self):
-        return 'PossibleTeamNotification'
+        return f'I may have found a match for the team `{self._team.name}` in the site `{self.site}`.\n Does the following team match the team you want to track?\n \
+                    Team Name in {self.site}: {self.possible_id[0]}\n \
+                    Game where the name was found: {self.sample.game_name}\n'

@@ -8,3 +8,15 @@ class OddSample:
         self.odd = odd
         self.start_time = start_time
         self.sample_time = sample_time
+    
+    @property
+    def team1_id(self) -> Tuple[str]:
+        return (self.game_id[0],)
+    
+    @property
+    def team2_id(self) -> Tuple[str]:
+        return (self.game_id[1],)
+    
+    @property
+    def game_name(self) -> str:
+        return f'{self.game_id[0]} vs {self.game_id[1]}'

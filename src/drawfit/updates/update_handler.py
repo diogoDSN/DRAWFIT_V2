@@ -21,21 +21,30 @@ class UpdateHandler:
     async def update(self) -> List[Notification]:
 
         codes_by_league = self.store.getAllLeagueCodes()
+        print("Codes -", codes_by_league)
         session = AsyncHTMLSession()
+        requests = {}
         results = {}
 
         # Schedule all requests tasks
         for league, league_codes in codes_by_league.items():
 
-            results[league] = [None for _ in Sites]
+            requests[league] = [None for _ in Sites]
 
             for site in Sites:
-                results[league][site.value] = asyncio.create_task(self.sites[site.value].getOddsLeague(session, league_codes[site.value]))
+                requests[league][site.value] = asyncio.create_task(self.sites[site.value].getOddsLeague(session, league_codes[site.value]))
+
+        print("Requests -", requests)
 
         # Await every created task for results
-        for league_results in results:
-            for site, result in enumerate(league_results):
-                league_results[site] = await result
+        for league, league_requests in requests.items():
+
+            results[league] = [None for _ in Sites]
+
+            for site, site_request in enumerate(league_requests):
+                results[league][site] = await site_request
+        
+        print("Results -", results)
             
         return self.store.updateLeaguesOdds(results)
         

@@ -7,8 +7,6 @@ from discord.ext import commands
 from drawfit.bot.permissions import Permissions
 
 def hasPermission(ctx: commands.Context, permission: Permissions) -> bool:
-    print(ctx.bot.getUsersWithPermission(permission))
-    print(ctx.author)
     return ctx.author in ctx.bot.getUsersWithPermission(permission)
 
 

@@ -12,6 +12,7 @@ class League:
     def __init__(self, name: str):
         
         self._name: str = name
+        self._active: bool = True
 
         self._current_games: List[Game] = []
 
@@ -23,6 +24,10 @@ class League:
     @property
     def name(self) -> str:
         return self._name
+    
+    @property
+    def active(self) -> bool:
+        return self._active
 
     @property
     def current_games(self) -> List[Game]:
@@ -37,7 +42,7 @@ class League:
         return self._inactive_teams
     
     @property
-    def league_codes(self) -> List[LeagueCode]:
+    def codes(self) -> List[LeagueCode]:
         return self._league_codes
     
     def setCode(self, code: LeagueCode) -> NoReturn:
@@ -59,13 +64,13 @@ class League:
     
     def addTeamKeywords(self, team_name: str, keywords: List[str]) -> bool:
 
-        team = next((team for tema in self.followed_teams if team.name == team_name), None)
+        team = next((team for team in self.followed_teams if team.name == team_name), None)
 
         if team is not None:
             team.addKeywords(keywords)
             return True
         
-        team = next((team for tema in self.inactive_teams if team.name == team_name), None)
+        team = next((team for team in self.inactive_teams if team.name == team_name), None)
 
         if team is not None:
             team.addKeywords(keywords)
@@ -117,8 +122,8 @@ class League:
 
             for sample in samples_by_site[site.value]:
                 notification = self.processSample(site, sample)
-                if notification not in results:
-                    results.append(notificaion)
+                if notification not in results and notification is not None:
+                    results.append(notification)
             
         return results
 
@@ -152,7 +157,7 @@ class League:
             possible_team = next((team for team in self.followed_teams if team.couldBeId(site, (team_id,))), None)
 
             if possible_team is not None:
-                return notf.PossibleTeamNotification(possible_team, sample, site)
+                return notf.PossibleTeamNotification(possible_team, sample, (team_id,), site)
         
         # 4 - test if the game could be a singled out inputed game
         possible_game = next((game for game in self.current_games if game.couldBeId(site, sample.game_id)), None)
