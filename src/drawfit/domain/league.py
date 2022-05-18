@@ -1,6 +1,7 @@
 from typing import List, Tuple, NoReturn
 from datetime import datetime
 
+import drawfit.domain.notifications as notf
 from drawfit.domain.followables import Game, Team 
 
 from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCode, LeagueCodeError
@@ -104,7 +105,7 @@ class League:
         if game is not None:
             game.setId(site, team_id)
     
-    def updateOdds(self, samples_by_site: List[List[OddSample]]) -> List[domain.Notification]:
+    def updateOdds(self, samples_by_site: List[List[OddSample]]) -> List[notf.Notification]:
 
         results = []
 
@@ -122,14 +123,14 @@ class League:
         return results
 
 
-    def processSample(self, site: Sites, sample: OddSample) -> domain.Notification:
+    def processSample(self, site: Sites, sample: OddSample) -> notf.Notification:
 
         # 1 - sample's game name is being monitored so the odd is added
         game = next((game for game in self.current_games if game.isId(site, sample.game_id)), None)
 
         if game is not None:
             if game.addOdd(sample, site):
-                return domain.NewOddNotification(game)
+                return notf.NewOddNotification(game)
             return None
 
 
@@ -143,21 +144,21 @@ class League:
             self._current_games.append(new_game)
             new_game.addOdd(sample, site)
 
-            return domain.NewOddNotification(new_game)
+            return notf.NewOddNotification(new_game)
 
         # 3 - test if the game could belong to a followed team
         for team_id in sample.game_id:
 
-            possible_team = next((team for team in self.followed_teams if team.couldBeId(site, team_id)), None)
+            possible_team = next((team for team in self.followed_teams if team.couldBeId(site, (team_id,))), None)
 
             if possible_team is not None:
-                return domain.PossibleTeamNotification(possible_team, sample, site)
+                return notf.PossibleTeamNotification(possible_team, sample, site)
         
         # 4 - test if the game could be a singled out inputed game
         possible_game = next((game for game in self.current_games if game.couldBeId(site, sample.game_id)), None)
 
         if possible_game is not None:
-            return domain.PossibleGameNotification(possible_game, sample, site)
+            return notf.PossibleGameNotification(possible_game, sample, site)
         
         return None
 

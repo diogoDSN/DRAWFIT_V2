@@ -1,8 +1,8 @@
 import asyncio
 from typing import Dict, List, Tuple, NoReturn
 
-from drawfit.domain.notifications import Notification
-from drawfit.domain.league import League
+import drawfit.domain.notifications as notf
+import drawfit.domain.league as l
 import drawfit.dtos as dtos
 
 from drawfit.utils import Sites, OddSample, LeagueCode
@@ -13,7 +13,7 @@ class DomainStore:
         self.knownLeagues = []
         self.n_sites = len(Sites.__members__)
 
-    def getLeague(self, league_id: str) -> League:
+    def getLeague(self, league_id: str) -> l.League:
         try:
             index = int(league_id)-1
             
@@ -31,7 +31,7 @@ class DomainStore:
         league = next((league for league in self.knownLeagues if league.name == league_name), None)
 
         if league is None:
-            self.knownLeagues.append(League(league_name))
+            self.knownLeagues.append(l.League(league_name))
 
 
     def removeLeague(self, league_id: str) -> NoReturn:
@@ -75,7 +75,7 @@ class DomainStore:
         
         return result
 
-    def updateLeaguesOdds(self, results: Dict[str, List[List[OddSample]]]) -> List[Notification]:
+    def updateLeaguesOdds(self, results: Dict[str, List[List[OddSample]]]) -> List[notf.Notification]:
 
         notifications = []
 

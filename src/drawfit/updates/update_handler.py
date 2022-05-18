@@ -15,7 +15,7 @@ class UpdateHandler:
     def __init__(self, store: DomainStore):
         self.store: DomainStore = store
         self.sites: List[Site] = [None for _ in Sites]
-        self.sites[Sites.BWIN.value] = Bwin()
+        self.sites[Sites.Bwin.value] = Bwin()
 
 
     async def update(self) -> List[Notification]:

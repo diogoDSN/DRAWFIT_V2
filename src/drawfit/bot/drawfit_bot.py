@@ -5,9 +5,8 @@ from typing import List, Dict, Tuple
 import discord
 from discord.ext import commands
 
-import drawfit.bot as bot
-import drawfit.domain as domain
-import drawfit.updates as updates
+import drawfit.domain.domain_store as store
+import drawfit.updates.update_handler as updates
 
 from drawfit.bot.permissions import Permissions
 from drawfit.utils import Sites
@@ -29,11 +28,9 @@ class DrawfitBot(commands.Bot):
         intents.members = True
         super().__init__(command_prefix='.', intents=intents)
 
-        self.store = domain.DomainStore()
+        self.store = store.DomainStore()
         
         self.pending_queries: List[asyncio.Task] = []
-    
-        self.perms: Dict[Permissions, List[discord.User]] = self.setInitialPermissions()
 
         self.configureCommands()
     
@@ -44,6 +41,9 @@ class DrawfitBot(commands.Bot):
         for permission, perms_list in DrawfitBot.permissions.items():
             
             current_perms = []
+
+            for member in self.get_all_members():
+                print(member)
 
             for user in self.get_all_members():
                 if str(user) in perms_list:
@@ -56,9 +56,12 @@ class DrawfitBot(commands.Bot):
     def configureCommands(self):
         import drawfit.bot.commands as cmd
 
-        for name, attribute in cmd.__dict__:
-            if callable(attribute):
-                self.add_command(attribute)
+        for name, attribute in cmd.__dict__.items():
+            try:
+                if callable(attribute):
+                    self.add_command(attribute)
+            except TypeError:
+                pass
 
     async def greet(self):
 
@@ -70,8 +73,10 @@ class DrawfitBot(commands.Bot):
 
     async def on_ready(self):
 
+        self.perms: Dict[Permissions, List[discord.User]] = self.setInitialPermissions()
+
         # prepare visitor
-        from drawfit.bot import Notify
+        from drawfit.bot.notify import Notify
         self.notification_visitor = Notify(self)
         self.notify_tasks = []
     
@@ -105,7 +110,7 @@ class DrawfitBot(commands.Bot):
             for notification in notifications:
                 self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
             
-            for task in notify_tasks:
+            for task in self.notify_tasks:
                 await task
 
             await asyncio.sleep(600)
@@ -124,7 +129,7 @@ class DrawfitBot(commands.Bot):
 
         users = []
 
-        if perm == Permissions.NOGUEIRA:
+        if perm == Permissions.NORMAL:
             users += self.perms[perm]
             perm = Permissions.MODERATOR
 
@@ -132,7 +137,7 @@ class DrawfitBot(commands.Bot):
             users += self.perms[perm]
             perm = Permissions.NORMAL
 
-        if perm == Permissions().NORMAL:
+        if perm == Permissions.NOGUEIRA:
             users += self.perms[perm]
         
         return users

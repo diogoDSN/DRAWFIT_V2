@@ -1,30 +1,36 @@
+from __future__ import annotations
 import asyncio
-from typing import NoReturn
+from typing import NoReturn, TYPE_CHECKING
 
-import drawfit.bot as bot
-import drawfit.domain.classes.notifications as notificaions
+if TYPE_CHECKING:
+    import drawfit.domain.notifications as notf
+
+import drawfit.bot.drawfit_bot as dbot
+
 
 from drawfit.bot.permissions import Permissions
 from drawfit.bot.utils import ReactionAnswerCheck
-from discord.bot.messages import TimedOut, Yes, No
+from drawfit.bot.messages import TimedOut, Yes, No
 
 class Notify:
 
-    def __init__(self, bot: bot.DrawfitBot):
+    def __init__(self, bot: dbot.DrawfitBot):
         self.bot = bot
-        self.channels = bot.getChannels(bot.DrawfitBot.update_channels)
-        self.mods = bot.getUsersWithPermissions(Permissions.MODERATOR)
+        self.channels = bot.getChannels(dbot.DrawfitBot.update_channels)
+        self.mods = bot.getUsersWithPermission(Permissions.MODERATOR)
         self.timeout = 86400
 
 
-    async def visitNewOdd(self, notification: domain.NewOddNotification) -> NoReturn:
+    async def visitNewOdd(self, notification: notf.NewOddNotification) -> NoReturn:
 
         for channel in self.channels:
             await channel.send(notification)
 
         self.bot.endTask(asyncio.current_task())
     
-    async def visitPossible(self, notification: domain.PossibleNotification) -> NoReturn:
+    async def visitPossible(self, notification: notf.PossibleNotification) -> NoReturn:
+
+        notification.followable.addConsidered(notication.site, notification.possible_id)
 
         moderators = self.bot.getUsersWithPermission(Permissions.MODERATOR)
 

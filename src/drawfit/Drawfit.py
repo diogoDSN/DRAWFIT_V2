@@ -3,12 +3,12 @@ from os.path import dirname, abspath
 
 sys.path.append(dirname(abspath(__file__)))
 
-from drawfit.bot.drawfit_bot import DrawfitBot
+import drawfit.bot.drawfit_bot as dbot
 
 def main():
     TOKEN = "OTUxOTEzMzQzNDk1NTY5NDY4.YiuYYg.GN4Jlpve1TnCLjJUnNVjSs9L5Uk"
 
-    bot = DrawfitBot()
+    bot = dbot.DrawfitBot()
     bot.run(TOKEN)
 
 

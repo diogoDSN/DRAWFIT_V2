@@ -6,13 +6,14 @@ from requests_html import AsyncHTMLSession
 
 import drawfit.updates as updates
 
+from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
 from drawfit.utils import Sites, OddSample, BwinCode
 from drawfit.dtos import OddDto
 
 
-class Bwin(updates.Site):
+class Bwin(Site):
 
     url = "https://cds-api.bwin.pt/bettingoffer/fixtures?"
 
@@ -65,7 +66,7 @@ class Bwin(updates.Site):
                     for bet in market['options']:
                         if bet['name']['value'] == 'X':
                             # Append tupple (game, odd) to the list off obtained odds
-                            oddsList.append(OddSample(game['name']['value'], bet['price']['odds'], convertDate(game['startDate']), now, self.getTeams(game['name']['value'])))
+                            oddsList.append(OddSample(game['name']['value'], bet['price']['odds'], convertDate(game['startDate']), now))
         
         return oddsList
 

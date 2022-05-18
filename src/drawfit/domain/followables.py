@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import NoReturn, List, Tuple
 
-from drawfit.domain.classes.odd import Odd
+from drawfit.domain.odd import Odd
 
 from drawfit.utils import Sites, OddSample
 
@@ -95,7 +95,7 @@ class Game(Followable):
             self._date = date
     
     @property
-    def odds(self) -> List[List[domain.Odd]]:
+    def odds(self) -> List[List[Odd]]:
         return self._odds
 
     def __eq__(self, o):
@@ -106,7 +106,7 @@ class Game(Followable):
     def addOdd(self, sample: OddSample, site: Sites) -> bool:
 
         if self.odds[site.value] == [] or self.odds[site.value][-1].value != sample.odd:
-            self.odds[site.value].append(domain.Odd(sample.odd, sample.sample_time))
+            self.odds[site.value].append(Odd(sample.odd, sample.sample_time))
             return True
         
         return False

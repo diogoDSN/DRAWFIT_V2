@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Tuple
 
 import drawfit.bot.notify as v
-import drawfit.followables.followables as followables
+import drawfit.domain.followables as followables
 
 from drawfit.utils import Sites, OddSample
 

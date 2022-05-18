@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from drawfit.bot.drawfit_bot import DrawfitBot
-from drawfit.bot.messages import EmptyArgument
+from drawfit.bot.messages.commands import EmptyArgument
 
 def isCommand(ctx: commands.Context) -> bool:
 
