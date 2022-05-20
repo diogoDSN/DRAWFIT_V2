@@ -2,11 +2,11 @@ from enum import Enum
 
 class Sites(Enum):
 
-    Bwin = 0
+    Bwin = 'Bwin'
+    Betano = 'Betano'
     '''
-    Betano = 1
-    Solverde = 2
-    Moosh = 3
-    Betway = 4
-    Betclic = 5
+    Solverde = 'Solverde'
+    Moosh = 'Moosh'
+    Betway = 'Betway'
+    Betclic = 'Betclic'
     '''

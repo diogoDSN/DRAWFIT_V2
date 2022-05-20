@@ -1,5 +1,6 @@
 from __future__ import annotations
 import asyncio
+from asyncio.exceptions import TimeoutError
 from typing import NoReturn, TYPE_CHECKING
 
 if TYPE_CHECKING:
@@ -18,7 +19,7 @@ class Notify:
         self.bot = bot
         self.channels = bot.getChannels(dbot.DrawfitBot.update_channels)
         self.mods = bot.getUsersWithPermission(Permissions.MODERATOR)
-        self.timeout = 86400
+        self.timeout = 7200
 
 
     async def visitNewOdd(self, notification: notf.NewOddNotification) -> NoReturn:
@@ -44,20 +45,23 @@ class Notify:
             await message.add_reaction(No())
             sent_messages.append(message)
         
-        answer = ReactionAnswerCheck(sent_messages)
+        print("readying check")
+        answer = ReactionAnswerCheck(sent_messages, self.bot.user)
             
         try:
-            reaction, _ = await self.bot.wait_for("on_reaction_add", check=answer.check, timeout=self.timeout)
+            print("waiting for reaction")
+            reaction, _ = await self.bot.wait_for("reaction_add", check=answer.check, timeout=self.timeout)
+            print("got reaction")
 
             await reaction.message.reply("Answer received.")
             
-            if reaction.emoji == Yes():
+            if str(reaction.emoji) == Yes():
                 notification.followable.setId(notification.site, notification.possible_id)            
 
         except TimeoutError:
 
             for msg in sent_messages:
-                msg.reply(TimedOut())
+                await msg.reply(TimedOut())
             
             notification.followable.removeConsidered(notification.site, notification.possible_id)
         

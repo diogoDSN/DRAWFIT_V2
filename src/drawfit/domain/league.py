@@ -1,4 +1,4 @@
-from typing import List, Tuple, NoReturn
+from typing import List, Tuple, NoReturn, Dict
 from datetime import datetime
 
 import drawfit.domain.notifications as notf
@@ -19,7 +19,7 @@ class League:
         self._followed_teams: List[Team] = []
         self._inactive_teams: List[Team] = []
 
-        self._league_codes: List[LeagueCode] = [None for _ in Sites]
+        self._league_codes: Dict[site, LeagueCode] = {site: None for site in Sites}
 
     @property
     def name(self) -> str:
@@ -46,7 +46,7 @@ class League:
         return self._league_codes
     
     def setCode(self, code: LeagueCode) -> NoReturn:
-        self._league_codes[code.getSite().value] = code
+        self._league_codes[code.getSite()] = code
 
     def registerGame(self, name: str, date: datetime = None) -> NoReturn:
         new_game = Game(name, date)
@@ -110,17 +110,17 @@ class League:
         if game is not None:
             game.setId(site, team_id)
     
-    def updateOdds(self, samples_by_site: List[List[OddSample]]) -> List[notf.Notification]:
+    def updateOdds(self, samples_by_site: Dict[Sites, List[OddSample]]) -> List[notf.Notification]:
 
         results = []
 
         for site in Sites:
 
             # site is not active or an error ocurred
-            if samples_by_site[site.value] is None:
+            if samples_by_site[site] is None:
                 continue
 
-            for sample in samples_by_site[site.value]:
+            for sample in samples_by_site[site]:
                 notification = self.processSample(site, sample)
                 if notification not in results and notification is not None:
                     results.append(notification)
@@ -143,7 +143,7 @@ class League:
         team = next((team for team in self.followed_teams if team.isId(site, sample.team1_id) or team.isId(site, sample.team2_id)), None)
         
         if team is not None:
-            new_game = Game(' vs '.join(sample.game_id), date=sample.game_id_time)
+            new_game = Game(sample.game_name, date=sample.start_time)
             new_game.setId(site, sample.game_id)
             
             self._current_games.append(new_game)

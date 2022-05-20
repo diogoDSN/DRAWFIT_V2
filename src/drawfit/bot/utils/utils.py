@@ -3,7 +3,7 @@ from typing import List
 import discord
 from discord.ext import commands
 
-
+from drawfit.bot.messages import Yes, No
 from drawfit.bot.permissions import Permissions
 
 def hasPermission(ctx: commands.Context, permission: Permissions) -> bool:
@@ -26,8 +26,9 @@ class MessageCheck:
 
 class ReactionAnswerCheck:
 
-    def __init__(self, messages: List[discord.Message]):
+    def __init__(self, messages: List[discord.Message], bot: discord.User):
         self.messages = messages
-    
+        self.bot = bot
     def check(self, reaction: discord.Reaction, user: discord.User):
-        return reaction.message in self.messages and reaction.emoji in ("👍", "👎")
+        print("Checking for reaction")
+        return user != self.bot and reaction.message in self.messages and str(reaction.emoji) in (Yes(), No())

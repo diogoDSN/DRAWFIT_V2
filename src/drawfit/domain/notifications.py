@@ -32,12 +32,12 @@ class NewOddNotification(Notification):
         return False
     
     def __str__(self):
-        result = f'```{self.game.name} has new odds!\n'
+        result = f'NEW ODDS\n`{self.game.name}`\n'
 
         for site in Sites:
-            result += f'{site.name} - {self.game.odds[site.value][-1]}\n'
+            result += f'> {site.name} - {self.game.odds[site][-1].value}\n'
         
-        return result + '```'
+        return result
 
 
 class PossibleNotification(Notification):
@@ -76,9 +76,9 @@ class PossibleGameNotification(PossibleNotification):
 
     
     def __str__(self):
-        return f'I may have found a match for the game `{game.name}` in the site `{self.site}`.\n Does this odd belong to the game you want to track?\n \
-                    Name: {self.sample.game_name}\n \
-                    Date: {self.sample.start_time}\n'
+        return f'I may have found a match for the game `{game.name}` in the site `{self.site.name}`.\n Does this odd belong to the game you want to track?\n \
+                    Name: `{self.sample.game_name}`\n \
+                    Date: `{self.sample.start_time}`\n'
 
 class PossibleTeamNotification(PossibleNotification):
 
@@ -91,6 +91,6 @@ class PossibleTeamNotification(PossibleNotification):
         return self._team
 
     def __str__(self):
-        return f'I may have found a match for the team `{self._team.name}` in the site `{self.site}`.\n Does the following team match the team you want to track?\n \
-                    Team Name in {self.site}: {self.possible_id[0]}\n \
-                    Game where the name was found: {self.sample.game_name}\n'
+        return f'I may have found a match for the team `{self._team.name}` in the site `{self.site.name}`.\n Does the following team match the team you want to track?\n \
+                    Team Name in {self.site.name}: `{self.possible_id[0]}`\n \
+                    Game where the name was found: `{self.sample.game_name}`\n'

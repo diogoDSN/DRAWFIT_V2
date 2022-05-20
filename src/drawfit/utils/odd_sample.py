@@ -20,3 +20,11 @@ class OddSample:
     @property
     def game_name(self) -> str:
         return f'{self.game_id[0]} vs {self.game_id[1]}'
+    
+    @property
+    def team1_name(self) -> str:
+        return self.team1_id[0]
+
+    @property
+    def team1_name(self) -> str:
+        return self.team1_id[1]

@@ -4,13 +4,10 @@ from datetime import datetime
 from typing import Dict, List, NoReturn
 from requests_html import AsyncHTMLSession
 
-import drawfit.updates as updates
-
 from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
 from drawfit.utils import Sites, OddSample, BwinCode
-from drawfit.dtos import OddDto
 
 
 class Bwin(Site):
@@ -43,7 +40,7 @@ class Bwin(Site):
                 return self.parseResponse(request.json())
 
             except ValueError:
-                raise SiteError(Sites.BWIN.name)
+                raise SiteError(Sites.Bwin.name)
 
         else:
             return None
@@ -66,7 +63,7 @@ class Bwin(Site):
                     for bet in market['options']:
                         if bet['name']['value'] == 'X':
                             # Append tupple (game, odd) to the list off obtained odds
-                            oddsList.append(OddSample(game['name']['value'], bet['price']['odds'], convertDate(game['startDate']), now))
+                            oddsList.append(OddSample(self.getTeams(game['name']['value']), bet['price']['odds'], convertDate(game['startDate']), now))
         
         return oddsList
 

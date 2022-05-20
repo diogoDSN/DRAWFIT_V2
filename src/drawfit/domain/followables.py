@@ -11,8 +11,8 @@ class Followable:
 
     def __init__(self, keywords: List[str] = []) -> NoReturn:
         self._keywords: List[str] = keywords
-        self._considered: List[List[Tuple[str]]] = [[] for _ in Sites]
-        self._ids: List[Tuple[str]] = [None for _ in Sites]
+        self._considered: Dict[Sites, Optional[List[Tuple[str]]]] = {site: [] for site in Sites}
+        self._ids: Dict[Sites, Optional[Tuple[str]]] = {site: None for site in Sites}
         self._complete: bool = False
 
     # properties
@@ -32,17 +32,17 @@ class Followable:
         return self._considered
     
     def addConsidered(self, site: Sites, considered: Tuple[str]) -> NoReturn:
-        self._considered[site.value].append(considered)
+        self._considered[site].append(considered)
     
     def removeConsidered(self, site: Sites, considered: Tuple[str]):
-        self._considered[site.value].remove(considered)
+        self._considered[site].remove(considered)
     
     @property
     def ids(self) -> List[Tuple[str]]:
         return self._ids
     
     def setId(self, site: Sites, id: Tuple[str]) -> NoReturn:
-        self._ids[site.value] = id
+        self._ids[site] = id
 
         if None not in self.ids:
             self._complete = True
@@ -54,11 +54,11 @@ class Followable:
     # followable logic
     
     def isId(self, site: Sites, id: Tuple[str]) -> bool:
-        return self.ids[site.value] == id
+        return self.ids[site] == id
     
     def couldBeId(self, site: Sites, id: Tuple[str]) -> bool:
 
-        if self.ids[site.value] is not None or id in self.considered[site.value]:
+        if self.ids[site] is not None or id in self.considered[site]:
             return False
         
         for keyword in self.keywords:
@@ -78,12 +78,12 @@ class Game(Followable):
         # Set universal undefined values
         self._name: str = name
         self._date: datetime = date
-        self._odds = [[] for _ in Sites]
+        self._odds = {site: [] for site in Sites}
         
 
     @property
     def name(self) -> str:
-        return self._name.join
+        return self._name
 
     @property
     def date(self) -> datetime:
@@ -105,8 +105,8 @@ class Game(Followable):
 
     def addOdd(self, sample: OddSample, site: Sites) -> bool:
 
-        if self.odds[site.value] == [] or self.odds[site.value][-1].value != sample.odd:
-            self.odds[site.value].append(Odd(sample.odd, sample.sample_time))
+        if self.odds[site] == [] or self.odds[site][-1].value != sample.odd:
+            self.odds[site].append(Odd(sample.odd, sample.sample_time))
             return True
         
         return False

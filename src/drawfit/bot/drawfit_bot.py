@@ -82,8 +82,6 @@ class DrawfitBot(commands.Bot):
 
         self.handler_routine = asyncio.create_task(self.handlerRoutine())
 
-        await self.handler_routine
-
 
 
     async def on_command_error(self, ctx, error):
@@ -110,9 +108,6 @@ class DrawfitBot(commands.Bot):
 
             for notification in notifications:
                 self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
-            
-            for task in self.notify_tasks:
-                await task
             
             print("All notification tasks created! Waiting next update!")
 

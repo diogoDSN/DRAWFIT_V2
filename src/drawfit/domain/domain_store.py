@@ -11,7 +11,6 @@ class DomainStore:
 
     def __init__(self) -> NoReturn:
         self.known_leagues = []
-        self.n_sites = len(Sites.__members__)
 
     def getLeague(self, league_id: str) -> l.League:
         try:
@@ -46,7 +45,7 @@ class DomainStore:
         league = self.getLeague(league_id)
 
         if league is not None:
-            leagueCodes[site.value] = newCode
+            leagueCodes[site] = newCode
 
     def getLeagues(self) -> List:
 
