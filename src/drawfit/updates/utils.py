@@ -14,7 +14,7 @@ def convertDate(date: str):
 
     components = list(map(int, re.split('[-,:,T]', date[:-1])))
 
-    return datetime(components[0], components[1], components[2], components[3], components[4], components[5])
+    return datetime(components[0], components[1], components[2], components[3], components[4], 0, 0)
 
 def convertMilisecondsEpoch(epochValue: int):
     """
@@ -22,4 +22,6 @@ def convertMilisecondsEpoch(epochValue: int):
     date - comes in de format 2022-02-20T17:00:00Z
     Throws ValueError if the epoch is invalid
     """
-    return datetime.fromtimestamp(epochValue/1000)
+    date = datetime.fromtimestamp(epochValue/1000)
+    date.replace(second=0, microsecond=0)
+    return date

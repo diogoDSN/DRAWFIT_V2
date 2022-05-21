@@ -1,5 +1,5 @@
 from datetime import datetime
-from typing import NoReturn, List, Tuple, Dict
+from typing import NoReturn, List, Tuple, Dict, Optional
 
 from drawfit.domain.odd import Odd
 
@@ -118,10 +118,21 @@ class Team(Followable):
         super().__init__()
         self._name = name
         self._active: bool = True
+        self._games = []
     
     @property
     def name(self) -> str:
         return self._name
+    
+    @property
+    def games(self) -> List[Game]:
+        return self._games
+    
+    def addGame(self, game: Game) -> None:
+        self._games.append(game)
+    
+    def getGameByDate(self, date: datetime) -> Optional[Game]:
+        return next((game for game in self.games if game.date == date), None)
     
     def __eq__(self, o) -> bool:
         if isinstance(o, Team):

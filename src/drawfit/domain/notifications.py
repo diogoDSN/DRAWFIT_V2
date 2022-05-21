@@ -37,7 +37,11 @@ class NewOddNotification(Notification):
         result = f'NEW ODDS\n`{self.game.name}`\n{self.creation_time.strftime(DateFormating())}\n'
 
         for site in Sites:
-            result += f'> {site.name} - {self.game.odds[site][-1].value}\n'
+            if self.game.odds[site] == []:
+                odd = "no odds yet"
+            else:
+                odd = str(self.game.odds[site][-1].value)
+            result += f'> {site.name} - {odd}\n'
         
         return result
 
