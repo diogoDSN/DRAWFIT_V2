@@ -1,13 +1,14 @@
 import pytest
+from drawfit.domain.league import League
 
 from drawfit.utils import Sites
 
-from ..utils import create_league, create_team, LEAGUE1, TEAM1
+from ..utils import LEAGUE1, TEAM1
 
 
-def test_league_constructor(create_league):
+def test_league_constructor():
     
-    league = create_league
+    league = League(LEAGUE1)
 
     assert league.name == LEAGUE1
     assert league.current_games == []
@@ -26,9 +27,9 @@ def test_league_constructor(create_league):
     with pytest.raises(AttributeError):
         league.codes = None
 
-def test_league_add_team_keywords(create_league):
+def test_league_add_team_keywords():
     
-    league = create_league
+    league = League(LEAGUE1)
     
     league.registerTeam(TEAM1)
     league.addTeamKeywords(TEAM1, ["key1", "key2"])

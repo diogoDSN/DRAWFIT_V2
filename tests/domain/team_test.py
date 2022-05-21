@@ -3,12 +3,12 @@ import pytest
 from drawfit.utils import Sites
 from drawfit.domain.followables import Team
 
-from ..utils import get_fixed_date1, create_team, TEAM1
+from ..utils import  TEAM1
 
 
-def test_team_constructor(create_team, get_fixed_date1):
+def test_team_constructor():
 
-    team = create_team
+    team = Team(TEAM1)
 
     assert team.name == TEAM1
 
