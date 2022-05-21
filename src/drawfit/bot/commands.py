@@ -2,10 +2,11 @@ from discord.ext import commands
 
 from drawfit.bot.permissions import Permissions
 from drawfit.bot.messages.commands import *
+from drawfit.bot.messages import NoPermission
 from drawfit.bot.utils import hasPermission
 from drawfit.bot.utils.commands import *
 
-from drawfit.utils import Sites, BwinCode, LeagueCodeError
+from drawfit.utils import BwinCode, BetanoCode, LeagueCodeError
 
 
 @commands.command()
@@ -111,6 +112,31 @@ async def setBwinLeagueCode(ctx: commands.Context, *, arguments = ''):
     except LeagueCodeError as e:
         await ctx.send(e.error_message)
 
+# $setBwinLeagueCode league_id (league_name|league_number)
+@commands.command()
+async def setBetanoLeagueCode(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+    
+    args = checkAtLeastNArguments(arguments, 2, setBwinLeagueCodeUsage())
+
+    try:
+
+        code = BetanoCode(args[0])
+        league = ' '.join(args[1:])
+
+        ctx.bot.store.setLeagueCode(league, code)
+
+        await ctx.send(f'Betano code: `{args[0]}` added to league `{league}`!')
+
+    except LeagueCodeError as e:
+        await ctx.send(e.error_message)
+
 
 # $addTeam league_name::team_name
 @commands.command()
@@ -147,10 +173,10 @@ async def addTeamKeywords(ctx: commands.Context, *, arguments = ''):
 
     if '' not in keywords and ctx.bot.store.addTeamKeywords(args[0], args[1], keywords) :
         
-        response = f'The following keywords were added to the team \'{args[1]}\':\n'
+        response = f'The following keywords were added to the team `{args[1]}`:\n'
 
         for keyword in keywords:
-            response += keyword + '\n'
+            response += f'> {keyword}\n'
 
         await ctx.send(response)
     else:

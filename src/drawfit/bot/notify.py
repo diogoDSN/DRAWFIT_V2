@@ -24,34 +24,39 @@ class Notify:
 
     async def visitNewOdd(self, notification: notf.NewOddNotification) -> NoReturn:
 
-        for channel in self.channels:
-            await channel.send(notification)
+        try:
 
-        self.bot.endTask(asyncio.current_task())
+            for channel in self.channels:
+                await channel.send(notification)
+            
+        except Exception as e:
+            print(e)
+        
+        finally:
+            self.bot.endTask(asyncio.current_task())
+
+        
     
     async def visitPossible(self, notification: notf.PossibleNotification) -> NoReturn:
 
-        notification.followable.addConsidered(notification.site, notification.possible_id)
-
-        moderators = self.bot.getUsersWithPermission(Permissions.MODERATOR)
-
-        sent_messages = []
-
-        for moderator in moderators:
-
-            message = await moderator.send(notification)
-
-            await message.add_reaction(Yes())
-            await message.add_reaction(No())
-            sent_messages.append(message)
-        
-        print("readying check")
-        answer = ReactionAnswerCheck(sent_messages, self.bot.user)
-            
         try:
-            print("waiting for reaction")
+
+            notification.followable.addConsidered(notification.site, notification.possible_id)
+
+            moderators = self.bot.getUsersWithPermission(Permissions.MODERATOR)
+
+            sent_messages = []
+
+            for moderator in moderators:
+
+                message = await moderator.send(notification)
+
+                await message.add_reaction(Yes())
+                await message.add_reaction(No())
+                sent_messages.append(message)
+            
+            answer = ReactionAnswerCheck(sent_messages, self.bot.user)
             reaction, _ = await self.bot.wait_for("reaction_add", check=answer.check, timeout=self.timeout)
-            print("got reaction")
 
             await reaction.message.reply("Answer received.")
             
@@ -65,6 +70,9 @@ class Notify:
             
             notification.followable.removeConsidered(notification.site, notification.possible_id)
         
+        except Exception as e:
+            print(e)
+
         finally:
             self.bot.endTask(asyncio.current_task())
 

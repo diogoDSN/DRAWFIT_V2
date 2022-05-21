@@ -82,8 +82,6 @@ class DrawfitBot(commands.Bot):
 
         self.handler_routine = asyncio.create_task(self.handlerRoutine())
 
-
-
     async def on_command_error(self, ctx, error):
         if error.__class__ == commands.BadArgument:
             await ctx.send(error)
@@ -91,7 +89,6 @@ class DrawfitBot(commands.Bot):
             pass
         else:
             raise error
-    
 
     async def handlerRoutine(self):
 
@@ -112,7 +109,6 @@ class DrawfitBot(commands.Bot):
             print("All notification tasks created! Waiting next update!")
 
             await asyncio.sleep(30)
-    
     
     def teamIdAccepted(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
         self.store.setTeamId(team_name, team_id, site, league_name)

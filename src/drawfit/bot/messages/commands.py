@@ -15,3 +15,9 @@ def addTeamKeywordsUsage():
 
 def setBwinLeagueCodeUsage():
     return 'Correct usage:\n```$setBwinLeagueCode (region_id),(competition_id) (league_name|league_number)```'
+
+def setBetanoLeagueCodeUsage():
+    return 'Correct usage:\n```$setBwinLeagueCode (league_id) (league_name|league_number)```'
+
+
+    

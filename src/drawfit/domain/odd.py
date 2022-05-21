@@ -4,8 +4,8 @@ from typing import NoReturn
 class Odd:
 
     def __init__(self, value: float, date: datetime) -> NoReturn:
-        self._value = value
-        self._date = date
+        self._value: float = value
+        self._date: datetime = date
 
     @property
     def value(self) -> float:

@@ -4,11 +4,27 @@ from typing import Tuple
 class OddSample:
 
     def __init__(self, game_id: Tuple[str], odd: float, start_time: datetime, sample_time: datetime):
-        self.game_id = game_id
-        self.odd = odd
-        self.start_time = start_time
-        self.sample_time = sample_time
+        self._game_id = game_id
+        self._odd = odd
+        self._start_time = start_time
+        self._sample_time = sample_time
     
+    @property
+    def game_id(self) -> Tuple[str]:
+        return self._game_id
+    
+    @property
+    def odd(self) -> float:
+        return self._odd
+    
+    @property
+    def start_time(self) -> datetime:
+        return self._start_time
+     
+    @property
+    def sample_time(self) -> datetime:
+        return self._sample_time
+
     @property
     def team1_id(self) -> Tuple[str]:
         return (self.game_id[0],)

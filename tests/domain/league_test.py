@@ -2,10 +2,10 @@ import pytest
 
 from drawfit.utils import Sites
 
-from ..utils import create_league, LEAGUE1
+from ..utils import create_league, create_team, LEAGUE1, TEAM1
 
 
-def test_constructor(create_league):
+def test_league_constructor(create_league):
     
     league = create_league
 
@@ -13,7 +13,7 @@ def test_constructor(create_league):
     assert league.current_games == []
     assert league.followed_teams == []
     assert league.inactive_teams == []
-    assert league.league_codes == [None for _ in Sites]
+    assert league.codes == {site: None for site in Sites}
 
     with pytest.raises(AttributeError):
         league.name = None
@@ -24,6 +24,16 @@ def test_constructor(create_league):
     with pytest.raises(AttributeError):
         league.inactive_teams = None
     with pytest.raises(AttributeError):
-        league.league_codes = None
+        league.codes = None
+
+def test_league_add_team_keywords(create_league):
     
+    league = create_league
+    
+    league.registerTeam(TEAM1)
+    league.addTeamKeywords(TEAM1, ["key1", "key2"])
+
+    assert "key1" in league.followed_teams[0].keywords
+    assert "key2" in league.followed_teams[0].keywords
+    assert len(league.followed_teams[0].keywords) == 2
 

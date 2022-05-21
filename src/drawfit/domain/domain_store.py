@@ -1,5 +1,9 @@
+from __future__ import annotations
 import asyncio
-from typing import Dict, List, Tuple, NoReturn
+from typing import Dict, List, Tuple, NoReturn, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from drawfit.domain.league import League
 
 import drawfit.domain.notifications as notf
 import drawfit.domain.league as l
@@ -12,7 +16,7 @@ class DomainStore:
     def __init__(self) -> NoReturn:
         self.known_leagues = []
 
-    def getLeague(self, league_id: str) -> l.League:
+    def getLeague(self, league_id: str) -> League:
         try:
             index = int(league_id)-1
             

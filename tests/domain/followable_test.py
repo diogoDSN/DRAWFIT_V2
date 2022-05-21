@@ -1,7 +1,7 @@
 import pytest
 
 from drawfit.utils import Sites
-from drawfit.domain import Followable
+from drawfit.domain.followables import Followable
 
 from ..utils import SITE1, SITE2, TEAM1, TEAM1_ID, NO_TEAM_ID
 
@@ -13,12 +13,11 @@ def create_followable():
 def set_name(create_followable):
     create_followable.setId(SITE1, TEAM1)
 
-def test_constructor(create_followable):
+def test_followable_constructor(create_followable):
     followable = create_followable
-
     assert followable.keywords == [TEAM1]
-    assert followable.considered == [[] for _ in Sites]
-    assert followable.ids == [None for _ in Sites]
+    assert followable.considered == {site: [] for site in Sites}
+    assert followable.ids == {site: None for site in Sites}
     assert followable.complete == False
 
     with pytest.raises(AttributeError):

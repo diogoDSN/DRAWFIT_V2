@@ -1,9 +1,14 @@
+from __future__ import annotations
+
 import asyncio
-from typing import NoReturn, List, Dict
+from typing import TYPE_CHECKING, NoReturn, List, Dict, Optional
 from requests_html import AsyncHTMLSession
 
-from drawfit.domain.notifications import Notification
-from drawfit.domain.domain_store import DomainStore
+if TYPE_CHECKING:
+    from drawfit.domain.notifications import Notification
+    from drawfit.domain.domain_store import DomainStore
+
+import drawfit.domain.domain_store as ds
 
 from drawfit.updates.sites.bwin import Bwin
 from drawfit.updates.sites.betano import Betano

@@ -29,6 +29,6 @@ class ReactionAnswerCheck:
     def __init__(self, messages: List[discord.Message], bot: discord.User):
         self.messages = messages
         self.bot = bot
+        
     def check(self, reaction: discord.Reaction, user: discord.User):
-        print("Checking for reaction")
         return user != self.bot and reaction.message in self.messages and str(reaction.emoji) in (Yes(), No())
