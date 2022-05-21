@@ -5,7 +5,7 @@ from drawfit.utils import Sites
 from drawfit.domain.followables import Game, Team
 from drawfit.utils.odd_sample import OddSample
 
-from ..utils import DATE1, DATE2, GAME1, GAME1_ID1, GAME1_ID2, GAME2, ODDS, RUNTIME, SITE1, SITE2
+from ..utils import DATE1, DATE2, GAME1, GAME1_BWIN_ID, GAME1_BETANO_ID, GAME2, ODDS, RUNTIME, BWIN, BETANO
 
 
 def test_game_constructor():
@@ -28,8 +28,8 @@ def test_game_equals_equal_game():
 
     game = Game(GAME1, DATE1)
     equal_game = Game(GAME1, DATE1)
-    equal_game.addOdd(OddSample(GAME1_ID1, ODDS[0], DATE1, RUNTIME), SITE1)
-    equal_game.addOdd(OddSample(GAME1_ID2, ODDS[1], DATE1, RUNTIME), SITE2)
+    equal_game.addOdd(OddSample(GAME1_BWIN_ID, ODDS[0], DATE1, RUNTIME), BWIN)
+    equal_game.addOdd(OddSample(GAME1_BETANO_ID, ODDS[1], DATE1, RUNTIME), BETANO)
 
     assert game == equal_game
 

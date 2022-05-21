@@ -52,6 +52,16 @@ class League:
         new_game = Game(name, date)
         if new_game not in self.current_games:
             self._current_games.append(new_game)
+        
+    def addGameKeywords(self, game_name: str, keywords: List[str]) -> bool:
+
+        game = next((game for game in self.current_games if game.name == game_name), None)
+
+        if game is not None:
+            game.addKeywords(keywords)
+            return True
+        
+        return False
 
     def registerTeam(self, name: str) -> bool:
 
@@ -114,13 +124,13 @@ class League:
 
         results = []
 
-        for site in Sites:
+        for site, site_samples in samples_by_site.items():
 
             # site is not active or an error ocurred
-            if samples_by_site[site] is None:
+            if site_samples is None:
                 continue
 
-            for sample in samples_by_site[site]:
+            for sample in site_samples:
                 notification = self.processSample(site, sample)
                 if notification not in results and notification is not None:
                     results.append(notification)

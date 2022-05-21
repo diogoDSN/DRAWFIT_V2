@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from datetime import datetime
-from typing import Tuple
+from typing import Tuple, overload
 
 import drawfit.bot.notify as v
 from drawfit.bot.messages import DateFormating
@@ -58,6 +58,13 @@ class PossibleNotification(Notification):
     def followable(self) -> followables.Followable:
         pass
 
+    def __eq__(self, o) -> bool:
+        if isinstance(o, PossibleNotification):
+            return self.possible_id == o.possible_id \
+               and self.site == o.site
+        
+        return False
+
     async def accept(self, visitor: v.Notify):
         await visitor.visitPossible(self)
 
@@ -73,9 +80,7 @@ class PossibleGameNotification(PossibleNotification):
 
     def __eq__(self, o):
         if isinstance(o, PossibleGameNotification):
-            return self.followable == o.followable \
-               and self.sample == o.sample \
-               and self.site == o.site
+            return super().__eq__(o) and self.followable == o.followable
         
         return False
     
@@ -96,9 +101,7 @@ class PossibleTeamNotification(PossibleNotification):
     
     def __eq__(self, o):
         if isinstance(o, PossibleTeamNotification):
-            return self.followable == o.followable \
-               and self.sample == o.sample \
-               and self.site == o.site
+            return super().__eq__(o) and self.followable == o.followable
         
         return False
 
