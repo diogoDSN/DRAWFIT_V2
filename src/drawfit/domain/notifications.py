@@ -34,7 +34,7 @@ class NewOddNotification(Notification):
 
     
     def __str__(self):
-        result = f'**NEW ODDS**\n{self.creation_time.strftime(DateFormating())}\n> {self.game.name}\n```'
+        result = f'**NEW ODDS**\n{self.creation_time.strftime(DateFormating())}\n> {self.game.name}\n> Date: {self.game.date.strftime(DateFormating())}\n```'
 
         for site in Sites:
             if self.game.odds[site] == []:

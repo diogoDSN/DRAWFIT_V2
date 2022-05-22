@@ -15,6 +15,7 @@ from drawfit.updates.sites.bwin import Bwin
 from drawfit.updates.sites.betano import Betano
 from drawfit.updates.sites.solverde import Solverde
 from drawfit.updates.sites.moosh import Moosh
+from drawfit.updates.sites.betway import Betway
 
 from drawfit.utils import Sites
 
@@ -29,6 +30,7 @@ class UpdateHandler:
         self.sites[Sites.Betano] = Betano()
         self.sites[Sites.Solverde] = Solverde()
         self.sites[Sites.Moosh] = Moosh()
+        self.sites[Sites.Betway] = Betway()
 
 
     async def update(self) -> List[Notification]:

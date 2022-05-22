@@ -68,4 +68,17 @@ class MooshCode(LeagueCode):
     def getSite(self) -> Sites:
         return Sites.Moosh
 
+class BetwayCode(LeagueCode):
+
+    pattern = '\\A.*\\Z'
+    error_msg = 'Invalid betway league code! A betway league code follows the format:\n `Itália - Série B`'
+
+    def __init__(self, raw_code: str):
+        
+        super().__init__(raw_code, BetwayCode.pattern, BetwayCode.error_msg)
+        self.name = raw_code
+
+    def getSite(self) -> Sites:
+        return Sites.Betway
+
         

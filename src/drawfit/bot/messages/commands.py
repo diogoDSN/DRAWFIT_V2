@@ -25,5 +25,8 @@ def setSolverdeLeagueCodeUsage():
 def setMooshLeagueCodeUsage():
     return 'Correct usage:\n```$setMooshLeagueCode (league_id)::(league_name|league_number)```'
 
+def setBetwayLeagueCodeUsage():
+    return 'Correct usage:\n```$setBetwayLeagueCode (league_id)::(league_name|league_number)```'
+
 
     

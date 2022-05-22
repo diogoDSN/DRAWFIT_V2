@@ -7,6 +7,7 @@ from drawfit.bot.utils import hasPermission
 from drawfit.bot.utils.commands import *
 
 from drawfit.utils import BwinCode, BetanoCode, SolverdeCode, MooshCode, LeagueCodeError
+from drawfit.utils.league_codes.league_codes import BetwayCode
 
 
 @commands.command()
@@ -188,6 +189,32 @@ async def setMooshLeagueCode(ctx: commands.Context, *, arguments = ''):
 
     except LeagueCodeError as e:
         await ctx.send(e.error_message)
+
+# $setMooshLeagueCode league_id::(league_name|league_number)
+@commands.command()
+async def setBetwayLeagueCode(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+    
+    args = checkNNameArguments(arguments, 2, setBetwayLeagueCodeUsage())
+
+    try:
+
+        code = BetwayCode(args[0])
+        league = args[1]
+
+        ctx.bot.store.setLeagueCode(league, code)
+
+        await ctx.send(f'Betway code: `{args[0]}` added to league `{league}`!')
+
+    except LeagueCodeError as e:
+        await ctx.send(e.error_message)
+
 
 
 # $addTeam league_name::team_name

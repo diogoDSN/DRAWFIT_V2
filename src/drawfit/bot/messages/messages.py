@@ -11,4 +11,4 @@ def No():
     return "👎"
 
 def DateFormating():
-    return '%Y-%B-%d, %A\n%H:%M:%S'
+    return '%A, %B-%d, %H:%M:%S'
