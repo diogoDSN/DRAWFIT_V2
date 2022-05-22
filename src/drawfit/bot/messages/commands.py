@@ -17,7 +17,7 @@ def setBwinLeagueCodeUsage():
     return 'Correct usage:\n```$setBwinLeagueCode (region_id),(competition_id) (league_name|league_number)```'
 
 def setBetanoLeagueCodeUsage():
-    return 'Correct usage:\n```$setBwinLeagueCode (league_id) (league_name|league_number)```'
+    return 'Correct usage:\n```$setBetanoLeagueCode (league_id) (league_name|league_number)```'
 
 def setSolverdeLeagueCodeUsage():
     return 'Correct usage:\n```$setSolverdeLeagueCode (country_code),(league_id) (league_name|league_number)```'
@@ -27,6 +27,9 @@ def setMooshLeagueCodeUsage():
 
 def setBetwayLeagueCodeUsage():
     return 'Correct usage:\n```$setBetwayLeagueCode (league_id)::(league_name|league_number)```'
+
+def setBetclicLeagueCodeUsage():
+    return 'Correct usage:\n```$setBetclicLeagueCode (league_id) (league_name|league_number)```'
 
 
     

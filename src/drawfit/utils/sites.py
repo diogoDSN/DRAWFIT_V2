@@ -7,6 +7,4 @@ class Sites(Enum):
     Solverde = 'Solverde'
     Moosh = 'Moosh'
     Betway = 'Betway'
-    '''
     Betclic = 'Betclic'
-    '''

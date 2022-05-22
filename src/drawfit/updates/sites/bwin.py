@@ -39,7 +39,7 @@ class Bwin(Site):
                 # Gets the odds from the info
                 return self.parseResponse(request.json())
 
-            except ValueError:
+            except Exception:
                 raise SiteError(Sites.Bwin.name)
 
         else:

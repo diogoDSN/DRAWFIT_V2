@@ -7,7 +7,7 @@ from drawfit.bot.utils import hasPermission
 from drawfit.bot.utils.commands import *
 
 from drawfit.utils import BwinCode, BetanoCode, SolverdeCode, MooshCode, LeagueCodeError
-from drawfit.utils.league_codes.league_codes import BetwayCode
+from drawfit.utils.league_codes.league_codes import BetclicCode, BetwayCode
 
 
 @commands.command()
@@ -124,7 +124,7 @@ async def setBetanoLeagueCode(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
     
-    args = checkAtLeastNArguments(arguments, 2, setBwinLeagueCodeUsage())
+    args = checkAtLeastNArguments(arguments, 2, setBetanoLeagueCodeUsage())
 
     try:
 
@@ -190,7 +190,7 @@ async def setMooshLeagueCode(ctx: commands.Context, *, arguments = ''):
     except LeagueCodeError as e:
         await ctx.send(e.error_message)
 
-# $setMooshLeagueCode league_id::(league_name|league_number)
+# $setBetwayLeagueCode league_id::(league_name|league_number)
 @commands.command()
 async def setBetwayLeagueCode(ctx: commands.Context, *, arguments = ''):
 
@@ -211,6 +211,31 @@ async def setBetwayLeagueCode(ctx: commands.Context, *, arguments = ''):
         ctx.bot.store.setLeagueCode(league, code)
 
         await ctx.send(f'Betway code: `{args[0]}` added to league `{league}`!')
+
+    except LeagueCodeError as e:
+        await ctx.send(e.error_message)
+
+# $setBwinLeagueCode league_id (league_name|league_number)
+@commands.command()
+async def setBetclicLeagueCode(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+    
+    args = checkAtLeastNArguments(arguments, 2, setBetclicLeagueCodeUsage())
+
+    try:
+
+        code = BetclicCode(args[0])
+        league = ' '.join(args[1:])
+
+        ctx.bot.store.setLeagueCode(league, code)
+
+        await ctx.send(f'Betano code: `{args[0]}` added to league `{league}`!')
 
     except LeagueCodeError as e:
         await ctx.send(e.error_message)

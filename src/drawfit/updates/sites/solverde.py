@@ -85,7 +85,7 @@ class Solverde(Site):
 
                 return odds
 
-            except json.JSONDecodeError:
+            except Exception:
                 raise SiteError(Sites.Solverde.name)
 
         else:

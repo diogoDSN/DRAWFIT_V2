@@ -4,7 +4,6 @@ import websockets as ws
 from datetime import datetime
 from typing import List, NoReturn
 from requests_html import AsyncHTMLSession
-from requests.exceptions import JSONDecodeError
 
 
 from drawfit.updates.sites.site import Site
@@ -49,7 +48,7 @@ class Moosh(Site):
 
                 return odds
 
-            except json.JSONDecodeError or JSONDecodeError:
+            except Exception:
                 raise SiteError(Sites.Moosh.name)
 
         else:
@@ -129,18 +128,21 @@ class Moosh(Site):
         
         return leagueID, regionID
     
-    
+        
     def getLeagueOdds(self, info):
         odds = []
         info = json.loads(info)
         events = info["result"]["events"]
         markets = info["result"]["markets"]
 
-        for i in range(len(events)):
+        diff = len(events) - len(markets)
 
-            for bet in markets[i]["selections"]:
+        for i, market in enumerate(markets):
+            
+            for bet in market["selections"]:
                 if bet["name"] == "Empate":
                     odd = bet["displayOdds"]["decimal"]
-            odds.append(OddSample(self.getTeams(events[i]["eventName"]), float(odd), convertDate(events[i]["startEventDate"]), datetime.now()))
+
+            odds.append(OddSample(self.getTeams(events[i + diff]["eventName"]), float(odd), convertDate(events[i]["startEventDate"]), datetime.now()))
         
         return odds

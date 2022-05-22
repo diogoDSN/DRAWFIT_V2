@@ -81,4 +81,17 @@ class BetwayCode(LeagueCode):
     def getSite(self) -> Sites:
         return Sites.Betway
 
+class BetclicCode(LeagueCode):
+
+    pattern = '\\A\\d{1,8}\\Z'
+    error_msg = 'Invalid betclic league code! A betclic league code follows the format:\n `0000`'
+
+    def __init__(self, raw_code: str):
+         
+        super().__init__(raw_code, BetclicCode.pattern, BetclicCode.error_msg)
+        self.id = raw_code
+
+    def getSite(self) -> Sites:
+        return Sites.Betclic
+
         
