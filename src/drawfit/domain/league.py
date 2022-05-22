@@ -64,15 +64,11 @@ class League:
         return False
 
     def registerTeam(self, name: str) -> bool:
-        
-        print(f"Registering {name}")
 
         if next((team for team in self.followed_teams if team.name == name), None) is None and next((team for team in self.inactive_teams if team.name == name), None) is None:
             self._followed_teams.append(Team(name))
-            print("Success")
-            return
+            return True
         
-        print("DAMN")
         return False
     
     def addTeamKeywords(self, team_name: str, keywords: List[str]) -> bool:
@@ -81,14 +77,12 @@ class League:
 
 
         if team is not None:
-            print(f'1 Team: {team.name}; Given name: {team_name}; Keywords: {team.keywords}; New Keywords: {keywords}')
             team.addKeywords(keywords)
             return True
         
         team = next((team for team in self.inactive_teams if team.name == team_name), None)
 
         if team is not None:
-            print(f'2 Team: {team.name}; Given name: {team_name}; Keywords: {team.keywords}; New Keywords: {keywords}')
             team.addKeywords(keywords)
             return True
         
@@ -124,7 +118,7 @@ class League:
         
         game = next((game for game in self.current_games if game.name == game_name), None)
         if game is not None:
-            game.setId(site, team_id)
+            game.setId(site, game_id)
     
     def updateOdds(self, samples_by_site: Dict[Sites, List[OddSample]]) -> List[notf.Notification]:
 
@@ -172,6 +166,7 @@ class League:
             new_game.setId(site, sample.game_id)
             
             self._current_games.append(new_game)
+            team.addGame(new_game)
             new_game.addOdd(sample, site)
 
             return notf.NewOddNotification(new_game)
