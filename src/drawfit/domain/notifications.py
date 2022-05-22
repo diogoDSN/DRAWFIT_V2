@@ -80,12 +80,12 @@ class PossibleGameNotification(PossibleNotification):
 
     def __eq__(self, o):
         if isinstance(o, PossibleGameNotification):
-            return super().__eq__(o) and self.followable == o.followable
+            return super().__eq__(o) and self.followable is o.followable
         
         return False
     
     def __str__(self):
-        return f'I may have found a match for the game `{game.name}` in the site `{self.site.name}`.\n Does this odd belong to the game you want to track?\n \
+        return f'I may have found a match for the game `{self.game.name}` in the site `{self.site.name}`.\n Does this odd belong to the game you want to track?\n \
                     Name: `{self.sample.game_name}`\n \
                     Date: `{self.sample.start_time}`\n'
 
@@ -101,7 +101,7 @@ class PossibleTeamNotification(PossibleNotification):
     
     def __eq__(self, o):
         if isinstance(o, PossibleTeamNotification):
-            return super().__eq__(o) and self.followable == o.followable
+            return super().__eq__(o) and self.followable is o.followable
         
         return False
 

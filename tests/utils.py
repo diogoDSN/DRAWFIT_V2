@@ -38,8 +38,8 @@ GAME2_BWIN_ID = (TEAM3_BWIN_ID[0], TEAM2_BWIN_ID[0])
 GAME2_BETANO_ID = (TEAM3_BETANO_ID[0], TEAM2_BETANO_ID[0])
 
 GAME3 = 'Portela vs Mucifal'
-GAME2_BWIN_ID = ('Portela de Sintra', 'Clube do Mucifal')
-GAME2_BETANO_ID = ('Portela', 'Mucifal')
+GAME3_BWIN_ID = ('Portela de Sintra', 'Clube do Mucifal')
+GAME3_BETANO_ID = ('Portela', 'Mucifal')
 
 ODDS = [1.4, 1.3, 2.0, 3.2, 2.5]
 

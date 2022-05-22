@@ -48,5 +48,12 @@ def test_possible_team_notification_equals():
     n1 = PossibleTeamNotification(team, sample2, sample2.team2_id, BWIN)
     n2 = PossibleTeamNotification(team, sample3, sample3.team2_id, BETANO)
 
+
+    print("\n\n\n\n")
+    print(n)
+    print("------------------------------------------")
+    print(n1)
+    print("\n\n\n\n")
+
     assert n == n1
     assert n != n2

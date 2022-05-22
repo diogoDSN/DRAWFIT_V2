@@ -42,8 +42,8 @@ class OddSample:
         return self.team1_id[0]
 
     @property
-    def team1_name(self) -> str:
-        return self.team1_id[1]
+    def team2_name(self) -> str:
+        return self.team2_id[0]
     
     def __str__(self) -> str:
         return f'Sample for {self.game_id} with value {self.odd}'
