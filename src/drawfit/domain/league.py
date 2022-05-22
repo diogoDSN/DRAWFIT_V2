@@ -19,7 +19,7 @@ class League:
         self._followed_teams: List[Team] = []
         self._inactive_teams: List[Team] = []
 
-        self._league_codes: Dict[site, LeagueCode] = {site: None for site in Sites}
+        self._league_codes: Dict[Sites, LeagueCode] = {site: None for site in Sites}
 
     @property
     def name(self) -> str:
@@ -64,25 +64,31 @@ class League:
         return False
 
     def registerTeam(self, name: str) -> bool:
-
-        new_team = Team(name)
-        if new_team not in self._followed_teams and new_team not in self._inactive_teams:
-            self._followed_teams.append(new_team)
-            return True
         
+        print(f"Registering {name}")
+
+        if next((team for team in self.followed_teams if team.name == name), None) is None and next((team for team in self.inactive_teams if team.name == name), None) is None:
+            self._followed_teams.append(Team(name))
+            print("Success")
+            return
+        
+        print("DAMN")
         return False
     
     def addTeamKeywords(self, team_name: str, keywords: List[str]) -> bool:
 
         team = next((team for team in self.followed_teams if team.name == team_name), None)
 
+
         if team is not None:
+            print(f'1 Team: {team.name}; Given name: {team_name}; Keywords: {team.keywords}; New Keywords: {keywords}')
             team.addKeywords(keywords)
             return True
         
         team = next((team for team in self.inactive_teams if team.name == team_name), None)
 
         if team is not None:
+            print(f'2 Team: {team.name}; Given name: {team_name}; Keywords: {team.keywords}; New Keywords: {keywords}')
             team.addKeywords(keywords)
             return True
         
@@ -132,6 +138,7 @@ class League:
 
             for sample in site_samples:
                 notification = self.processSample(site, sample)
+
                 if notification not in results and notification is not None:
                     results.append(notification)
             
@@ -139,8 +146,6 @@ class League:
 
 
     def processSample(self, site: Sites, sample: OddSample) -> notf.Notification:
-
-        print(f'Processing {sample} for site {site.name}.')
 
         # 1 - sample's game name is being monitored so the odd is added
         game = next((game for game in self.current_games if game.isId(site, sample.game_id)), None)
@@ -172,17 +177,20 @@ class League:
             return notf.NewOddNotification(new_game)
 
         # 3 - test if the game could belong to a followed team
-        for team_id in sample.game_id:
+        for team_name in sample.game_id:
 
-            possible_team = next((team for team in self.followed_teams if team.couldBeId(site, (team_id,))), None)
+            team_id = (team_name, )
+            possible_team = next((team for team in self.followed_teams if team.couldBeId(site, team_id)), None)
 
             if possible_team is not None:
-                return notf.PossibleTeamNotification(possible_team, sample, (team_id,), site)
+                possible_team.addConsidered(site, team_id)
+                return notf.PossibleTeamNotification(possible_team, sample, team_id, site)
         
         # 4 - test if the game could be a singled out inputed game
         possible_game = next((game for game in self.current_games if game.couldBeId(site, sample.game_id)), None)
 
         if possible_game is not None:
+            possible_game.addConsidered(site, sample.game_id)
             return notf.PossibleGameNotification(possible_game, sample, site)
         
         return None

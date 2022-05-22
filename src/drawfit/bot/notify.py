@@ -30,6 +30,7 @@ class Notify:
                 await channel.send(notification)
             
         except Exception as e:
+            print("Exception raised in visitNewOdd!")
             print(e)
         
         finally:
@@ -40,8 +41,6 @@ class Notify:
     async def visitPossible(self, notification: notf.PossibleNotification) -> NoReturn:
 
         try:
-
-            notification.followable.addConsidered(notification.site, notification.possible_id)
 
             moderators = self.bot.getUsersWithPermission(Permissions.MODERATOR)
 
@@ -71,6 +70,7 @@ class Notify:
             notification.followable.removeConsidered(notification.site, notification.possible_id)
         
         except Exception as e:
+            print("Exception raised in visitPossible!")
             print(e)
 
         finally:

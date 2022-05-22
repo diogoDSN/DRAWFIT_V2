@@ -105,7 +105,10 @@ class PossibleTeamNotification(PossibleNotification):
         
         return False
 
-    def __str__(self):
+    def __str__(self) -> str:
         return f'I may have found a match for the team `{self._team.name}` in the site `{self.site.name}`.\n Does the following team match the team you want to track?\n \
                     Team Name in {self.site.name}: `{self.possible_id[0]}`\n \
                     Game where the name was found: `{self.sample.game_name}`\n'
+    
+    def __repr__(self) -> str:
+        return str(self)

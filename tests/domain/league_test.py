@@ -9,7 +9,7 @@ from drawfit.utils.odd_sample import OddSample
 from ..utils import BETANO, BWIN, DATE1, GAME1, GAME1_BETANO_ID, GAME1_BWIN_ID, GAME2_BWIN_ID, GAME3, LEAGUE1, ODDS, RUNTIME, TEAM1, TEAM1_BWIN_ID, TEAM2, TEAM2_BWIN_ID, TEAM3
 
 
-@pytest.fixture
+@pytest.fixture(scope="function")
 def create_demo_league():
     league = League(LEAGUE1)
     league.registerTeam(TEAM1)
@@ -43,18 +43,38 @@ def test_league_constructor():
     with pytest.raises(AttributeError):
         league.codes = None
 
+
+def test_register_team():
+
+    league = League(LEAGUE1)
+
+    league.registerTeam(TEAM1)
+    league.registerTeam(TEAM2)
+
+    assert len(league.followed_teams) == 2
+    assert league.followed_teams[0].name == TEAM1
+    assert league.followed_teams[1].name == TEAM2
+
 def test_league_add_team_keywords():
     
     league = League(LEAGUE1)
-    
+
+    print(f'\n{league.followed_teams}\n')
+
     league.registerTeam(TEAM1)
+    league.registerTeam(TEAM2)
+
+    print(f'\n{league.followed_teams}\n')
+
     league.addTeamKeywords(TEAM1, ["key1", "key2"])
+
+    print(f'\n{league.followed_teams}\n')
 
     assert "key1" in league.followed_teams[0].keywords
     assert "key2" in league.followed_teams[0].keywords
     assert len(league.followed_teams[0].keywords) == 2
+    assert league.followed_teams[1].keywords == []
 
-'''
 def test_possible_team(create_demo_league):
 
     league = create_demo_league
@@ -66,7 +86,7 @@ def test_possible_team(create_demo_league):
 
     notifications = league.updateOdds(update)
 
-    assert notifications == [PossibleTeamNotification(Team(TEAM1), sample, TEAM1_BWIN_ID, BWIN)]
+    assert notifications == [PossibleTeamNotification(league.followed_teams[1], sample, TEAM2_BWIN_ID, BWIN)]
 
 def test_possible_team_two_teams(create_demo_league):
 
@@ -80,9 +100,7 @@ def test_possible_team_two_teams(create_demo_league):
     notifications1 = league.updateOdds(update)
     notifications2 = league.updateOdds(update)
 
-    assert notifications1 == [PossibleTeamNotification(Team(TEAM1), sample, TEAM1_BWIN_ID, BWIN)]
-    assert notifications2 == [PossibleTeamNotification(Team(TEAM2), sample, TEAM2_BWIN_ID, BWIN)]
+    
 
-'''
-
-
+    assert notifications1 == [PossibleTeamNotification(league.followed_teams[1], sample, TEAM2_BWIN_ID, BWIN)]
+    assert notifications2 == [PossibleTeamNotification(league.followed_teams[0], sample, TEAM1_BWIN_ID, BWIN)]

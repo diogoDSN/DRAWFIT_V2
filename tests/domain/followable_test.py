@@ -54,5 +54,13 @@ def test_complete():
     
     assert followable.complete
 
+def test_add_keywords():
 
+    f1 = Followable()
+    f2 = Followable()
+
+    f1.addKeywords(["key1", "key2"])
+
+    assert f1.keywords == ["key1", "key2"]
+    assert f2.keywords == []
 

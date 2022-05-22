@@ -9,7 +9,10 @@ class Followable:
 
     # constructor
 
-    def __init__(self, keywords: List[str] = []) -> NoReturn:
+    def __init__(self, keywords: Optional[List[Tuple[str]]] = None) -> NoReturn:
+        if keywords == None:
+            keywords = []
+
         self._keywords: List[str] = keywords
         self._considered: Dict[Sites, Optional[List[Tuple[str]]]] = {site: [] for site in Sites}
         self._ids: Dict[Sites, Optional[Tuple[str]]] = {site: None for site in Sites}
@@ -71,8 +74,11 @@ class Followable:
 
 class Game(Followable):
 
-    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = []):
+    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None):
         
+        if keywords is None:
+            keywords = []
+
         super().__init__(keywords)
 
         # Set universal undefined values
@@ -117,7 +123,6 @@ class Team(Followable):
     def __init__(self, name: str):
         super().__init__()
         self._name = name
-        self._active: bool = True
         self._games = []
     
     @property
@@ -139,3 +144,6 @@ class Team(Followable):
             return self.name == o.name
         
         return False
+    
+    def __repr__(self) -> str:
+        return f'Name: {self.name}; Games: {self.games};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self.ids}; Complete: {self.complete}'
