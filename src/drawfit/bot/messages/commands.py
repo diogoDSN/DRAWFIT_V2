@@ -19,5 +19,11 @@ def setBwinLeagueCodeUsage():
 def setBetanoLeagueCodeUsage():
     return 'Correct usage:\n```$setBwinLeagueCode (league_id) (league_name|league_number)```'
 
+def setSolverdeLeagueCodeUsage():
+    return 'Correct usage:\n```$setSolverdeLeagueCode (country_code),(league_id) (league_name|league_number)```'
+
+def setMooshLeagueCodeUsage():
+    return 'Correct usage:\n```$setMooshLeagueCode (league_id)::(league_name|league_number)```'
+
 
     

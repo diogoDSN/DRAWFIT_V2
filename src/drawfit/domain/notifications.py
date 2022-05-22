@@ -34,16 +34,16 @@ class NewOddNotification(Notification):
 
     
     def __str__(self):
-        result = f'NEW ODDS\n`{self.game.name}`\n{self.creation_time.strftime(DateFormating())}\n'
+        result = f'**NEW ODDS**\n{self.creation_time.strftime(DateFormating())}\n> {self.game.name}\n```'
 
         for site in Sites:
             if self.game.odds[site] == []:
-                odd = "no odds yet"
+                odd = 0.0
             else:
-                odd = str(self.game.odds[site][-1].value)
-            result += f'> {site.name} - {odd}\n'
+                odd = self.game.odds[site][-1].value
+            result += f'> {site.name:-<10s}{odd:->5.2f}\n'
         
-        return result
+        return result + '```'
 
 
 class PossibleNotification(Notification):

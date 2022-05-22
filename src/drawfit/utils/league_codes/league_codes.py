@@ -41,4 +41,31 @@ class BetanoCode(LeagueCode):
 
     def getSite(self) -> Sites:
         return Sites.Betano
+
+class SolverdeCode(LeagueCode):
+
+    pattern = '\\A[a-zA-Z]{1,3},\\d{4,6}\\Z'
+    error_msg = 'Invalid solverde league code! A solverde league code follows the format:\n `aa,00000`'
+
+    def __init__(self, raw_code: str):
+        
+        super().__init__(raw_code, SolverdeCode.pattern, SolverdeCode.error_msg)
+        self.country_code, self.league_id = raw_code.split(',')
+
+    def getSite(self) -> Sites:
+        return Sites.Solverde
+
+class MooshCode(LeagueCode):
+
+    pattern = '\\A.*\\Z'
+    error_msg = 'Invalid moosh league code! A moosh league code follows the format:\n `Itália - Série B`'
+
+    def __init__(self, raw_code: str):
+        
+        super().__init__(raw_code, MooshCode.pattern, MooshCode.error_msg)
+        self.name = raw_code
+
+    def getSite(self) -> Sites:
+        return Sites.Moosh
+
         

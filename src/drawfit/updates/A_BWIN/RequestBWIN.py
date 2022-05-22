@@ -98,3 +98,10 @@ def BWIN_Odds(competitionID=COMPETITION_ID, regionID=REGION_ID):
     odds = getOddsLeague(info)
 
     return odds
+
+def mainBwin():
+
+    print(BWIN_Odds())
+
+if __name__ == '__main__':
+    mainBwin()

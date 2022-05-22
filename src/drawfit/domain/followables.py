@@ -121,7 +121,7 @@ class Game(Followable):
 class Team(Followable):
 
     def __init__(self, name: str):
-        super().__init__()
+        super().__init__([name])
         self._name = name
         self._games = []
     

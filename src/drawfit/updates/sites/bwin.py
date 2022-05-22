@@ -17,7 +17,7 @@ class Bwin(Site):
     def __init__(self) -> NoReturn:
         super().__init__(' - ')
     
-    async def getOddsLeague(self, session: AsyncHTMLSession, league_id: BwinCode) -> List[OddSample]:
+    async def getOddsLeague(self, session: AsyncHTMLSession, league_code: BwinCode) -> List[OddSample]:
         """
         Returns the odds of a given league.
         Arguments:
@@ -26,12 +26,12 @@ class Bwin(Site):
         Throws:
             SiteError - when an error during parsing ocurred
         """
-        if self.active and league_id is not None:
+        if self.active and league_code is not None:
 
             try:
 
                 # Creates the request url
-                bwin_url = self.buildUrl(region_id=league_id.region_id, competition_id=league_id.competition_id)
+                bwin_url = self.buildUrl(region_id=league_code.region_id, competition_id=league_code.competition_id)
 
                 # Makes request to api
                 request = await session.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
@@ -63,7 +63,7 @@ class Bwin(Site):
                     for bet in market['options']:
                         if bet['name']['value'] == 'X':
                             # Append tupple (game, odd) to the list off obtained odds
-                            oddsList.append(OddSample(self.getTeams(game['name']['value']), bet['price']['odds'], convertDate(game['startDate']), now))
+                            oddsList.append(OddSample(self.getTeams(game['name']['value']), float(bet['price']['odds']), convertDate(game['startDate']), now))
         
         return oddsList
 

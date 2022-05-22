@@ -6,7 +6,7 @@ from drawfit.bot.messages import NoPermission
 from drawfit.bot.utils import hasPermission
 from drawfit.bot.utils.commands import *
 
-from drawfit.utils import BwinCode, BetanoCode, LeagueCodeError
+from drawfit.utils import BwinCode, BetanoCode, SolverdeCode, MooshCode, LeagueCodeError
 
 
 @commands.command()
@@ -133,6 +133,58 @@ async def setBetanoLeagueCode(ctx: commands.Context, *, arguments = ''):
         ctx.bot.store.setLeagueCode(league, code)
 
         await ctx.send(f'Betano code: `{args[0]}` added to league `{league}`!')
+
+    except LeagueCodeError as e:
+        await ctx.send(e.error_message)
+
+
+# $setSolverdeLeagueCode country_code,league_id (league_name|league_number)
+@commands.command()
+async def setSolverdeLeagueCode(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+    
+    args = checkAtLeastNArguments(arguments, 2, setBwinLeagueCodeUsage())
+
+    try:
+
+        code = SolverdeCode(args[0])
+        league = ' '.join(args[1:])
+
+        ctx.bot.store.setLeagueCode(league, code)
+
+        await ctx.send(f'Solverde code: `{args[0]}` added to league `{league}`!')
+
+    except LeagueCodeError as e:
+        await ctx.send(e.error_message)
+
+
+# $setMooshLeagueCode league_id::(league_name|league_number)
+@commands.command()
+async def setMooshLeagueCode(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+    
+    args = checkNNameArguments(arguments, 2, setMooshLeagueCodeUsage())
+
+    try:
+
+        code = MooshCode(args[0])
+        league = args[1]
+
+        ctx.bot.store.setLeagueCode(league, code)
+
+        await ctx.send(f'Moosh code: `{args[0]}` added to league `{league}`!')
 
     except LeagueCodeError as e:
         await ctx.send(e.error_message)

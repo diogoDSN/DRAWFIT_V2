@@ -3,6 +3,7 @@ import urllib as u
 from datetime import datetime
 from typing import Dict, List, NoReturn
 from requests_html import AsyncHTMLSession
+from requests.exceptions import JSONDecodeError
 
 from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
@@ -12,16 +13,18 @@ from drawfit.utils import Sites, OddSample, BetanoCode
 
 class Betano(Site):
 
+    url = "https://www.betano.pt/api/sport/futebol/ligas/"
+
     def __init__(self) -> NoReturn:
         super().__init__(' - ')
     
-    async def getOddsLeague(self, session: AsyncHTMLSession, league_id: BetanoCode) -> List[OddSample]:
-        if self.active and league_id is not None:
+    async def getOddsLeague(self, session: AsyncHTMLSession, league_code: BetanoCode) -> List[OddSample]:
+        if self.active and league_code is not None:
 
             try:
 
                 # Creates the request url
-                betano_url = self.buildUrl(league_id.id)
+                betano_url = self.buildUrl(league_code.id)
 
                 # Makes request to api
                 request = await session.get(betano_url, headers={"User-Agent": "Mozilla/5.0"})
@@ -29,7 +32,7 @@ class Betano(Site):
                 # Gets the odds from the info
                 return self.parseResponse(request.json())
 
-            except ValueError:
+            except JSONDecodeError:
                 raise SiteError(Sites.Betano.name)
 
         else:
@@ -39,7 +42,7 @@ class Betano(Site):
         query = {}
         query['req'] = 'la,s,tn,stnf,c,mb'
 
-        return "https://www.betano.pt/api/sport/futebol/ligas/" + leagueID + "r/?" + u.parse.urlencode(query)
+        return Betano.url + leagueID + "r/?" + u.parse.urlencode(query)
 
 
     def parseResponse(self, leaguesInfo) -> List[OddSample]:
@@ -54,7 +57,7 @@ class Betano(Site):
                     if market["name"] == "Resultado Final":
                         for bet in market["selections"]:
                             if bet["name"] == "X":
-                                oddsList.append(OddSample(self.getTeams(event["name"]), bet["price"], convertMilisecondsEpoch(event["startTime"]), datetime.now()))
+                                oddsList.append(OddSample(self.getTeams(event["name"]), float(bet["price"]), convertMilisecondsEpoch(event["startTime"]), datetime.now()))
                                 break
                         break
         return oddsList

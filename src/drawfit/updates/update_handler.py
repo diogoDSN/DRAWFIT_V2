@@ -10,19 +10,25 @@ if TYPE_CHECKING:
 
 import drawfit.domain.domain_store as ds
 
+from drawfit.updates.sites.site import Site
 from drawfit.updates.sites.bwin import Bwin
 from drawfit.updates.sites.betano import Betano
-from drawfit.updates.sites.site import Site
+from drawfit.updates.sites.solverde import Solverde
+from drawfit.updates.sites.moosh import Moosh
 
 from drawfit.utils import Sites
 
 class UpdateHandler:
+
+    requests_interval = 1
 
     def __init__(self, store: DomainStore):
         self.store: DomainStore = store
         self.sites: Dict[Sites, Optional[Site]] = {site: None for site in Sites}
         self.sites[Sites.Bwin] = Bwin()
         self.sites[Sites.Betano] = Betano()
+        self.sites[Sites.Solverde] = Solverde()
+        self.sites[Sites.Moosh] = Moosh()
 
 
     async def update(self) -> List[Notification]:
@@ -35,10 +41,17 @@ class UpdateHandler:
         for league, league_codes in codes_by_league.items():
 
             results[league] = {site: None for site in Sites}
+            tasks = {site: None for site in Sites}
 
             for site in Sites:
-                print(league_codes[site])
-                results[league][site] = await self.sites[site].getOddsLeague(session, league_codes[site])
+
+                tasks[site] = asyncio.create_task(self.sites[site].getOddsLeague(session, league_codes[site]))
+
+            for site in Sites:
+
+                results[league][site] = await tasks[site]
+
+            await asyncio.sleep(UpdateHandler.requests_interval)
                 
 
         return self.store.updateLeaguesOdds(results)

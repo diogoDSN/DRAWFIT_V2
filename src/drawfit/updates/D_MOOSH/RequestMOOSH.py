@@ -148,8 +148,13 @@ async def main_comm(leagueName="Itália - Série B"):
         await websocket.send(prepEventsRequest(sportID, leagueID, ptID))
         odds = getLeagueOdds(await websocket.recv())
 
+    print(odds)
+
     return odds
 
 
 def MOOSH_Odds(leagueName=LEAGUE_NAME):
     return asyncio.run(main_comm(leagueName))
+
+if __name__ == '__main__':
+    MOOSH_Odds()
