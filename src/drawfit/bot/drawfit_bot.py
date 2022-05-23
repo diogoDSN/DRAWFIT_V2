@@ -21,7 +21,7 @@ class DrawfitBot(commands.Bot):
     command_channels = {'Drawfit✔': ['commands-channel']}
     update_channels = {'Drawfit✔' : ['updates-channel']}
     permissions = {Permissions.NOGUEIRA: ['Pistache#2173'], \
-                            Permissions.MODERATOR: ['piki2015ps#3645'], \
+                            Permissions.MODERATOR: ['piki2015ps#3645', 'Tomás Belo#8277'], \
                             Permissions.NORMAL: []}
     
     def __init__(self):
@@ -95,10 +95,16 @@ class DrawfitBot(commands.Bot):
 
         while(True):
 
+            print('Update Started')
+
             notifications = await handler.update()
+
+            print(f'Update ended. With {len(notifications)} notifications')
 
             for notification in notifications:
                 self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
+
+            print('All notification tasks created')
 
             await asyncio.sleep(30)
     

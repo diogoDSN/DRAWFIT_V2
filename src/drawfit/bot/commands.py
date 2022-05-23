@@ -85,7 +85,7 @@ async def removeLeague(ctx: commands.Context, *, arguments = ''):
     
     checkAnyArguments(arguments, removeLeagueUsage())
     
-    ctx.drawfit.bot.store.removeLeague(arguments)
+    ctx.bot.store.removeLeague(arguments)
     await ctx.send(f'League `{arguments}` removed!')
 
 # $setBwinLeagueCode region_id,competition_id (league_name|league_number)
@@ -150,7 +150,7 @@ async def setSolverdeLeagueCode(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
     
-    args = checkAtLeastNArguments(arguments, 2, setBwinLeagueCodeUsage())
+    args = checkAtLeastNArguments(arguments, 2, setSolverdeLeagueCodeUsage())
 
     try:
 
@@ -235,7 +235,7 @@ async def setBetclicLeagueCode(ctx: commands.Context, *, arguments = ''):
 
         ctx.bot.store.setLeagueCode(league, code)
 
-        await ctx.send(f'Betano code: `{args[0]}` added to league `{league}`!')
+        await ctx.send(f'Betclic code: `{args[0]}` added to league `{league}`!')
 
     except LeagueCodeError as e:
         await ctx.send(e.error_message)

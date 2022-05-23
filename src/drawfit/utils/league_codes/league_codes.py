@@ -18,7 +18,7 @@ class LeagueCode:
 
 class BwinCode(LeagueCode):
 
-    pattern = '\\A\\d{1,2},\\d{5,7}\\Z'
+    pattern = '\\A\\d{1,4},\\d{5,7}\\Z'
     error_msg = 'Invalid bwin league code! A bwin league code follows the format:\n `0000,000000`'
 
     def __init__(self, raw_code: str):
@@ -61,7 +61,7 @@ class MooshCode(LeagueCode):
     error_msg = 'Invalid moosh league code! A moosh league code follows the format:\n `Itália - Série B`'
 
     def __init__(self, raw_code: str):
-        
+
         super().__init__(raw_code, MooshCode.pattern, MooshCode.error_msg)
         self.name = raw_code
 

@@ -40,7 +40,8 @@ class Bwin(Site):
                 return self.parseResponse(request.json())
 
             except Exception:
-                raise SiteError(Sites.Bwin.name)
+                return None
+                #raise SiteError(Sites.Bwin.name)
 
         else:
             return None

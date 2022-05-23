@@ -49,7 +49,8 @@ class Betway(Site):
                 return odds
 
             except Exception:
-                raise SiteError(Sites.Betway.name)
+                return None
+                #raise SiteError(Sites.Betway.name)
 
         else:
             return None

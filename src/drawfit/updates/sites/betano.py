@@ -33,7 +33,8 @@ class Betano(Site):
                 return self.parseResponse(request.json())
 
             except Exception:
-                raise SiteError(Sites.Betano.name)
+                return None
+                #raise SiteError(Sites.Betano.name)
 
         else:
             return None

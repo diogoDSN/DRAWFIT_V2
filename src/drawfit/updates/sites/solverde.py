@@ -86,7 +86,8 @@ class Solverde(Site):
                 return odds
 
             except Exception:
-                raise SiteError(Sites.Solverde.name)
+                return None
+                #raise SiteError(Sites.Solverde.name)
 
         else:
             return None
