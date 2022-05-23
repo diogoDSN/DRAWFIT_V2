@@ -15,14 +15,14 @@ from drawfit.utils import Sites
 
 class DrawfitBot(commands.Bot):
 
-    store_path = "save_data.pickle"
-    greeting = 'Hello there! - Obi-Wan Kenobi'
+    store_path = "/tmp/save_data.pickle"
+    greeting = '**Hello there!** - Obi-Wan Kenobi'
     command_timeout = 7
-    command_channels = {'Vascolândia': ['private-nogueira']}
-    update_channels = {'Vascolândia' : ['private-nogueira-2']}
+    command_channels = {'Drawfit✔': ['commands-channel']}
+    update_channels = {'Drawfit✔' : ['updates-channel']}
     permissions = {Permissions.NOGUEIRA: ['Pistache#2173'], \
-                            Permissions.MODERATOR: [], \
-                            Permissions.NORMAL: ['Periquito#0366', 'Peter Pie#3256']}
+                            Permissions.MODERATOR: ['piki2015ps#3645'], \
+                            Permissions.NORMAL: []}
     
     def __init__(self):
 
@@ -93,19 +93,12 @@ class DrawfitBot(commands.Bot):
 
         handler = updates.UpdateHandler(self.store)
 
-        print("Reached Update Handler")
         while(True):
-
-            print("Update Started!")
 
             notifications = await handler.update()
 
-            print(f"Update Ended! With {len(notifications)} notifications pending!")
-
             for notification in notifications:
                 self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
-            
-            print("All notification tasks created! Waiting next update!")
 
             await asyncio.sleep(30)
     

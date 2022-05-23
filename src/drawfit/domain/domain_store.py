@@ -49,7 +49,7 @@ class DomainStore:
         league = self.getLeague(league_id)
 
         if league is not None:
-            leagueCodes[site] = newCode
+            league.codes[site] = newCode
 
     def getLeagues(self) -> List:
 
@@ -67,7 +67,7 @@ class DomainStore:
         if league is None:
             return []
 
-        return leagueCodes.copy()
+        return league.codes.copy()
 
     def getAllLeagueCodes(self) -> Dict[str, List[str]]:
 

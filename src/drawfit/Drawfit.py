@@ -6,7 +6,9 @@ sys.path.append(dirname(abspath(__file__)))
 import drawfit.bot.drawfit_bot as dbot
 
 def main():
-    TOKEN = "OTUxOTEzMzQzNDk1NTY5NDY4.YiuYYg.GN4Jlpve1TnCLjJUnNVjSs9L5Uk"
+
+    with open("/tmp/drawfit_token.txt", 'r') as f:
+        TOKEN = f.readline()[:-1]
 
     bot = dbot.DrawfitBot()
     bot.run(TOKEN)
