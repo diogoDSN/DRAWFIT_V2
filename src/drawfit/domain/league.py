@@ -141,13 +141,12 @@ class League:
 
     def processSample(self, site: Sites, sample: OddSample) -> notf.Notification:
 
-
         # 1 - sample's game name is being monitored so the odd is added
         game = next((game for game in self.current_games if game.isId(site, sample.game_id)), None)
 
         if game is not None:
 
-            if sample.start_time >= sample.sample_time:
+            if sample.start_time <= sample.sample_time:
                 self.current_games.remove(game)
                 return None
 

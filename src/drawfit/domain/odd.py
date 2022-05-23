@@ -20,3 +20,6 @@ class Odd:
             return self.value == o.value and self.date == o.date
 
         return False
+    
+    def __str__(self) -> str:
+        return f'Odd: {self.value}; Date: {self.date}'

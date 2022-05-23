@@ -1,4 +1,5 @@
 import asyncio
+import pickle
 
 from typing import List, Dict, Tuple
 
@@ -14,6 +15,7 @@ from drawfit.utils import Sites
 
 class DrawfitBot(commands.Bot):
 
+    store_path = "save_data.pickle"
     greeting = 'Hello there! - Obi-Wan Kenobi'
     command_timeout = 7
     command_channels = {'Vascolândia': ['private-nogueira']}
@@ -28,7 +30,11 @@ class DrawfitBot(commands.Bot):
         intents.members = True
         super().__init__(command_prefix='.', intents=intents)
 
-        self.store = store.DomainStore()
+        try:
+            with open(DrawfitBot.store_path, 'rb') as f:
+                self.store = pickle.load(f)
+        except Exception:
+            self.store = store.DomainStore()
         
         self.pending_queries: List[asyncio.Task] = []
 
@@ -82,13 +88,6 @@ class DrawfitBot(commands.Bot):
 
         self.handler_routine = asyncio.create_task(self.handlerRoutine())
 
-    async def on_command_error(self, ctx, error):
-        if error.__class__ == commands.BadArgument:
-            await ctx.send(error)
-        elif error.__class__ == commands.CommandNotFound:
-            pass
-        else:
-            raise error
 
     async def handlerRoutine(self):
 
@@ -109,6 +108,14 @@ class DrawfitBot(commands.Bot):
             print("All notification tasks created! Waiting next update!")
 
             await asyncio.sleep(30)
+    
+    async def on_command_error(self, ctx, error):
+        if error.__class__ == commands.BadArgument:
+            await ctx.send(error)
+        elif error.__class__ == commands.CommandNotFound:
+            pass
+        else:
+            raise error
     
     def teamIdAccepted(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
         self.store.setTeamId(team_name, team_id, site, league_name)
@@ -155,3 +162,14 @@ class DrawfitBot(commands.Bot):
                 channels.append(channel)
 
         return channels  
+    
+    def save(self) -> bool:
+        try:
+            with open(DrawfitBot.store_path, 'wb') as f:
+                pickle.dump(self.store, f)
+            
+            return True
+        except Exception:
+            pass
+        
+        return False

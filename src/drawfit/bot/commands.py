@@ -285,3 +285,20 @@ async def addTeamKeywords(ctx: commands.Context, *, arguments = ''):
         await ctx.send(response)
     else:
         await ctx.send('The given keywords couldn\'t be added')
+
+@commands.command()
+async def save(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.MODERATOR):
+        await ctx.send(NoPermission(Permissions.MODERATOR.value))
+        return
+    
+    checkEmptyArguments(arguments, 'save')
+
+    if ctx.bot.save():
+        await ctx.send('Save successful')
+    else:
+        await ctx.send('**An error occurred! Couldn\'t save.**')
