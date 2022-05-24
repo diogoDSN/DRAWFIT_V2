@@ -31,9 +31,6 @@ class Moosh(Site):
         Throws:
             SiteError - when an error during parsing ocurred
         """
-
-        print(f'active: {self.active}; code: {league_code}')
-
         if self.active and league_code is not None:
 
             try:
@@ -56,7 +53,6 @@ class Moosh(Site):
                 #raise SiteError(Sites.Moosh.name)
 
         else:
-            print("UI")
             return None
         
     

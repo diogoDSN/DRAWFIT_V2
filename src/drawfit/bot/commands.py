@@ -26,7 +26,7 @@ async def test(ctx: commands.Context, *, arguments = ''):
 
 
 # $addLeague (name of new league)
-@commands.command()
+@commands.command(aliases=['aL'])
 async def addLeague(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -42,7 +42,7 @@ async def addLeague(ctx: commands.Context, *, arguments = ''):
     await ctx.send(f'New league: `{arguments}` added!')
 
 # $getLeagues
-@commands.command()
+@commands.command(aliases=['gL'])
 async def getLeagues(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -73,7 +73,7 @@ async def getLeagues(ctx: commands.Context, *, arguments = ''):
     await ctx.send(answer)
 
 # $removeLeague (name of new league)
-@commands.command()
+@commands.command(aliases=['rL'])
 async def removeLeague(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -89,7 +89,7 @@ async def removeLeague(ctx: commands.Context, *, arguments = ''):
     await ctx.send(f'League `{arguments}` removed!')
 
 # $setBwinLeagueCode region_id,competition_id (league_name|league_number)
-@commands.command()
+@commands.command(aliases=['bwin'])
 async def setBwinLeagueCode(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -114,7 +114,7 @@ async def setBwinLeagueCode(ctx: commands.Context, *, arguments = ''):
         await ctx.send(e.error_message)
 
 # $setBwinLeagueCode league_id (league_name|league_number)
-@commands.command()
+@commands.command(aliases=['betano'])
 async def setBetanoLeagueCode(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -140,7 +140,7 @@ async def setBetanoLeagueCode(ctx: commands.Context, *, arguments = ''):
 
 
 # $setSolverdeLeagueCode country_code,league_id (league_name|league_number)
-@commands.command()
+@commands.command(aliases=['solverde'])
 async def setSolverdeLeagueCode(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -166,7 +166,7 @@ async def setSolverdeLeagueCode(ctx: commands.Context, *, arguments = ''):
 
 
 # $setMooshLeagueCode league_id::(league_name|league_number)
-@commands.command()
+@commands.command(aliases=['moosh'])
 async def setMooshLeagueCode(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -191,7 +191,7 @@ async def setMooshLeagueCode(ctx: commands.Context, *, arguments = ''):
         await ctx.send(e.error_message)
 
 # $setBetwayLeagueCode league_id::(league_name|league_number)
-@commands.command()
+@commands.command(aliases=['betway'])
 async def setBetwayLeagueCode(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -216,7 +216,7 @@ async def setBetwayLeagueCode(ctx: commands.Context, *, arguments = ''):
         await ctx.send(e.error_message)
 
 # $setBwinLeagueCode league_id (league_name|league_number)
-@commands.command()
+@commands.command(aliases=['betclic'])
 async def setBetclicLeagueCode(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -243,7 +243,7 @@ async def setBetclicLeagueCode(ctx: commands.Context, *, arguments = ''):
 
 
 # $addTeam league_name::team_name
-@commands.command()
+@commands.command(aliases=['aT'])
 async def addTeam(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -261,7 +261,7 @@ async def addTeam(ctx: commands.Context, *, arguments = ''):
         await ctx.send('Team couldn\'t be added')
 
 # $addTeamKeywords league_name::team_name::keyword1 keyword2 keyword3 ...
-@commands.command()
+@commands.command(aliases=['aTK'])
 async def addTeamKeywords(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -286,7 +286,7 @@ async def addTeamKeywords(ctx: commands.Context, *, arguments = ''):
     else:
         await ctx.send('The given keywords couldn\'t be added')
 
-@commands.command()
+@commands.command(aliases=['s'])
 async def save(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
