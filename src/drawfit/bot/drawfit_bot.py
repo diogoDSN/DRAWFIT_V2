@@ -22,7 +22,7 @@ class DrawfitBot(commands.Bot):
     update_channels = {'Drawfit✔' : ['📃updates-channel']}
     permissions = {Permissions.NOGUEIRA: ['Pistache#2173'], \
                             Permissions.MODERATOR: ['piki2015ps#3645', 'Tomás Belo#8277'], \
-                            Permissions.NORMAL: []}
+                            Permissions.NORMAL: ['File_Read_Bot#9655']}
     
     def __init__(self):
 

@@ -62,7 +62,7 @@ class DomainStore:
     
     def getLeagueCodes(self, leagueName: str) -> List:
 
-        league = next((league for league in self.known_leagues if league.name == leagueName), None)
+        league = self.getLeague(leagueName)
 
         if league is None:
             return []

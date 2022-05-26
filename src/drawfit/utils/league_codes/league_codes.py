@@ -28,6 +28,9 @@ class BwinCode(LeagueCode):
 
     def getSite(self) -> Sites:
         return Sites.Bwin
+    
+    def __str__(self) -> str:
+        return f'{self.getSite().name}:'
 
 class BetanoCode(LeagueCode):
 

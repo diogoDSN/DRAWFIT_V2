@@ -10,7 +10,7 @@ from drawfit.utils import BwinCode, BetanoCode, SolverdeCode, MooshCode, LeagueC
 from drawfit.utils.league_codes.league_codes import BetclicCode, BetwayCode
 
 
-@commands.command()
+@commands.command(hidden=True)
 async def test(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
@@ -28,6 +28,8 @@ async def test(ctx: commands.Context, *, arguments = ''):
 # $addLeague (name of new league)
 @commands.command(aliases=['aL'])
 async def addLeague(ctx: commands.Context, *, arguments = ''):
+
+    print(f'{str(ctx.author)}; {ctx.message}')
 
     if not isCommand(ctx):
         return
@@ -72,9 +74,9 @@ async def getLeagues(ctx: commands.Context, *, arguments = ''):
 
     await ctx.send(answer)
 
-# $removeLeague (name of new league)
-@commands.command(aliases=['rL'])
-async def removeLeague(ctx: commands.Context, *, arguments = ''):
+# $getLeagues
+@commands.command(hidden=True, aliases=['sL'])
+async def seeLeague(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
         return
@@ -83,10 +85,18 @@ async def removeLeague(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
     
-    checkAnyArguments(arguments, removeLeagueUsage())
+    checkAtLeastNArguments(arguments, n, seeLeagueUsage())
     
-    ctx.bot.store.removeLeague(arguments)
-    await ctx.send(f'League `{arguments}` removed!')
+    codes = ctx.bot.store.getLeagueCodes(arguments)
+
+    if codes == []:
+        answer = f'League `{arguments}` not found'
+    else:
+        answer = f'`{arguments}`:\n'
+        for code in codes:
+            answer += f'{str(code)}\n'
+
+    await ctx.send(answer)
 
 # $setBwinLeagueCode region_id,competition_id (league_name|league_number)
 @commands.command(aliases=['bwin'])

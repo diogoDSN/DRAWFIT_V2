@@ -1,11 +1,11 @@
 def EmptyArgument(command: str):
     return f'This command takes no arguments. Correct usage:\n```.{command}```'
 
-def removeLeagueUsage():
-    return 'Correct usage:\n```.removeLeague (league_name|league_number)```'
-
 def addLeagueUsage():
     return 'Correct usage:\n```.addLeague (league_name)```'
+
+def seeLeagueUsage():
+    return 'Correct usage:\n```.seeLeague (league_name)```'
 
 def addTeamUsage():
     return 'Correct usage:\n```.addTeam (league_name)::(team_name)```'

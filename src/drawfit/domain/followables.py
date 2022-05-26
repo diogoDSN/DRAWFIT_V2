@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import NoReturn, List, Tuple, Dict, Optional
 
 from drawfit.domain.odd import Odd
@@ -120,6 +120,8 @@ class Game(Followable):
 
 class Team(Followable):
 
+    delta = timedelta(hours=30)
+
     def __init__(self, name: str):
         super().__init__([name])
         self._name = name
@@ -137,7 +139,7 @@ class Team(Followable):
         self._games.append(game)
     
     def getGameByDate(self, date: datetime) -> Optional[Game]:
-        return next((game for game in self.games if game.date == date), None)
+        return next((game for game in self.games if game.date - Team.delta  < date < game.date + Team.delta), None)
     
     def __eq__(self, o) -> bool:
         if isinstance(o, Team):
