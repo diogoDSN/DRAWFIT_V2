@@ -15,7 +15,7 @@ from drawfit.utils import Sites
 
 class DrawfitBot(commands.Bot):
 
-    store_path = "/tmp/save_test.pickle"
+    store_path = "/tmp/test_data.pickle"
     greeting = '**Hello there!** - Obi-Wan Kenobi'
     command_timeout = 7
     command_channels = {'Vascolândia': ['private-nogueira']}
