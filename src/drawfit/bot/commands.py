@@ -25,6 +25,25 @@ async def test(ctx: commands.Context, *, arguments = ''):
     await ctx.send('This test was successful!')
 
 
+# $getLeagues
+@commands.command(aliases=['b'])
+async def browse(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+    
+    checkEmptyArguments(arguments, 'browse')
+    
+    domain_dto = ctx.bot.store.getDomain()
+
+    await ctx.send(embed=domain_dto.embed)
+
+
+
 # $addLeague (name of new league)
 @commands.command(aliases=['aL'])
 async def addLeague(ctx: commands.Context, *, arguments = ''):
@@ -42,6 +61,7 @@ async def addLeague(ctx: commands.Context, *, arguments = ''):
     
     ctx.bot.store.addLeague(arguments)
     await ctx.send(f'New league: `{arguments}` added!')
+
 
 # $getLeagues
 @commands.command(aliases=['gL'])
