@@ -7,7 +7,7 @@ if TYPE_CHECKING:
 
 import drawfit.domain.notifications as notf
 import drawfit.domain.league as l
-from drawfit.dtos import LeagueDto
+from drawfit.dtos import LeagueDto, DomainDto
 
 from drawfit.utils import Sites, OddSample, LeagueCode
 
@@ -35,14 +35,6 @@ class DomainStore:
 
         if league is None:
             self.known_leagues.append(l.League(league_name))
-
-
-    def removeLeague(self, league_id: str) -> NoReturn:
-
-        league = self.getLeague(league_id)
-
-        if league is not None:
-            self.known_leagues.remove(league)
             
     def changeLeagueCode(self, league_id: str, site: Sites, newCode: str):
 
@@ -50,6 +42,9 @@ class DomainStore:
 
         if league is not None:
             league.codes[site] = newCode
+
+    def getDomain(self) -> DomainDto:
+        return DomainDto(self.known_leagues)
 
     def getLeagues(self) -> List:
 

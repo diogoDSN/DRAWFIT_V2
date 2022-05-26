@@ -15,11 +15,11 @@ from drawfit.utils import Sites
 
 class DrawfitBot(commands.Bot):
 
-    store_path = "/tmp/save_data.pickle"
+    store_path = "/tmp/save_test.pickle"
     greeting = '**Hello there!** - Obi-Wan Kenobi'
     command_timeout = 7
-    command_channels = {'Drawfit✔': ['🤖commands-channel']}
-    update_channels = {'Drawfit✔' : ['📃updates-channel']}
+    command_channels = {'Vascolândia': ['private-nogueira']}
+    update_channels = {'Vascolândia' : ['private-nogueira-2']}
     permissions = {Permissions.NOGUEIRA: ['Pistache#2173'], \
                             Permissions.MODERATOR: ['piki2015ps#3645', 'Tomás Belo#8277'], \
                             Permissions.NORMAL: ['File_Read_Bot#9655']}
