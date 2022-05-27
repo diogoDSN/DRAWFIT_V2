@@ -1,6 +1,6 @@
 from __future__ import annotations
 import asyncio
-from typing import Dict, List, Tuple, NoReturn, TYPE_CHECKING
+from typing import Dict, List, Tuple, NoReturn, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from drawfit.domain.league import League
@@ -16,7 +16,7 @@ class DomainStore:
     def __init__(self) -> NoReturn:
         self.known_leagues = []
 
-    def getLeague(self, league_id: str) -> League:
+    def getLeague(self, league_id: str) -> Optional[League]:
         try:
             index = int(league_id)-1
             
@@ -82,6 +82,26 @@ class DomainStore:
             notifications.extend(league.updateOdds(odds_sample))
         
         return notifications
+
+    def activateTeam(self, league_id: str, team_id: str) -> NoReturn:
+        league = self.getLeague(league_id)
+
+        if league is not None:
+            league.activateTeam(team_id)
+        else:
+            #TODO Exception
+            pass
+
+    def deactivateTeam(self, league_id: str, team_id: str) -> NoReturn:
+        
+        league = self.getLeague(league_id)
+
+        if league is not None:
+            league.deactivateTeam(team_id)
+        else:
+            #TODO Exception
+            pass
+
 
     def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
         league = next((league for league in self.known_leagues if league.name == league_name), None)

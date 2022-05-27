@@ -19,8 +19,7 @@ class Notify:
         self.bot = bot
         self.channels = bot.getChannels(dbot.DrawfitBot.update_channels)
         self.mods = bot.getUsersWithPermission(Permissions.MODERATOR)
-        self.timeout = 7200
-
+        self.timeout = 43200
 
     async def visitNewOdd(self, notification: notf.NewOddNotification) -> NoReturn:
 

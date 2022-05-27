@@ -96,7 +96,7 @@ class League:
                 self.followed_teams.pop(index)
                 break
     
-    def activate_team(self, team_name: str) -> NoReturn:
+    def activateTeam(self, team_name: str) -> NoReturn:
         for index, team in enumerate(self.inactive_teams):
             if team.name == team_name:
                 self.followed_teams.append(team)
