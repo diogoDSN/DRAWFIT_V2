@@ -9,22 +9,29 @@ if TYPE_CHECKING:
 class DomainDto:
 
     embed_color = 0xD52E0B
+    no_code = 'No Code'
 
     def makeEmbed(leagues: List[League]) -> discord.Embed:
 
-        embed = Embed(title='Leagues', description='All the leagues currently registered.', color=DomainDto.embed_color)
+        embed = discord.Embed(title='Leagues', description='All the leagues currently registered.', color=DomainDto.embed_color)
 
-        for league in leagues:
-            field_value = ''
+        for number, league in enumerate(leagues):
+            name = f'{number+1}. {league.name}'
+            field_value = '```'
             if league.active:
-                field_value += 'Active\n'
+                name += ' - *Active*'
             else:
-                field_value += 'Inactive\n'
+                name += ' - *Inactive*'
             
-            for code in league.getLeagueCodes():
-                field_value += f'{code.getSite().name:-<10s}{str(code):->15s}\n'
+            for site, code in league.codes.items():
+                if code != None:
+                    field_value += f'{site.name:-<10s}{str(code):->30}\n'
+                else:
+                    field_value += f'{site.name:-<10s}{DomainDto.no_code:->30}\n'
 
-            embed.add_field(name=league.name, value=field_value, inline=False)
+            field_value += '```'
+
+            embed.add_field(name=name, value=field_value, inline=False)
         
         embed.set_footer(text='Choose number/name of league\nq to quit')
 
