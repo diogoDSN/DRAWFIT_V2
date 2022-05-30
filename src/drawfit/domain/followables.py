@@ -125,21 +125,25 @@ class Team(Followable):
     def __init__(self, name: str):
         super().__init__([name])
         self._name = name
-        self._games = []
+        self._current_game = None
     
     @property
     def name(self) -> str:
         return self._name
     
     @property
-    def games(self) -> List[Game]:
-        return self._games
+    def current_game(self) -> Optional[Game]:
+        return self._current_game
     
-    def addGame(self, game: Game) -> None:
-        self._games.append(game)
+    @current_game.setter
+    def current_game(self, game: Game) -> Game:
+        self._current_game = game
     
-    def getGameByDate(self, date: datetime) -> Optional[Game]:
-        return next((game for game in self.games if game.date - Team.delta  < date < game.date + Team.delta), None)
+    def hasGame(self) -> bool:
+        return self.current_game != None
+    
+    def isGameByDate(self, date: datetime) -> bool:
+        return self.hasGame() and self.current_game.date - Team.delta  < date < self.current_game.date + Team.delta
     
     def __eq__(self, o) -> bool:
         if isinstance(o, Team):
