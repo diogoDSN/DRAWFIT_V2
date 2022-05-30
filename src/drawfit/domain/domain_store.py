@@ -83,24 +83,22 @@ class DomainStore:
         
         return notifications
 
-    def activateTeam(self, league_id: str, team_id: str) -> NoReturn:
+    def activateTeam(self, league_id: str, team_id: str) -> bool:
         league = self.getLeague(league_id)
 
         if league is not None:
-            league.activateTeam(team_id)
+            return league.activateTeam(team_id)
         else:
-            #TODO Exception
-            pass
+            return False
 
-    def deactivateTeam(self, league_id: str, team_id: str) -> NoReturn:
+    def deactivateTeam(self, league_id: str, team_id: str) -> bool:
         
         league = self.getLeague(league_id)
 
         if league is not None:
-            league.deactivateTeam(team_id)
+            return league.deactivateTeam(team_id)
         else:
-            #TODO Exception
-            pass
+            return False
 
 
     def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
