@@ -94,14 +94,18 @@ class League:
             if team.name == team_name:
                 self.inactive_teams.append(team)
                 self.followed_teams.pop(index)
-                break
+                return True
+        
+        return False
     
     def activateTeam(self, team_name: str) -> NoReturn:
         for index, team in enumerate(self.inactive_teams):
             if team.name == team_name:
                 self.followed_teams.append(team)
                 self.inactive_teams.pop(index)
-                break
+                return True
+        
+        return False
     
     def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites) -> NoReturn:
 
@@ -160,18 +164,19 @@ class League:
         
         if team is not None and sample.start_time >= sample.sample_time:
 
-            game = team.getGameByDate(sample.start_time)
+            if team.isGameByDate(sample.start_time):
+                team.current_game.setId(site, sample.game_id)
+                team.current_game.addOdd(sample, site)
+                return notf.NewOddNotification(team.current_game)
 
-            if game is not None:
-                game.setId(site, sample.game_id)
-                game.addOdd(sample, site)
-                return notf.NewOddNotification(game)
+            if team.hasGame():
+                return None
 
             new_game = Game(sample.game_name, date=sample.start_time)
             new_game.setId(site, sample.game_id)
             
             self._current_games.append(new_game)
-            team.addGame(new_game)
+            team.current_game = new_game
             new_game.addOdd(sample, site)
 
             return notf.NewOddNotification(new_game)
