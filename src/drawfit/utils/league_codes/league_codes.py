@@ -50,7 +50,7 @@ class BetanoCode(LeagueCode):
 
 class SolverdeCode(LeagueCode):
 
-    pattern = '\\A[a-zA-Z]{1,3},\\d{4,6}\\Z'
+    pattern = '\\A[a-zA-Z0-9]{1,6},\\d{4,6}\\Z'
     error_msg = 'Invalid solverde league code! A solverde league code follows the format:\n `aa,00000`'
 
     def __init__(self, raw_code: str):
