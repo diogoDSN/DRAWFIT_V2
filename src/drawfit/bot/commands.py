@@ -1,9 +1,11 @@
+import asyncio
+from re import template
 from discord.ext import commands
 
 from drawfit.bot.permissions import Permissions
 from drawfit.bot.messages.commands import *
 from drawfit.bot.messages import NoPermission
-from drawfit.bot.utils import hasPermission
+from drawfit.bot.utils import hasPermission, MessageCheck, ReactionCheck
 from drawfit.bot.utils.commands import *
 
 from drawfit.utils import BwinCode, BetanoCode, SolverdeCode, MooshCode, LeagueCodeError
@@ -38,14 +40,46 @@ async def browse(ctx: commands.Context, *, arguments = ''):
     
     checkEmptyArguments(arguments, 'browse')
     
-    domain_dto = ctx.bot.store.getDomain()
 
-    await ctx.send(embed=domain_dto.embed)
+    browse_message = await ctx.send('*Loading...*')
+
+    domain_dto = ctx.bot.store.getDomain()
+    page = DomainPage(domain_dto, browse_message)
+
+    m_check = MessageCheck(ctx)
+    r_check = ReactionCheck(browse_message, ctx.author)
+
+
+    while True:
+
+        await page.editPage()
+
+        message_task = asyncio.create_task(ctx.bot.wait_for("message", check=m_check.check))
+        reaction_add_task = asyncio.create_task(ctx.bot.wait_for("reaction_add", check=r_check.check))
+        reaction_remove_task = asyncio.create_task(ctx.bot.wait_for("reaction_remove", check=r_check.check))
+
+        tasks_done, _ = await asyncio.wait([message_task, reaction_add_task, reaction_remove_task], timeout=BROWSE_TIMEOUT, return_when=asyncio.FIRST_COMPLETED)
+
+        if message_task in tasks_done:
+            message = await message_task
+            page = page.message(message)
+
+        elif reaction_add_task in tasks_done:
+            reaction, user = await reaction_add_task
+            page = page.addReaction(reaction, user)
+
+        elif reaction_remove_task in tasks_done:
+            reaction, user = await reaction_remove_task
+            page = page.removeReaction(reaction, user)
+
+        else:
+            await browse_message.reply('Exiting')
+            break
 
 
 
 # $addLeague (name of new league)
-@commands.command(aliases=['aL'])
+@commands.command(aliases=['aL','al'])
 async def addLeague(ctx: commands.Context, *, arguments = ''):
 
     print(f'{str(ctx.author)}; {ctx.message}')
@@ -63,10 +97,9 @@ async def addLeague(ctx: commands.Context, *, arguments = ''):
     await ctx.send(f'New league: `{arguments}` added!')
 
 
-
 # $getLeagues
-@commands.command(hidden=True, aliases=['sL'])
-async def seeLeague(ctx: commands.Context, *, arguments = ''):
+@commands.command(aliases=['gL','gl'])
+async def getLeagues(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
         return
@@ -75,16 +108,23 @@ async def seeLeague(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
     
-    checkAtLeastNArguments(arguments, n, seeLeagueUsage())
+    checkEmptyArguments(arguments, 'getLeagues')
     
-    codes = ctx.bot.store.getLeagueCodes(arguments)
+    leagueDtos = ctx.bot.store.getLeagues()
 
-    if codes == []:
-        answer = f'League `{arguments}` not found'
-    else:
-        answer = f'`{arguments}`:\n'
-        for code in codes:
-            answer += f'{str(code)}\n'
+    answer = 'The known leagues are:\n```'
+    if len(leagueDtos) == 0:
+        answer += 'No Leagues\n'
+    for i, league in enumerate(leagueDtos):
+        answer += str(i+1) + ' - '
+        if league.active:
+            answer += 'A - '
+        else:
+            answer += 'I - '
+        
+        answer += league.name + '\n'
+
+    answer += '```A - active, I - inactive'
 
     await ctx.send(answer)
 
@@ -285,6 +325,51 @@ async def addTeamKeywords(ctx: commands.Context, *, arguments = ''):
         await ctx.send(response)
     else:
         await ctx.send('The given keywords couldn\'t be added')
+
+
+# $addTeamKeywords league_name::team_name
+@commands.command(aliases=['acT', 'act'])
+async def activateTeam(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+    
+    args = checkNNameArguments(arguments, 2, addTeamKeywordsUsage())
+
+    league_id, team_id = args
+
+    if ctx.bot.store.activateTeam(league_id, team_id):
+        
+        response = f'The following team was activated `{team_id}`:\n'
+        await ctx.send(response)
+    else:
+        await ctx.send('The given team couldn\'t be activated')
+
+# $addTeamKeywords league_name::team_name
+@commands.command(aliases=['dT', 'dt'])
+async def deactivateTeam(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+
+    args = checkNNameArguments(arguments, 2, addTeamKeywordsUsage())
+
+    league_id, team_id = args
+
+    if ctx.bot.store.deactivateTeam(league_id, team_id):
+        
+        response = f'The following team was deactivated `{team_id}`:\n'
+        await ctx.send(response)
+    else:
+        await ctx.send('The given team couldn\'t be deactivated')
 
 @commands.command(aliases=['s'])
 async def save(ctx: commands.Context, *, arguments = ''):
