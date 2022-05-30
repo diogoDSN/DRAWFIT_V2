@@ -21,7 +21,7 @@ class DrawfitBot(commands.Bot):
     command_channels = {'Vascolândia': ['private-nogueira']}
     update_channels = {'Vascolândia' : ['private-nogueira-2']}
     permissions = {Permissions.NOGUEIRA: ['Pistache#2173'], \
-                            Permissions.MODERATOR: ['piki2015ps#3645', 'Tomás Belo#8277'], \
+                            Permissions.MODERATOR: [], \
                             Permissions.NORMAL: ['File_Read_Bot#9655']}
     
     def __init__(self):
