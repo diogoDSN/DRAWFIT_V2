@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from typing import NoReturn, List, Tuple, Dict, Optional
 
@@ -74,7 +76,7 @@ class Followable:
 
 class Game(Followable):
 
-    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None):
+    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team1: Team = None, team2: Team = None,):
         
         if keywords is None:
             keywords = []
@@ -85,6 +87,7 @@ class Game(Followable):
         self._name: str = name
         self._date: datetime = date
         self._odds = {site: [] for site in Sites}
+        self._teams = [team1, team2]
         
 
     @property
@@ -103,6 +106,22 @@ class Game(Followable):
     @property
     def odds(self) -> Dict[Sites, List[Odd]]:
         return self._odds
+
+    @property
+    def team1(self) -> Team:
+        return self._teams[0]
+
+    @team1.setter  
+    def team1(self, team: Team) -> NoReturn:
+        self._teams[0] = team
+
+    @property
+    def team2(self) -> Team:
+        return self._teams[1]
+
+    @team2.setter  
+    def team2(self, team: Team) -> NoReturn:
+        self._teams[1] = team
 
     def __eq__(self, o):
         if isinstance(o, Game):
