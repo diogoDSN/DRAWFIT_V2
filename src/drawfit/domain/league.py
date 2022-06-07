@@ -23,7 +23,6 @@ class League:
         self._inactive_teams: List[Team] = []
 
         self._league_codes: Dict[Sites, LeagueCode] = {site: None for site in Sites}
-        self.remove_cycle = asyncio.create_task(self.removeCycle())
 
     @property
     def name(self) -> str:
@@ -128,7 +127,7 @@ class League:
         if game is not None:
             game.setId(site, game_id)
     
-    def remove_game(self, game: Game) -> NoReturn:
+    def removeGame(self, game: Game) -> NoReturn:
         if game.team1 is not None:
             game.team1.current_game = None
         if game.team2 is not None:
@@ -139,7 +138,7 @@ class League:
     def removeRoutine(self) -> NoReturn:
         for game in self.current_games:
             if game.date <= datetime.now():
-                self.remove_game(game)
+                self.removeGame(game)
 
 
     def updateOdds(self, samples_by_site: Dict[Sites, List[OddSample]]) -> List[notf.Notification]:
@@ -148,7 +147,6 @@ class League:
 
         for site, site_samples in samples_by_site.items():
 
-            print(site.name)
             # site is not active or an error ocurred
             if site_samples is None:
                 continue
@@ -170,7 +168,7 @@ class League:
         if game is not None:
 
             if sample.start_time <= sample.sample_time:
-                self.remove_game(game)
+                self.removeGame(game)
                 return None
 
             if game.addOdd(sample, site):
