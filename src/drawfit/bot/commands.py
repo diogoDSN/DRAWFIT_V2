@@ -62,6 +62,11 @@ async def browse(ctx: commands.Context, *, arguments = ''):
 
         if message_task in tasks_done:
             message = await message_task
+
+            if message.content == 'q':
+                await browse_message.reply('Exiting')
+                break
+
             page = page.message(message)
 
         elif reaction_add_task in tasks_done:
