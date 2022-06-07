@@ -1,3 +1,5 @@
+import asyncio
+
 from typing import List, Tuple, NoReturn, Dict
 from datetime import datetime
 
@@ -13,6 +15,7 @@ class League:
         
         self._name: str = name
         self._active: bool = True
+        self.color: int = 0xffffff
 
         self._current_games: List[Game] = []
 
@@ -20,6 +23,7 @@ class League:
         self._inactive_teams: List[Team] = []
 
         self._league_codes: Dict[Sites, LeagueCode] = {site: None for site in Sites}
+        self.remove_cycle = asyncio.create_task(self.removeCycle())
 
     @property
     def name(self) -> str:
@@ -124,12 +128,27 @@ class League:
         if game is not None:
             game.setId(site, game_id)
     
+    def remove_game(self, game: Game) -> NoReturn:
+        if game.team1 is not None:
+            game.team1.current_game = None
+        if game.team2 is not None:
+            game.team2.current_game = None
+        
+        self.current_games.remove(game)
+
+    def removeRoutine(self) -> NoReturn:
+        for game in self.current_games:
+            if game.date <= datetime.now():
+                self.remove_game(game)
+
+
     def updateOdds(self, samples_by_site: Dict[Sites, List[OddSample]]) -> List[notf.Notification]:
 
         results = []
 
         for site, site_samples in samples_by_site.items():
 
+            print(site.name)
             # site is not active or an error ocurred
             if site_samples is None:
                 continue
@@ -151,7 +170,7 @@ class League:
         if game is not None:
 
             if sample.start_time <= sample.sample_time:
-                self.current_games.remove(game)
+                self.remove_game(game)
                 return None
 
             if game.addOdd(sample, site):
@@ -172,12 +191,17 @@ class League:
             if team.hasGame():
                 return None
 
-            new_game = Game(sample.game_name, date=sample.start_time)
+            # check if the game belongs to any other registered team
+            other_team = next((t for t in self.followed_teams if (t.isId(site, sample.team1_id) or t.isId(site, sample.team2_id)) and t != team), None)
+
+            new_game = Game(sample.game_name, date=sample.start_time, team1=team, team2=other_team)
             new_game.setId(site, sample.game_id)
-            
+            new_game.addOdd(sample, site)
+
             self._current_games.append(new_game)
             team.current_game = new_game
-            new_game.addOdd(sample, site)
+            if other_team != None:
+                other_team.current_game = new_game
 
             return notf.NewOddNotification(new_game)
 

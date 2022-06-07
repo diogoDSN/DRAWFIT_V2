@@ -29,6 +29,12 @@ class DomainStore:
             return next((league for league in self.known_leagues if league.name == league_id), None)
 
     
+    async def removeRoutine(self) -> NoReturn:
+        while True:
+            await asyncio.sleep(3600)
+            for league in self.known_leagues:
+                league.removeRoutine()
+
     def addLeague(self, league_name: str) -> NoReturn:
 
         league = next((league for league in self.known_leagues if league.name == league_name), None)
@@ -36,12 +42,25 @@ class DomainStore:
         if league is None:
             self.known_leagues.append(l.League(league_name))
             
-    def changeLeagueCode(self, league_id: str, site: Sites, newCode: str):
+    def changeLeagueCode(self, league_id: str, site: Sites, newCode: str) -> bool:
 
         league = self.getLeague(league_id)
 
         if league is not None:
             league.codes[site] = newCode
+            return True
+        
+        return False
+
+    def changeLeagueColor(self, league_id: str, new_color: int) -> bool:
+
+        league = self.getLeague(league_id)
+
+        if league is not None:
+            league.color = new_color
+            return True
+        
+        return False
 
     def getDomain(self) -> DomainDto:
         return DomainDto(self.known_leagues)
