@@ -52,6 +52,11 @@ def checkAtLeastNArguments(arguments: str, n: int, message: str) -> List[str]:
 
 class Page:
 
+    def __init__(self, domain_dto: DomainDto, page_message: discord.Message) -> NoReturn:
+        self.domain_dto = domain_dto
+        self.page_message = page_message
+        self.change = True
+
     @abstractmethod
     def addReaction(self) -> Page:
         pass
@@ -65,7 +70,7 @@ class Page:
         pass
     
     @abstractmethod
-    async def editPage(self) -> discord.Message:
+    async def editPage(self) -> NoReturn:
         pass
 
     
@@ -74,46 +79,42 @@ class Page:
 class DomainPage(Page):
 
     codes_emoji = '*️⃣'
+    no_code = 'No Code'
+    embed_color = 0xffffff
 
     def __init__(self, domain_dto: DomainDto, page_message: discord.Message) -> NoReturn:
-        self.domain_dto = domain_dto
-        self.page_message = page_message
+        super().__init__(domain_dto, page_message)
         self.show_codes = False
-        self.change = True
     
-    async def editPage(self) -> discord.Message:
+    async def editPage(self) -> NoReturn:
 
-        if self.change == False:
+        if not self.change:
             return
         
         self.change = False
 
-        embed = discord.Embed(title='Leagues', description='All the leagues currently registered.', color=DomainDto.embed_color)
+        embed = discord.Embed(title='Leagues', description='All the leagues currently registered.', color=DomainPage.embed_color)
 
         for number, league in enumerate(self.domain_dto.known_leagues):
             name = f'{number+1}. {league.name}'
-            field_value = ''
+            
+            field_value = '**' + ('Active' if league.active else 'Inactive') + '**'
 
             if self.show_codes:
-                field_value += '```'
-                if league.active:
-                    name += ' - *Active*'
-                else:
-                    name += ' - *Inactive*'
+                field_value += '\n```'
                 
                 for site, code in league.codes.items():
                     if code != None:
                         field_value += f'{site.name:-<10s}{str(code):->30}\n'
                     else:
-                        field_value += f'{site.name:-<10s}{DomainDto.no_code:->30}\n'
+                        field_value += f'{site.name:-<10s}{DomainPage.no_code:->30}\n'
 
                 field_value += '```'
-            else:
-                field_value += '*codes not displayed*'
-
+            
             embed.add_field(name=name, value=field_value, inline=False)
+
         
-        embed.set_footer(text='Choose number/name of league\nq to quit')
+        embed.set_footer(text='Choose league by number.')
 
         await self.page_message.edit(content=None, embed=embed)
         await self.page_message.add_reaction(DomainPage.codes_emoji)
@@ -131,5 +132,45 @@ class DomainPage(Page):
         return self
     
     def message(self, message: discord.Message) -> Page:
+        try:
+
+            number = int(message.content) - 1
+
+            if self.domain_dto.getLeague(number) is not None:
+
+                return LeaguePage(self.domain_dto, self.page_message, number)
+
+        except:
+            return self
+
+class LeaguePage(Page):
+
+    def __init__(self, domain_dto: DomainDto, page_message: discord.Message, number: int) -> NoReturn:
+        super().__init__(domain_dto, page_message)
+        self.league_dto = self.domain_dto.getLeague(number)
+
+    async def editPage(self) -> NoReturn:
+
+        if not self.change:
+            return
+        
+        self.change = False
+
+        embed = discord.Embed(title=self.league_dto.name, \
+                              description=('Active' if self.league_dto.active else 'Inactive'), \
+                              color=self.league_dto.color)
+
+        embed.set_footer(text='Nothing.')
+
+        await self.page_message.edit(content=None, embed=embed)
+        await self.page_message.clear_reactions()
+
+    def addReaction(self) -> Page:
         return self
 
+    def removeReaction(self) -> Page:
+        return self
+
+    def message(self) -> Page:
+        return self
+    

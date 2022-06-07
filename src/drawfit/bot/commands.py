@@ -82,8 +82,6 @@ async def browse(ctx: commands.Context, *, arguments = ''):
 @commands.command(aliases=['aL','al'])
 async def addLeague(ctx: commands.Context, *, arguments = ''):
 
-    print(f'{str(ctx.author)}; {ctx.message}')
-
     if not isCommand(ctx):
         return
 
