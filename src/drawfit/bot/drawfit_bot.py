@@ -37,6 +37,7 @@ class DrawfitBot(commands.Bot):
             self.store = store.DomainStore()
         
         self.pending_queries: List[asyncio.Task] = []
+        self.routines: List[asyncio.Task] = []
 
         self.configureCommands()
     
@@ -83,10 +84,11 @@ class DrawfitBot(commands.Bot):
         self.notification_visitor = Notify(self)
         self.notify_tasks = []
     
-        
+        self.routines.append(asyncio.create_task(self.store.removeRoutine()))
+
         await self.greet()
 
-        self.handler_routine = asyncio.create_task(self.handlerRoutine())
+        self.routines.append(asyncio.create_task(self.handlerRoutine()))
 
 
     async def handlerRoutine(self):
