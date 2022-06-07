@@ -20,7 +20,7 @@ class Moosh(Site):
     # Types of STOMP Messages to send
 
     def __init__(self) -> NoReturn:
-        super().__init__(' vs ')
+        super().__init__([' vs ', ' x '])
     
     async def getOddsLeague(self, session: AsyncHTMLSession,  league_code: MooshCode) -> List[OddSample]:
         """

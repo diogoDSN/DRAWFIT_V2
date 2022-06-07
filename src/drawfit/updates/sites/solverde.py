@@ -37,7 +37,7 @@ class Solverde(Site):
     SUB_ERR = create_stomp_msg("SUBSCRIBE", {"id":"/user/error", "destination":"/user/error"})
 
     def __init__(self) -> NoReturn:
-        super().__init__(' - ')
+        super().__init__([' - '])
     
     async def getOddsLeague(self, _: AsyncHTMLSession,  league_code: SolverdeCode) -> List[OddSample]:
         """
