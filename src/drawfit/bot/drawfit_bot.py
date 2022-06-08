@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import asyncio
 import pickle
 
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, TYPE_CHECKING
 
 import discord
 from discord.ext import commands
@@ -11,6 +13,9 @@ import drawfit.updates.update_handler as updates
 
 from drawfit.bot.permissions import Permissions
 from drawfit.utils import Sites
+
+if TYPE_CHECKING:
+    import drawfit.domain.notifications as notf
 
 
 class DrawfitBot(commands.Bot):
@@ -104,7 +109,7 @@ class DrawfitBot(commands.Bot):
             print(f'Update ended. With {len(notifications)} notifications')
 
             for notification in notifications:
-                self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
+                self.notify(notification)
 
             print('All notification tasks created')
 
@@ -118,6 +123,10 @@ class DrawfitBot(commands.Bot):
         else:
             raise error
     
+
+    def notify(self, notification: notf.Notification) -> NoReturn:
+        self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
+
     def teamIdAccepted(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
         self.store.setTeamId(team_name, team_id, site, league_name)
         
