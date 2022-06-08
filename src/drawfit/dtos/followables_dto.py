@@ -17,7 +17,7 @@ class FollowableDto:
         self.complete = followable.complete
 
         for site in Sites:
-            self.keywords[site] = followable.keywords[site].copy()
+            self.keywords = followable.keywords.copy()
             self.considered[site] = followable.considered[site].copy()
 
 class GameDto(FollowableDto):
@@ -39,7 +39,7 @@ class TeamDto(FollowableDto):
         super().__init__(team)
 
         self.name = team.name
-        self.current_game = GameDto(team.current_game)
+        self.current_game = None if team.current_game is None else GameDto(team.current_game)
 
 
 
