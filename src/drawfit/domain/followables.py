@@ -171,4 +171,4 @@ class Team(Followable):
         return False
     
     def __repr__(self) -> str:
-        return f'Name: {self.name}; Games: {self.games};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self.ids}; Complete: {self.complete}'
+        return f'Name: {self.name}; Game: {self.current_game(self, game)};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self.ids}; Complete: {self.complete}'
