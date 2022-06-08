@@ -7,6 +7,7 @@ from drawfit.bot.messages.commands import *
 from drawfit.bot.messages import NoPermission
 from drawfit.bot.utils import hasPermission, MessageCheck, ReactionCheck
 from drawfit.bot.utils.commands import *
+from drawfit.bot.browse_pages import *
 
 from drawfit.utils import BwinCode, BetanoCode, SolverdeCode, MooshCode, LeagueCodeError
 from drawfit.utils.league_codes.league_codes import BetclicCode, BetwayCode
@@ -45,14 +46,13 @@ async def browse(ctx: commands.Context, *, arguments = ''):
 
     domain_dto = ctx.bot.store.getDomain()
     page = DomainPage(domain_dto, browse_message)
+    await page.initPage()
 
     m_check = MessageCheck(ctx)
     r_check = ReactionCheck(browse_message, ctx.author)
 
 
     while True:
-
-        await page.editPage()
 
         message_task = asyncio.create_task(ctx.bot.wait_for("message", check=m_check.check))
         reaction_add_task = asyncio.create_task(ctx.bot.wait_for("reaction_add", check=r_check.check))
@@ -67,20 +67,21 @@ async def browse(ctx: commands.Context, *, arguments = ''):
                 await browse_message.reply('Exiting')
                 break
 
-            page = page.message(message)
+            page = await page.message(message)
 
         elif reaction_add_task in tasks_done:
             reaction, user = await reaction_add_task
-            page = page.addReaction(reaction, user)
+            page = await page.addReaction(reaction, user)
 
         elif reaction_remove_task in tasks_done:
             reaction, user = await reaction_remove_task
-            page = page.removeReaction(reaction, user)
+            page = await page.removeReaction(reaction, user)
 
         else:
             await browse_message.reply('Exiting')
             break
 
+        await page.editPage()
 
 
 # $addLeague (name of new league)
@@ -341,7 +342,7 @@ async def activateTeam(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
     
-    args = checkNNameArguments(arguments, 2, addTeamKeywordsUsage())
+    args = checkNNameArguments(arguments, 2, activateTeamUsage())
 
     league_id, team_id = args
 
@@ -363,7 +364,7 @@ async def deactivateTeam(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
 
-    args = checkNNameArguments(arguments, 2, addTeamKeywordsUsage())
+    args = checkNNameArguments(arguments, 2, deactivateTeamUsage())
 
     league_id, team_id = args
 
