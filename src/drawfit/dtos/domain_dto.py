@@ -16,10 +16,5 @@ class DomainDto:
 
         for league in leagues:
             self.known_leagues.append(l.LeagueDto(league))
-    
-    def getLeague(self, number: int) -> Optional[LeagueDto]:
-        if 0 <= number < len(self.known_leagues):
-            return self.known_leagues[number]
-        return None
 
 
