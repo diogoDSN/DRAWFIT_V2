@@ -9,12 +9,17 @@ class Sites(Enum):
     Moosh = 'Moosh'
     Betway = 'Betway'
    
-
-    '''
-    Bwin = 'Bwin'
-    Betano = 'Betano'
-    Solverde = 'Solverde'
-    Moosh = 'Moosh'
-    Betway = 'Betway'
-    Betclic = 'Betclic'
-    '''
+    def small(self) -> str:
+        if self == Sites.Bwin:
+            return 'BWIN'
+        elif self == Sites.Betano:
+            return 'TANO'
+        elif self == Sites.Betclic:
+            return 'CLIC'
+        elif self == Sites.Solverde:
+            return 'SOLV'
+        elif self == Sites.Moosh:
+            return 'MOSH'
+        elif self == Sites.Betway:
+            return 'BWAY'
+        
