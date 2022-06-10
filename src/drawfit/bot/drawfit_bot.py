@@ -3,7 +3,7 @@ from __future__ import annotations
 import asyncio
 import pickle
 
-from typing import List, Dict, Tuple, TYPE_CHECKING
+from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn
 
 import discord
 from discord.ext import commands
@@ -22,6 +22,7 @@ class DrawfitBot(commands.Bot):
 
     store_path = "/tmp/test_data.pickle"
     greeting = '**Hello there!** - Obi-Wan Kenobi'
+    update_cycle = 30
     command_timeout = 7
     command_channels = {'Vascolândia': ['private-nogueira']}
     update_channels = {'Vascolândia' : ['private-nogueira-2']}
@@ -113,7 +114,7 @@ class DrawfitBot(commands.Bot):
 
             print('All notification tasks created')
 
-            await asyncio.sleep(30)
+            await asyncio.sleep(DrawfitBot.update_cycle)
     
     async def on_command_error(self, ctx, error):
         if error.__class__ == commands.BadArgument:
