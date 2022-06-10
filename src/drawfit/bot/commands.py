@@ -45,7 +45,7 @@ async def browse(ctx: commands.Context, *, arguments = ''):
     browse_message = await ctx.send('*Loading...*')
 
     domain_dto = ctx.bot.store.getDomain()
-    page = DomainPage(domain_dto, browse_message)
+    page = DomainPage(ctx.author, domain_dto, browse_message)
     await page.initPage()
 
     m_check = MessageCheck(ctx)
