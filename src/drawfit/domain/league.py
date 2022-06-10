@@ -95,6 +95,7 @@ class League:
     def deactivateTeam(self, team_name: str) -> NoReturn:
         for index, team in enumerate(self.followed_teams):
             if team.name == team_name:
+                team.active = False
                 self.inactive_teams.append(team)
                 self.followed_teams.pop(index)
                 return True
@@ -104,6 +105,7 @@ class League:
     def activateTeam(self, team_name: str) -> NoReturn:
         for index, team in enumerate(self.inactive_teams):
             if team.name == team_name:
+                team.active = True
                 self.followed_teams.append(team)
                 self.inactive_teams.pop(index)
                 return True

@@ -144,11 +144,20 @@ class Team(Followable):
     def __init__(self, name: str):
         super().__init__([name])
         self._name = name
+        self._active: bool = True
         self._current_game = None
     
     @property
     def name(self) -> str:
         return self._name
+    
+    @property
+    def active(self) -> bool:
+        return self._active
+    
+    @active.setter
+    def active(self, active: bool) -> NoReturn:
+        self._active = active
     
     @property
     def current_game(self) -> Optional[Game]:

@@ -7,6 +7,8 @@ from drawfit.utils import Sites
 if TYPE_CHECKING:
     from drawfit.domain.followables import Followable, Game, Team
 
+from drawfit.dtos.odd_dto import OddDto
+
 
 class FollowableDto:
 
@@ -27,11 +29,15 @@ class GameDto(FollowableDto):
 
         self.name = game.name
         self.date = game.date
+        self.team1 = None if game.team1 is None else game.team1.name
+        self.team2 = None if game.team2 is None else game.team2.name
 
         self.odds = {}
 
         for site in Sites:
-            self.odds[site] = game.odds.copy()
+            self.odds[site] = []
+            for odd in game.odds[site]:
+                self.odds[site].append(OddDto(odd))
 
 class TeamDto(FollowableDto):
 
@@ -39,6 +45,7 @@ class TeamDto(FollowableDto):
         super().__init__(team)
 
         self.name = team.name
+        self.active = team.active
         self.current_game = None if team.current_game is None else GameDto(team.current_game)
 
 
