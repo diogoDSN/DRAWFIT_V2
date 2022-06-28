@@ -8,6 +8,8 @@ from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn
 import discord
 from discord.ext import commands
 
+from drawfit.parameters import SAVE_PATH
+
 import drawfit.domain.domain_store as store
 import drawfit.updates.update_handler as updates
 
@@ -20,7 +22,6 @@ if TYPE_CHECKING:
 
 class DrawfitBot(commands.Bot):
 
-    store_path = "/tmp/test_data.pickle"
     greeting = '**Hello there!** - Obi-Wan Kenobi'
     update_cycle = 30
     command_timeout = 7
@@ -37,7 +38,7 @@ class DrawfitBot(commands.Bot):
         super().__init__(command_prefix='.', intents=intents)
 
         try:
-            with open(DrawfitBot.store_path, 'rb') as f:
+            with open(SAVE_PATH, 'rb') as f:
                 self.store = pickle.load(f)
         except Exception:
             self.store = store.DomainStore()
@@ -176,7 +177,7 @@ class DrawfitBot(commands.Bot):
     
     def save(self) -> bool:
         try:
-            with open(DrawfitBot.store_path, 'wb') as f:
+            with open(SAVE_PATH, 'wb') as f:
                 pickle.dump(self.store, f)
             
             return True
