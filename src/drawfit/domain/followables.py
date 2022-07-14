@@ -16,7 +16,7 @@ class Followable:
             keywords = []
 
         self._keywords: List[str] = keywords
-        self._considered: Dict[Sites, Optional[List[Tuple[str]]]] = {site: [] for site in Sites}
+        self._considered: Dict[Sites, List[Tuple[str]]] = {site: [] for site in Sites}
         self._ids: Dict[Sites, Optional[Tuple[str]]] = {site: None for site in Sites}
         self._complete: bool = False
 
@@ -33,7 +33,7 @@ class Followable:
         self._keywords = list(filter(lambda x: x not in to_remove, self._keywords))
     
     @property
-    def considered(self) -> List[List[str]]:
+    def considered(self) -> Dict[Sites, List[Tuple[str]]]:
         return self._considered
     
     def addConsidered(self, site: Sites, considered: Tuple[str]) -> NoReturn:
@@ -43,13 +43,13 @@ class Followable:
         self._considered[site].remove(considered)
     
     @property
-    def ids(self) -> List[Tuple[str]]:
+    def ids(self) -> Dict[Sites, Optional[Tuple[str]]]:
         return self._ids
     
-    def setId(self, site: Sites, id: Tuple[str]) -> NoReturn:
+    def setId(self, site: Sites, id: str) -> NoReturn:
         self._ids[site] = id
 
-        if None not in self.ids:
+        if None not in self._ids:
             self._complete = True
     
     @property
@@ -59,11 +59,11 @@ class Followable:
     # followable logic
     
     def isId(self, site: Sites, id: Tuple[str]) -> bool:
-        return self.ids[site] == id
+        return self._ids[site] == id
     
     def couldBeId(self, site: Sites, id: Tuple[str]) -> bool:
 
-        if self.ids[site] is not None or id in self.considered[site]:
+        if self._ids[site] is not None or id in self.considered[site]:
             return False
         
         for keyword in self.keywords:
@@ -123,15 +123,26 @@ class Game(Followable):
     def team2(self, team: Team) -> NoReturn:
         self._teams[1] = team
 
+    def hoursLeft(self, time: datetime = None) -> float:
+
+        if self.date is None:
+            return 0
+
+        if time is None:
+            time = datetime.now()
+
+        delta = self.date - time
+        return delta.total_seconds() / 3600
+
     def __eq__(self, o):
         if isinstance(o, Game):
             return self.name == o.name and self.date == o.date
-        return False       
+        return False
 
     def addOdd(self, sample: OddSample, site: Sites) -> bool:
 
         if  self.odds[site] == [] or self.odds[site][-1].value != sample.odd:
-            self._odds[site].append(Odd(sample.odd, sample.sample_time))
+            self._odds[site].append(Odd(sample.odd, sample.sample_time, self.hoursLeft(sample.sample_time)))
             return True
         
         return False
@@ -180,4 +191,4 @@ class Team(Followable):
         return False
     
     def __repr__(self) -> str:
-        return f'Name: {self.name}; Game: {self.current_game(self, game)};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self.ids}; Complete: {self.complete}'
+        return f'Name: {self.name}; Game: {self.current_game(self, game)};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self._ids}; Complete: {self.complete}'

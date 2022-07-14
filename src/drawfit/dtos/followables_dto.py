@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
+from datetime import datetime
 from drawfit.utils import Sites
 
 
@@ -15,12 +16,13 @@ class FollowableDto:
     def __init__(self, followable: Followable):
         self.keywords = {}
         self.considered = {}
-        self.ids = followable.ids.copy()
+        self.ids = {}
         self.complete = followable.complete
 
         for site in Sites:
             self.keywords = followable.keywords.copy()
-            self.considered[site] = followable.considered[site].copy()
+            self.ids[site] = ' vs '.join(followable.ids[site]) if followable.ids[site] is not None else 'No Id'
+            self.considered[site] = [' vs '.join(id) for id in followable.considered[site]]
 
 class GameDto(FollowableDto):
 
@@ -38,6 +40,17 @@ class GameDto(FollowableDto):
             self.odds[site] = []
             for odd in game.odds[site]:
                 self.odds[site].append(OddDto(odd))
+    
+    def hoursLeft(self, time: datetime = None) -> float:
+
+        if self.date is None:
+            return 0
+
+        if time is None:
+            time = datetime.now()
+
+        delta = self.date - time
+        return delta.total_seconds() / 3600
 
 class TeamDto(FollowableDto):
 
