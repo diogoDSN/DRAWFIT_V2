@@ -13,9 +13,9 @@ class Sites(Enum):
         if self == Sites.Bwin:
             return 'BWIN'
         elif self == Sites.Betano:
-            return 'TANO'
+            return 'BTAN'
         elif self == Sites.Betclic:
-            return 'CLIC'
+            return 'BCLC'
         elif self == Sites.Solverde:
             return 'SOLV'
         elif self == Sites.Moosh:
