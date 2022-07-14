@@ -370,7 +370,7 @@ async def deactivateTeam(ctx: commands.Context, *, arguments = ''):
 
     if ctx.bot.store.deactivateTeam(league_id, team_id):
         
-        response = f'The following team was deactivated `{team_id}`:\n'
+        response = f'The following team was deactivated: `{team_id}`\n'
         await ctx.send(response)
     else:
         await ctx.send('The given team couldn\'t be deactivated')
