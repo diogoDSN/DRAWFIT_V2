@@ -159,5 +159,5 @@ cython_debug/
 #  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
 
-src/drawfit/token.txt
+src/drawfit/parameters.py
 .DS_Store
