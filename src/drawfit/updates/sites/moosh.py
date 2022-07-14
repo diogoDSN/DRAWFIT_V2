@@ -48,7 +48,7 @@ class Moosh(Site):
 
                 return odds
 
-            except Exception as e:
+            except:
                 return None
                 #raise SiteError(Sites.Moosh.name)
 

@@ -40,7 +40,7 @@ class Betclic(Site):
                 # Gets the odds from the info
                 return self.parseResponse(request.json())
 
-            except Exception:
+            except:
                 return None
                 #raise SiteError(Sites.Betclic.name)
 
