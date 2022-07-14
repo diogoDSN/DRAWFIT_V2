@@ -349,7 +349,7 @@ class GamePage(Page):
                     Sites.Betway:  '⚪'}
     no_team = 'Team not found'
     time = 'time left'
-    delta = timedelta(seconds=360) # use timedelta(seconds=bot.DrawfitBot.update_cycle) for the bots update cycle
+    delta = timedelta(seconds=bot.DrawfitBot.update_cycle)# timedelta(seconds=360) # use timedelta(seconds=bot.DrawfitBot.update_cycle) for the bots update cycle
 
     def __init__(self, user: User, domain: DomainDto, league: LeagueDto, game: GameDto, page_message: Message, team: Optional[TeamDto]=None) -> NoReturn:
         
@@ -435,6 +435,25 @@ class GamePage(Page):
                 
                 line = '|'.join(line)
                 odds += f'{line}\n'
+
+
+            odds += '\nCurrent odds:\n'
+
+            if self.columns[GamePage.time] == []:
+                last_line = ['This game has no odds.']
+            
+            else:
+                last_line = [self.columns[GamePage.time][-1]]
+
+                for _, odd in self.game.odds.items():
+
+                    if odd == []:
+                        last_line.append('----')
+                    else:
+                        last_line.append(f'{odd[-1].value:1.2f}')
+                
+
+            odds += '|'.join(last_line) + '\n'
 
             odds += '```'
             embed.add_field(name='Odds History', value=odds, inline=False)
