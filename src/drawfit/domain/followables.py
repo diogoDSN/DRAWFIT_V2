@@ -175,7 +175,7 @@ class Team(Followable):
         return self._current_game
     
     @current_game.setter
-    def current_game(self, game: Game) -> Game:
+    def current_game(self, game: Optional[Game]) -> NoReturn:
         self._current_game = game
     
     def hasGame(self) -> bool:
