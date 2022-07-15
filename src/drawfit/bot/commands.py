@@ -130,7 +130,7 @@ async def changeLeagueColor(ctx: commands.Context, *, arguments = ''):
     while True:
 
         try:
-            message = await ctx.bot.wait_for("message", check=m_check.check, timeout=5)
+            message = await ctx.bot.wait_for("message", check=m_check.check, timeout=10)
             n = int(message.content)
 
             if n < 1 or n > len(ds.DomainStore.colors_list):
