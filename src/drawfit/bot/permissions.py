@@ -2,6 +2,6 @@ from enum import Enum
 
 class Permissions(Enum):
 
-    NOGUEIRA = 'nogueira'
+    OWNER = 'owner'
     MODERATOR = 'moderator'
     NORMAL = 'normal'
