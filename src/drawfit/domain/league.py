@@ -106,6 +106,11 @@ class League:
                 team.active = False
                 self.inactive_teams.append(team)
                 self.followed_teams.pop(index)
+
+                if team.current_game is not None:
+                    self.current_games.remove(team.current_game)
+                
+                team.current_game = None
                 return True
         
         return False
