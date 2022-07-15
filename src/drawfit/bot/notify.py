@@ -3,6 +3,10 @@ import asyncio
 from asyncio.exceptions import TimeoutError
 from typing import NoReturn, TYPE_CHECKING
 
+from discord import Embed
+
+from drawfit.parameters import UPDATES_CHANNELS
+
 if TYPE_CHECKING:
     import drawfit.domain.notifications as notf
 
@@ -12,12 +16,13 @@ import drawfit.bot.drawfit_bot as dbot
 from drawfit.bot.permissions import Permissions
 from drawfit.bot.utils import ReactionAnswerCheck
 from drawfit.bot.messages import TimedOut, Yes, No
+from drawfit.parameters import UPDATES_CHANNELS
 
 class Notify:
 
     def __init__(self, bot: dbot.DrawfitBot):
         self.bot = bot
-        self.channels = bot.getChannels(dbot.DrawfitBot.update_channels)
+        self.channels = bot.getChannels(UPDATES_CHANNELS)
         self.mods = bot.getUsersWithPermission(Permissions.MODERATOR)
         self.timeout = 43200
 
@@ -25,8 +30,11 @@ class Notify:
 
         try:
 
+            embed = Embed(title='New Odds', color=notification.color)
+            embed.add_field(name=notification.game.name, value=str(notification))
+
             for channel in self.channels:
-                await channel.send(notification)
+                await channel.send(embed=embed)
             
         except Exception as e:
             print("Exception raised in visitNewOdd!")

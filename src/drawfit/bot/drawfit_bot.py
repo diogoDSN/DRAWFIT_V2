@@ -8,7 +8,7 @@ from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn
 import discord
 from discord.ext import commands
 
-from drawfit.parameters import SAVE_PATH
+from drawfit.parameters import PERMISSIONS, SAVE_PATH, COMMAND_CHANNELS, UPDATES_CHANNELS
 
 import drawfit.domain.domain_store as store
 import drawfit.updates.update_handler as updates
@@ -24,12 +24,6 @@ class DrawfitBot(commands.Bot):
 
     greeting = '**Hello there!** - Obi-Wan Kenobi'
     update_cycle = 30
-    command_timeout = 7
-    command_channels = {'Vascolândia': ['private-nogueira']}
-    update_channels = {'Vascolândia' : ['private-nogueira-2']}
-    permissions = {Permissions.NOGUEIRA: ['Pistache#2173'], \
-                            Permissions.MODERATOR: [], \
-                            Permissions.NORMAL: ['File_Read_Bot#9655']}
     
     def __init__(self):
 
@@ -52,7 +46,7 @@ class DrawfitBot(commands.Bot):
 
         perms = {}
 
-        for permission, perms_list in DrawfitBot.permissions.items():
+        for permission, perms_list in PERMISSIONS.items():
             
             current_perms = []
 
@@ -76,8 +70,8 @@ class DrawfitBot(commands.Bot):
 
     async def greet(self):
 
-        all_channels = self.getChannels(DrawfitBot.command_channels)
-        all_channels.extend(self.getChannels(DrawfitBot.update_channels))
+        all_channels = self.getChannels(COMMAND_CHANNELS)
+        all_channels.extend(self.getChannels(UPDATES_CHANNELS))
 
         for channel in all_channels:
             await channel.send(DrawfitBot.greeting)    
@@ -148,9 +142,9 @@ class DrawfitBot(commands.Bot):
 
         if perm == Permissions.MODERATOR:
             users += self.perms[perm]
-            perm = Permissions.NOGUEIRA
+            perm = Permissions.OWNER
 
-        if perm == Permissions.NOGUEIRA:
+        if perm == Permissions.OWNER:
             users += self.perms[perm]
         
         return users

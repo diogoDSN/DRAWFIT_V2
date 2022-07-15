@@ -15,7 +15,7 @@ class League:
         
         self._name: str = name
         self._active: bool = True
-        self.color: int = 0xffffff
+        self._color: int = 0xffffff
 
         self._current_games: List[Game] = []
 
@@ -31,6 +31,14 @@ class League:
     @property
     def active(self) -> bool:
         return self._active
+    
+    @property
+    def color(self) -> int:
+        return self._color
+    
+    @color.setter
+    def color(self, color: int) -> NoReturn:
+        self._color = color
 
     @property
     def current_games(self) -> List[Game]:
@@ -174,7 +182,9 @@ class League:
                 return None
 
             if game.addOdd(sample, site):
-                return notf.NewOddNotification(game)
+                n = notf.NewOddNotification(game)
+                n.color = self.color
+                return n
             return None
 
 
@@ -186,7 +196,10 @@ class League:
             if team.isGameByDate(sample.start_time):
                 team.current_game.setId(site, sample.game_id)
                 team.current_game.addOdd(sample, site)
-                return notf.NewOddNotification(team.current_game)
+
+                n = notf.NewOddNotification(team.current_game)
+                n.color = self.color
+                return n
 
             if team.hasGame():
                 return None
@@ -203,7 +216,9 @@ class League:
             if other_team != None:
                 other_team.current_game = new_game
 
-            return notf.NewOddNotification(new_game)
+            n = notf.NewOddNotification(new_game)
+            n.color = self.color
+            return n
 
         # 3 - test if the game could belong to a followed team
         for team_name in sample.game_id:

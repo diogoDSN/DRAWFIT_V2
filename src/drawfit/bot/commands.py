@@ -12,6 +12,8 @@ from drawfit.bot.browse_pages import *
 from drawfit.utils import BwinCode, BetanoCode, SolverdeCode, MooshCode, LeagueCodeError
 from drawfit.utils.league_codes.league_codes import BetclicCode, BetwayCode
 
+from drawfit.domain import domain_store as ds
+
 
 @commands.command(hidden=True)
 async def test(ctx: commands.Context, *, arguments = ''):
@@ -19,8 +21,8 @@ async def test(ctx: commands.Context, *, arguments = ''):
     if not isCommand(ctx):
         return
 
-    if not hasPermission(ctx, Permissions.NOGUEIRA):
-        await ctx.send(NoPermission('Nogueira Level'))
+    if not hasPermission(ctx, Permissions.OWNER):
+        await ctx.send(NoPermission('Owner Level'))
         return
     
     checkEmptyArguments(arguments, 'test')
@@ -100,10 +102,9 @@ async def addLeague(ctx: commands.Context, *, arguments = ''):
     ctx.bot.store.addLeague(arguments)
     await ctx.send(f'New league: `{arguments}` added!')
 
-
-# $getLeagues
-@commands.command(aliases=['gL','gl'])
-async def getLeagues(ctx: commands.Context, *, arguments = ''):
+# $changeLeagueColor color league_name
+@commands.command(aliases=['cLC','color'])
+async def changeLeagueColor(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
         return
@@ -112,25 +113,39 @@ async def getLeagues(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
     
-    checkEmptyArguments(arguments, 'getLeagues')
-    
-    leagueDtos = ctx.bot.store.getLeagues()
+    checkAnyArguments(arguments, changeLeagueColorCorrectUsage())
 
-    answer = 'The known leagues are:\n```'
-    if len(leagueDtos) == 0:
-        answer += 'No Leagues\n'
-    for i, league in enumerate(leagueDtos):
-        answer += str(i+1) + ' - '
-        if league.active:
-            answer += 'A - '
-        else:
-            answer += 'I - '
-        
-        answer += league.name + '\n'
+    colors = 'Choose from the following colors (use number):\n```'
 
-    answer += '```A - active, I - inactive'
+    for index, color in enumerate(ds.DomainStore.colors_list):
+        colors += str(index+1) + ' - ' + color[0] + '\n'
 
-    await ctx.send(answer)
+    colors += '```'
+
+    await ctx.send(colors)
+
+    n = -1
+    m_check = MessageCheck(ctx)
+
+    while n < 1 or n > len(ds.DomainStore.colors_list):
+
+        try:
+            message = await ctx.bot.wait_for("message", check=m_check.check, timeout=5)
+            n = int(message.content)
+        except asyncio.TimeoutError:
+            message.reply('Timeout')
+            return
+        except ValueError:
+            message.reply('Invalid color number.')
+
+
+    if ctx.bot.store.changeLeagueColor(arguments, n-1):
+        await ctx.send('Color successfully changed!')
+    else:
+        await ctx.send('Color could not be changed...')
+
+
+
 
 # $setBwinLeagueCode region_id,competition_id (league_name|league_number)
 @commands.command(aliases=['bwin'])
