@@ -160,3 +160,4 @@ cython_debug/
 #.idea/
 
 src/drawfit/token.txt
+src/drawfit/parameters.py
