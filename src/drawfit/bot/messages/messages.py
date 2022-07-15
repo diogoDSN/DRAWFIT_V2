@@ -9,6 +9,3 @@ def Yes():
 
 def No():
     return "👎"
-
-def DateFormating():
-    return '%A, %B-%d, %H:%M:%S'

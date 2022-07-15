@@ -13,6 +13,27 @@ from drawfit.utils import Sites, OddSample, LeagueCode
 
 class DomainStore:
 
+    colors_list = (
+        ('White', 0xFFFFFF),
+        ('Red', 0xFF0000),
+        ('Orange', 0xFF7000),
+        ('Yellow', 0xFFFF00),
+        ('Cyan', 0x42D4F4),
+        ('Blue', 0x4363D8),
+        ('Navy', 0x000075),
+        ('Green', 0x3CB44B),
+        ('Lime', 0xBFEF45),
+        ('Mint', 0xAAFFC3),
+        ('Pink', 0xF032E6),
+        ('Purple', 0x800080),
+        ('Lavender', 0xDCBEFF),
+        ('Maroon', 0x800000),
+        ('Olive', 0x808000),
+        ('Apricot', 0xFFD8B1),
+        ('Brown', 0x9A6324),
+        ('Gray', 0x808080)
+    )
+
     def __init__(self) -> NoReturn:
         self.known_leagues = []
 
@@ -56,8 +77,8 @@ class DomainStore:
 
         league = self.getLeague(league_id)
 
-        if league is not None:
-            league.color = new_color
+        if league is not None and 0 <= new_color < len(DomainStore.colors_list):
+            league.color = DomainStore.colors_list[new_color][1]
             return True
         
         return False

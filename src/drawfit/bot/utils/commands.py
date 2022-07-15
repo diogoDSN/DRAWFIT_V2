@@ -13,14 +13,16 @@ from drawfit.bot.drawfit_bot import DrawfitBot
 from drawfit.bot.messages.commands import EmptyArgument
 from drawfit.dtos.domain_dto import DomainDto
 
+from drawfit.parameters import COMMAND_CHANNELS
+
 BROWSE_TIMEOUT = 60
 
 def isCommand(ctx: commands.Context) -> bool:
 
     if ctx.guild:
-        for guild in DrawfitBot.command_channels:
+        for guild in COMMAND_CHANNELS:
             if guild == ctx.guild.name:
-                for channel in DrawfitBot.command_channels[guild]:
+                for channel in COMMAND_CHANNELS[guild]:
                     if channel == ctx.channel.name:
                         return True
                 break

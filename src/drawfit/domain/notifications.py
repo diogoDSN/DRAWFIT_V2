@@ -1,9 +1,8 @@
 from abc import abstractmethod
 from datetime import datetime
-from typing import Tuple, overload
+from typing import NoReturn, Tuple, overload
 
 import drawfit.bot.notify as v
-from drawfit.bot.messages import DateFormating
 import drawfit.domain.followables as followables
 
 from drawfit.utils import Sites, OddSample
@@ -21,6 +20,7 @@ class NewOddNotification(Notification):
     def __init__(self, game: followables.Game):
         self.game: followables.Game = game
         self.creation_time: datetime = datetime.now()
+        self.color: int = 0xffffff
 
     async def accept(self, visitor: v.Notify):
         await visitor.visitNewOdd(self)
@@ -34,16 +34,19 @@ class NewOddNotification(Notification):
 
     
     def __str__(self):
-        result = f'**NEW ODDS**\n{self.creation_time.strftime(DateFormating())}\n> {self.game.name}\n> Date: {self.game.date.strftime(DateFormating())}\n```'
+
+        info = f'Hours Left: `{self.game.hoursLeft():3.1f}`\n```\n'
 
         for site in Sites:
             if self.game.odds[site] == []:
-                odd = 0.0
+                odd = 'No Odd'
+                info += f'> {site.name:-<10s}{odd:->8}\n'
             else:
                 odd = self.game.odds[site][-1].value
-            result += f'> {site.name:-<10s}{odd:->5.2f}\n'
+                info += f'> {site.name:-<10s}{odd:->5.2f}\n'
+            
         
-        return result + '```'
+        return info + '```'
 
 
 class PossibleNotification(Notification):
