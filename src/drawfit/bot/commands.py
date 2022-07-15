@@ -127,16 +127,22 @@ async def changeLeagueColor(ctx: commands.Context, *, arguments = ''):
     n = -1
     m_check = MessageCheck(ctx)
 
-    while n < 1 or n > len(ds.DomainStore.colors_list):
+    while True:
 
         try:
             message = await ctx.bot.wait_for("message", check=m_check.check, timeout=5)
             n = int(message.content)
-        except asyncio.TimeoutError:
-            message.reply('Timeout')
+
+            if n < 1 or n > len(ds.DomainStore.colors_list):
+                raise ValueError
+            break
+
+        except asyncio.exceptions.TimeoutError:
+            await ctx.reply('Timeout')
             return
         except ValueError:
-            message.reply('Invalid color number.')
+            await message.reply('Invalid color number.')
+            continue
 
 
     if ctx.bot.store.changeLeagueColor(arguments, n-1):
