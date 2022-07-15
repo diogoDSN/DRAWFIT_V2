@@ -35,7 +35,7 @@ class NewOddNotification(Notification):
     
     def __str__(self):
 
-        info = f'Hours Left: `{self.game.hoursLeft():3.1f}`\n```\n'
+        info = '```\n'
 
         for site in Sites:
             if self.game.odds[site] == []:
@@ -43,7 +43,7 @@ class NewOddNotification(Notification):
                 info += f'> {site.name:-<10s}{odd:->8}\n'
             else:
                 odd = self.game.odds[site][-1].value
-                info += f'> {site.name:-<10s}{odd:->5.2f}\n'
+                info += f'> {site.name:-<10s}{odd:->8.2f}\n'
             
         
         return info + '```'

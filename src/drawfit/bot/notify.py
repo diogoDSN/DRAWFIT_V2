@@ -30,8 +30,8 @@ class Notify:
 
         try:
 
-            embed = Embed(title='New Odds', color=notification.color)
-            embed.add_field(name=notification.game.name, value=str(notification))
+            embed = Embed(title=notification.game.name, color=notification.color)
+            embed.add_field(name=f'Hours Left: {notification.game.hoursLeft():3.1f}', value=str(notification))
 
             for channel in self.channels:
                 await channel.send(embed=embed)
