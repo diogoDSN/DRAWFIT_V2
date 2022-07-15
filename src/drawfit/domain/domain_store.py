@@ -44,7 +44,7 @@ class DomainStore:
             if index >= len(self.known_leagues):
                 return None
             
-            return self.known_leagues(index)
+            return self.known_leagues[index]
 
         except ValueError:
             return next((league for league in self.known_leagues if league.name == league_id), None)
