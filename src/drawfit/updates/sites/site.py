@@ -6,9 +6,9 @@ from drawfit.utils import OddSample, LeagueCode
 
 class Site:
 
-    def __init__(self, site_vs_string: str) -> NoReturn:
+    def __init__(self, site_vs_strings: List[str]) -> NoReturn:
         self.active = True
-        self.site_vs_string = site_vs_string
+        self.site_vs_strings = site_vs_strings
 
     @abstractmethod
     async def getOddsLeague(self, session: AsyncHTMLSession, league_id: LeagueCode) -> List[OddSample]:
@@ -19,4 +19,6 @@ class Site:
 
 
     def getTeams(self, game_name: str) -> Tuple[str]:
-        return tuple(game_name.split(self.site_vs_string))
+        for string in self.site_vs_strings:
+            if string in game_name:
+                return tuple(game_name.split(string))

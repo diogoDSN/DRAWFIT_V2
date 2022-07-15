@@ -1,3 +1,5 @@
+import asyncio
+
 from typing import List, Tuple, NoReturn, Dict
 from datetime import datetime
 
@@ -13,6 +15,7 @@ class League:
         
         self._name: str = name
         self._active: bool = True
+        self._color: int = 0xffffff
 
         self._current_games: List[Game] = []
 
@@ -28,6 +31,14 @@ class League:
     @property
     def active(self) -> bool:
         return self._active
+    
+    @property
+    def color(self) -> int:
+        return self._color
+    
+    @color.setter
+    def color(self, color: int) -> NoReturn:
+        self._color = color
 
     @property
     def current_games(self) -> List[Game]:
@@ -92,16 +103,22 @@ class League:
     def deactivateTeam(self, team_name: str) -> NoReturn:
         for index, team in enumerate(self.followed_teams):
             if team.name == team_name:
+                team.active = False
                 self.inactive_teams.append(team)
                 self.followed_teams.pop(index)
-                break
+                return True
+        
+        return False
     
-    def activate_team(self, team_name: str) -> NoReturn:
+    def activateTeam(self, team_name: str) -> NoReturn:
         for index, team in enumerate(self.inactive_teams):
             if team.name == team_name:
+                team.active = True
                 self.followed_teams.append(team)
                 self.inactive_teams.pop(index)
-                break
+                return True
+        
+        return False
     
     def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites) -> NoReturn:
 
@@ -120,6 +137,20 @@ class League:
         if game is not None:
             game.setId(site, game_id)
     
+    def removeGame(self, game: Game) -> NoReturn:
+        if game.team1 is not None:
+            game.team1.current_game = None
+        if game.team2 is not None:
+            game.team2.current_game = None
+        
+        self.current_games.remove(game)
+
+    def removeRoutine(self) -> NoReturn:
+        for game in self.current_games:
+            if game.date <= datetime.now():
+                self.removeGame(game)
+
+
     def updateOdds(self, samples_by_site: Dict[Sites, List[OddSample]]) -> List[notf.Notification]:
 
         results = []
@@ -147,11 +178,13 @@ class League:
         if game is not None:
 
             if sample.start_time <= sample.sample_time:
-                self.current_games.remove(game)
+                self.removeGame(game)
                 return None
 
             if game.addOdd(sample, site):
-                return notf.NewOddNotification(game)
+                n = notf.NewOddNotification(game)
+                n.color = self.color
+                return n
             return None
 
 
@@ -160,21 +193,32 @@ class League:
         
         if team is not None and sample.start_time >= sample.sample_time:
 
-            game = team.getGameByDate(sample.start_time)
+            if team.isGameByDate(sample.start_time):
+                team.current_game.setId(site, sample.game_id)
+                team.current_game.addOdd(sample, site)
 
-            if game is not None:
-                game.setId(site, sample.game_id)
-                game.addOdd(sample, site)
-                return notf.NewOddNotification(game)
+                n = notf.NewOddNotification(team.current_game)
+                n.color = self.color
+                return n
 
-            new_game = Game(sample.game_name, date=sample.start_time)
+            if team.hasGame():
+                return None
+
+            # check if the game belongs to any other registered team
+            other_team = next((t for t in self.followed_teams if (t.isId(site, sample.team1_id) or t.isId(site, sample.team2_id)) and t != team), None)
+
+            new_game = Game(sample.game_name, date=sample.start_time, team1=team, team2=other_team)
             new_game.setId(site, sample.game_id)
-            
-            self._current_games.append(new_game)
-            team.addGame(new_game)
             new_game.addOdd(sample, site)
 
-            return notf.NewOddNotification(new_game)
+            self._current_games.append(new_game)
+            team.current_game = new_game
+            if other_team != None:
+                other_team.current_game = new_game
+
+            n = notf.NewOddNotification(new_game)
+            n.color = self.color
+            return n
 
         # 3 - test if the game could belong to a followed team
         for team_name in sample.game_id:

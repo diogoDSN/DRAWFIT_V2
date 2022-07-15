@@ -16,7 +16,7 @@ class Betano(Site):
     url = "https://www.betano.pt/api/sport/futebol/ligas/"
 
     def __init__(self) -> NoReturn:
-        super().__init__(' - ')
+        super().__init__([' - '])
     
     async def getOddsLeague(self, session: AsyncHTMLSession, league_code: BetanoCode) -> List[OddSample]:
         if self.active and league_code is not None:
@@ -32,7 +32,7 @@ class Betano(Site):
                 # Gets the odds from the info
                 return self.parseResponse(request.json())
 
-            except Exception:
+            except:
                 return None
                 #raise SiteError(Sites.Betano.name)
 

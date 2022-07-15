@@ -44,3 +44,18 @@ To run the full unit test package use the following command in the project's roo
 ```
 pytest --rootdir=src/test
 ```
+
+## Notes
+
+To function correctly the bot needs multiple permissions and intents:
+
+> General Permissions to send, read and react to messages on a channel.
+ - Allows basic bot functionality;
+
+> Manage Messages Channel Permission
+ - Needed for the browse command to transition correclty between pages;
+
+> Server Members Intent
+ - **Needed to check permissions;**
+ - Collect info on members to costumize answers;
+ - Check authors of messages for correct command interactions;

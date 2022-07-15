@@ -16,7 +16,7 @@ class Betclic(Site):
     url = "https://cds-api.bwin.pt/bettingoffer/fixtures?"
 
     def __init__(self) -> NoReturn:
-        super().__init__(' - ')
+        super().__init__([' - '])
     
     async def getOddsLeague(self, session: AsyncHTMLSession, league_code: BetclicCode) -> List[OddSample]:
         """
@@ -40,7 +40,7 @@ class Betclic(Site):
                 # Gets the odds from the info
                 return self.parseResponse(request.json())
 
-            except Exception:
+            except:
                 return None
                 #raise SiteError(Sites.Betclic.name)
 

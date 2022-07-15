@@ -30,7 +30,7 @@ class BwinCode(LeagueCode):
         return Sites.Bwin
     
     def __str__(self) -> str:
-        return f'{self.getSite().name}:'
+        return f'{self.region_id},{self.competition_id}'
 
 class BetanoCode(LeagueCode):
 
@@ -45,9 +45,12 @@ class BetanoCode(LeagueCode):
     def getSite(self) -> Sites:
         return Sites.Betano
 
+    def __str__(self) -> str:
+        return f'{self.id}'
+
 class SolverdeCode(LeagueCode):
 
-    pattern = '\\A[a-zA-Z]{1,3},\\d{4,6}\\Z'
+    pattern = '\\A[a-zA-Z0-9]{1,6},\\d{4,6}\\Z'
     error_msg = 'Invalid solverde league code! A solverde league code follows the format:\n `aa,00000`'
 
     def __init__(self, raw_code: str):
@@ -57,6 +60,9 @@ class SolverdeCode(LeagueCode):
 
     def getSite(self) -> Sites:
         return Sites.Solverde
+
+    def __str__(self) -> str:
+        return f'{self.country_code},{self.league_id}'
 
 class MooshCode(LeagueCode):
 
@@ -70,6 +76,9 @@ class MooshCode(LeagueCode):
 
     def getSite(self) -> Sites:
         return Sites.Moosh
+    
+    def __str__(self) -> str:
+        return f'{self.name}'
 
 class BetwayCode(LeagueCode):
 
@@ -83,6 +92,9 @@ class BetwayCode(LeagueCode):
 
     def getSite(self) -> Sites:
         return Sites.Betway
+    
+    def __str__(self) -> str:
+        return f'{self.name}'
 
 class BetclicCode(LeagueCode):
 
@@ -96,5 +108,8 @@ class BetclicCode(LeagueCode):
 
     def getSite(self) -> Sites:
         return Sites.Betclic
+    
+    def __str__(self) -> str:
+        return f'{self.id}'
 
         

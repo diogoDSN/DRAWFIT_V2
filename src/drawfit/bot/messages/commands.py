@@ -7,8 +7,17 @@ def addLeagueUsage():
 def seeLeagueUsage():
     return 'Correct usage:\n```.seeLeague (league_name)```'
 
+def changeLeagueColorCorrectUsage():
+    return 'Correct usage:\n```.changeLeagueColorCorrectUsage (league_name)'
+
 def addTeamUsage():
     return 'Correct usage:\n```.addTeam (league_name)::(team_name)```'
+
+def activateTeamUsage():
+    return 'Correct usage:\n```.activateTeam (league_name)::(team_name)```'
+
+def deactivateTeamUsage():
+    return 'Correct usage:\n```.deactivateTeam (league_name)::(team_name)```'
 
 def addTeamKeywordsUsage():
     return 'Correct usage:\n```.addTeamKeywords (league_name)::(team_name)::(keyword1) (keyword2) (keyword3) ...```'

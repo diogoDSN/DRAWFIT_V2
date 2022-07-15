@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from typing import NoReturn, List, Tuple, Dict, Optional
 
@@ -14,7 +16,7 @@ class Followable:
             keywords = []
 
         self._keywords: List[str] = keywords
-        self._considered: Dict[Sites, Optional[List[Tuple[str]]]] = {site: [] for site in Sites}
+        self._considered: Dict[Sites, List[Tuple[str]]] = {site: [] for site in Sites}
         self._ids: Dict[Sites, Optional[Tuple[str]]] = {site: None for site in Sites}
         self._complete: bool = False
 
@@ -31,7 +33,7 @@ class Followable:
         self._keywords = list(filter(lambda x: x not in to_remove, self._keywords))
     
     @property
-    def considered(self) -> List[List[str]]:
+    def considered(self) -> Dict[Sites, List[Tuple[str]]]:
         return self._considered
     
     def addConsidered(self, site: Sites, considered: Tuple[str]) -> NoReturn:
@@ -41,13 +43,13 @@ class Followable:
         self._considered[site].remove(considered)
     
     @property
-    def ids(self) -> List[Tuple[str]]:
+    def ids(self) -> Dict[Sites, Optional[Tuple[str]]]:
         return self._ids
     
-    def setId(self, site: Sites, id: Tuple[str]) -> NoReturn:
+    def setId(self, site: Sites, id: str) -> NoReturn:
         self._ids[site] = id
 
-        if None not in self.ids:
+        if None not in self._ids:
             self._complete = True
     
     @property
@@ -57,11 +59,11 @@ class Followable:
     # followable logic
     
     def isId(self, site: Sites, id: Tuple[str]) -> bool:
-        return self.ids[site] == id
+        return self._ids[site] == id
     
     def couldBeId(self, site: Sites, id: Tuple[str]) -> bool:
 
-        if self.ids[site] is not None or id in self.considered[site]:
+        if self._ids[site] is not None or id in self.considered[site]:
             return False
         
         for keyword in self.keywords:
@@ -74,7 +76,7 @@ class Followable:
 
 class Game(Followable):
 
-    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None):
+    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team1: Team = None, team2: Team = None,):
         
         if keywords is None:
             keywords = []
@@ -85,6 +87,7 @@ class Game(Followable):
         self._name: str = name
         self._date: datetime = date
         self._odds = {site: [] for site in Sites}
+        self._teams = [team1, team2]
         
 
     @property
@@ -104,15 +107,42 @@ class Game(Followable):
     def odds(self) -> Dict[Sites, List[Odd]]:
         return self._odds
 
+    @property
+    def team1(self) -> Team:
+        return self._teams[0]
+
+    @team1.setter  
+    def team1(self, team: Team) -> NoReturn:
+        self._teams[0] = team
+
+    @property
+    def team2(self) -> Team:
+        return self._teams[1]
+
+    @team2.setter  
+    def team2(self, team: Team) -> NoReturn:
+        self._teams[1] = team
+
+    def hoursLeft(self, time: datetime = None) -> float:
+
+        if self.date is None:
+            return 0
+
+        if time is None:
+            time = datetime.now()
+
+        delta = self.date - time
+        return delta.total_seconds() / 3600
+
     def __eq__(self, o):
         if isinstance(o, Game):
             return self.name == o.name and self.date == o.date
-        return False       
+        return False
 
     def addOdd(self, sample: OddSample, site: Sites) -> bool:
 
         if  self.odds[site] == [] or self.odds[site][-1].value != sample.odd:
-            self._odds[site].append(Odd(sample.odd, sample.sample_time))
+            self._odds[site].append(Odd(sample.odd, sample.sample_time, self.hoursLeft(sample.sample_time)))
             return True
         
         return False
@@ -125,21 +155,34 @@ class Team(Followable):
     def __init__(self, name: str):
         super().__init__([name])
         self._name = name
-        self._games = []
+        self._active: bool = True
+        self._current_game = None
     
     @property
     def name(self) -> str:
         return self._name
     
     @property
-    def games(self) -> List[Game]:
-        return self._games
+    def active(self) -> bool:
+        return self._active
     
-    def addGame(self, game: Game) -> None:
-        self._games.append(game)
+    @active.setter
+    def active(self, active: bool) -> NoReturn:
+        self._active = active
     
-    def getGameByDate(self, date: datetime) -> Optional[Game]:
-        return next((game for game in self.games if game.date - Team.delta  < date < game.date + Team.delta), None)
+    @property
+    def current_game(self) -> Optional[Game]:
+        return self._current_game
+    
+    @current_game.setter
+    def current_game(self, game: Game) -> Game:
+        self._current_game = game
+    
+    def hasGame(self) -> bool:
+        return self.current_game != None
+    
+    def isGameByDate(self, date: datetime) -> bool:
+        return self.hasGame() and self.current_game.date - Team.delta  < date < self.current_game.date + Team.delta
     
     def __eq__(self, o) -> bool:
         if isinstance(o, Team):
@@ -148,4 +191,4 @@ class Team(Followable):
         return False
     
     def __repr__(self) -> str:
-        return f'Name: {self.name}; Games: {self.games};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self.ids}; Complete: {self.complete}'
+        return f'Name: {self.name}; Game: {self.current_game(self, game)};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self._ids}; Complete: {self.complete}'

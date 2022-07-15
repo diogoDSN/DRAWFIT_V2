@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import asyncio
 import pickle
 
-from typing import List, Dict, Tuple
+from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn
 
 import discord
 from discord.ext import commands
+
+from drawfit.parameters import PERMISSIONS, SAVE_PATH, COMMAND_CHANNELS, UPDATES_CHANNELS
 
 import drawfit.domain.domain_store as store
 import drawfit.updates.update_handler as updates
@@ -12,17 +16,14 @@ import drawfit.updates.update_handler as updates
 from drawfit.bot.permissions import Permissions
 from drawfit.utils import Sites
 
+if TYPE_CHECKING:
+    import drawfit.domain.notifications as notf
+
 
 class DrawfitBot(commands.Bot):
 
-    store_path = "/tmp/save_data.pickle"
     greeting = '**Hello there!** - Obi-Wan Kenobi'
-    command_timeout = 7
-    command_channels = {'Drawfit✔': ['🤖commands-channel']}
-    update_channels = {'Drawfit✔' : ['📃updates-channel']}
-    permissions = {Permissions.NOGUEIRA: ['Pistache#2173'], \
-                            Permissions.MODERATOR: ['piki2015ps#3645', 'Tomás Belo#8277'], \
-                            Permissions.NORMAL: ['File_Read_Bot#9655']}
+    update_cycle = 30
     
     def __init__(self):
 
@@ -31,12 +32,13 @@ class DrawfitBot(commands.Bot):
         super().__init__(command_prefix='.', intents=intents)
 
         try:
-            with open(DrawfitBot.store_path, 'rb') as f:
+            with open(SAVE_PATH, 'rb') as f:
                 self.store = pickle.load(f)
         except Exception:
             self.store = store.DomainStore()
         
         self.pending_queries: List[asyncio.Task] = []
+        self.routines: List[asyncio.Task] = []
 
         self.configureCommands()
     
@@ -44,7 +46,7 @@ class DrawfitBot(commands.Bot):
 
         perms = {}
 
-        for permission, perms_list in DrawfitBot.permissions.items():
+        for permission, perms_list in PERMISSIONS.items():
             
             current_perms = []
 
@@ -68,8 +70,8 @@ class DrawfitBot(commands.Bot):
 
     async def greet(self):
 
-        all_channels = self.getChannels(DrawfitBot.command_channels)
-        all_channels.extend(self.getChannels(DrawfitBot.update_channels))
+        all_channels = self.getChannels(COMMAND_CHANNELS)
+        all_channels.extend(self.getChannels(UPDATES_CHANNELS))
 
         for channel in all_channels:
             await channel.send(DrawfitBot.greeting)    
@@ -83,10 +85,11 @@ class DrawfitBot(commands.Bot):
         self.notification_visitor = Notify(self)
         self.notify_tasks = []
     
-        
+        self.routines.append(asyncio.create_task(self.store.removeRoutine()))
+
         await self.greet()
 
-        self.handler_routine = asyncio.create_task(self.handlerRoutine())
+        self.routines.append(asyncio.create_task(self.handlerRoutine()))
 
 
     async def handlerRoutine(self):
@@ -102,11 +105,11 @@ class DrawfitBot(commands.Bot):
             print(f'Update ended. With {len(notifications)} notifications')
 
             for notification in notifications:
-                self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
+                self.notify(notification)
 
             print('All notification tasks created')
 
-            await asyncio.sleep(30)
+            await asyncio.sleep(DrawfitBot.update_cycle)
     
     async def on_command_error(self, ctx, error):
         if error.__class__ == commands.BadArgument:
@@ -116,6 +119,10 @@ class DrawfitBot(commands.Bot):
         else:
             raise error
     
+
+    def notify(self, notification: notf.Notification) -> NoReturn:
+        self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
+
     def teamIdAccepted(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
         self.store.setTeamId(team_name, team_id, site, league_name)
         
@@ -135,9 +142,9 @@ class DrawfitBot(commands.Bot):
 
         if perm == Permissions.MODERATOR:
             users += self.perms[perm]
-            perm = Permissions.NOGUEIRA
+            perm = Permissions.OWNER
 
-        if perm == Permissions.NOGUEIRA:
+        if perm == Permissions.OWNER:
             users += self.perms[perm]
         
         return users
@@ -164,7 +171,7 @@ class DrawfitBot(commands.Bot):
     
     def save(self) -> bool:
         try:
-            with open(DrawfitBot.store_path, 'wb') as f:
+            with open(SAVE_PATH, 'wb') as f:
                 pickle.dump(self.store, f)
             
             return True
