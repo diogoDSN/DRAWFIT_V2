@@ -428,7 +428,7 @@ class GamePage(Page):
 
 
             for i, time in enumerate(self.columns[GamePage.time]):
-                line = [time]
+                line = [f'{time:0>4}']
 
                 for site in self.shownSites:
                     line.append(f'{self.columns[site][i]:>4}')
@@ -443,7 +443,7 @@ class GamePage(Page):
                 last_line = ['This game has no odds.']
             
             else:
-                last_line = [self.columns[GamePage.time][-1]]
+                last_line = [f'{self.columns[GamePage.time][-1]:0>4}']
 
                 for _, odd in self.game.odds.items():
 
