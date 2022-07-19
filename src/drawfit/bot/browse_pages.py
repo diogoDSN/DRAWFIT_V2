@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from datetime import datetime, timedelta, MAXYEAR
+from pytz import timezone
 from typing import NoReturn, List, Optional, Set
 
 
@@ -15,51 +16,53 @@ from drawfit.dtos.followables_dto import FollowableDto, TeamDto, GameDto
 from drawfit.dtos.odd_dto import OddDto
 from drawfit.utils.sites import Sites
 
+from drawfit.parameters import TIME_ZONE
+
 back_emoji = '⬅️'
-ids_emoji = '*️⃣'
-keywords_emoji = '🇰'
-considered_emoji = '🇨'
+
+ids_letter = '*'
+keywords_letter = 'k'
+considered_letter = 'c'
+
 no_id = 'No Id'
 no_considered_ids = 'No Considered Ids'
 
 def addFollowableFields(embed: Embed, followable: FollowableDto, toggle_on: Set[str]) -> NoReturn:
-    if ids_emoji in toggle_on:
+    if ids_letter in toggle_on:
             ids = '```\n'
             for site, id in followable.ids.items():
-                print(site)
-                print(id)
-                ids += f'{site.name:-<10}{id if id is not None else no_id:->20}\n'
+                ids += f'{site.name:-<10}{id if id is not None else no_id:->40}\n'
             ids += '```'
-            embed.add_field(name=f'{ids_emoji} - Ids', value=ids, inline=False)
+            embed.add_field(name=f'Ids', value=ids, inline=False)
 
-    if keywords_emoji in toggle_on:
+    if keywords_letter in toggle_on:
         keywords = '`No Keywords`'
 
         if followable.keywords != []:
             keywords = '```\n'
             for number, keyword in enumerate(followable.keywords):
-                keywords += f'{number+1:02}{keyword:->20}\n'
+                keywords += f'{number+1:02}{keyword:->30}\n'
             keywords += '```'
 
-        embed.add_field(name=f'{keywords_emoji} - Keywords', value=keywords, inline=False)
+        embed.add_field(name=f'Keywords', value=keywords, inline=False)
 
-    if considered_emoji in toggle_on:
+    if considered_letter in toggle_on:
         considered = '```\n'
         for site, considered_ids in followable.considered.items():
             considered += f'{site.name}\n'
 
             if considered_ids == []:
-                considered += f'{no_considered_ids:->20}\n'
+                considered += f'{no_considered_ids:->40}\n'
             else:
                 for number, considered_id in enumerate(considered_ids):
-                    considered += f'  {number+1:02}{considered_id:->18}\n'
+                    considered += f'  {number+1:02}{considered_id:->40}\n'
             
         considered += '```'
-        embed.add_field(name=f'{considered_emoji} - Considered Ids', value=considered, inline=False)
+        embed.add_field(name=f'Considered Ids', value=considered, inline=False)
 
 class Page:
 
-    def __init__(self, user: User, domain: DomainDto, page_message: Message, all_emojis: List[str], toggle_emojis: Set[str]) -> NoReturn:
+    def __init__(self, user: User, domain: DomainDto, page_message: Message, all_emojis: List[str], toggle_emojis: Set[str], char_toggles: Set[str]) -> NoReturn:
         self.user = user
         self.domain = domain
         self.page_message = page_message
@@ -68,7 +71,9 @@ class Page:
         self.all_toggles = toggle_emojis
 
         self.toggles_on = set()
+        self.char_toggles = char_toggles
         self.change = True
+        
 
     async def initPage(self) -> NoReturn:
         await self.page_message.clear_reactions()
@@ -85,7 +90,10 @@ class Page:
         
         self.change = False
 
-        await self.page_message.edit(content=None, embed=self.makeEmbed())
+        try:
+            await self.page_message.edit(content=None, embed=self.makeEmbed())
+        except:
+            await self.page_message.reply('Fatal Error: Exiting')
 
     def isAuthor(self, user: User) -> bool:
         return user == self.user
@@ -96,6 +104,16 @@ class Page:
             return self
 
         try:
+
+            if message.content in self.char_toggles:
+                await message.delete()
+                if message.content in self.toggles_on:
+                    self.toggles_on.remove(message.content)
+                else:
+                    self.toggles_on.add(message.content)
+                self.change = True
+                return self
+
             number = int(message.content)
             await message.delete()
 
@@ -153,7 +171,7 @@ class DomainPage(Page):
     embed_color = 0xffffff
 
     def __init__(self, user: User, domain: DomainDto, page_message: Message) -> NoReturn:
-        super().__init__(user, domain, page_message, [DomainPage.codes_emoji], {DomainPage.codes_emoji})
+        super().__init__(user, domain, page_message, [DomainPage.codes_emoji], {DomainPage.codes_emoji}, set())
 
     def makeEmbed(self) -> Embed:
 
@@ -205,7 +223,8 @@ class LeaguePage(Page):
     def __init__(self, user: User, domain: DomainDto, league: LeagueDto, page_message: Message) -> NoReturn:
         super().__init__(user, domain, page_message, \
                         [back_emoji, LeaguePage.act_teams_emoji, LeaguePage.inact_teams_emoji, LeaguePage.games_emoji], \
-                        {LeaguePage.act_teams_emoji, LeaguePage.inact_teams_emoji, LeaguePage.games_emoji})
+                        {LeaguePage.act_teams_emoji, LeaguePage.inact_teams_emoji, LeaguePage.games_emoji}, \
+                        set())
         
         self.league = league
 
@@ -296,8 +315,9 @@ class TeamPage(Page):
     
     def __init__(self, user: User, domain: DomainDto, league: LeagueDto, team: TeamDto, page_message: Message) -> NoReturn:
         super().__init__(user, domain, page_message, \
-                    [back_emoji, ids_emoji, keywords_emoji, considered_emoji, TeamPage.game_emoji], \
-                    {ids_emoji, keywords_emoji, considered_emoji})
+                    [back_emoji, TeamPage.game_emoji], \
+                    set(), \
+                    {ids_letter, keywords_letter, considered_letter})
         self.league = league
         self.team = team
 
@@ -355,16 +375,19 @@ class GamePage(Page):
         
         def oddDate(odd: Optional[OddDto]) -> datetime:
             if odd is None:
-                return datetime(year=MAXYEAR, month=1, day=1)
+                tz = timezone(TIME_ZONE)
+                return tz.localize(datetime(year=MAXYEAR, month=1, day=1))
             return odd.date
 
-        emojis = [back_emoji, ids_emoji, keywords_emoji, considered_emoji, GamePage.odds_emoji]
+        emojis = [back_emoji, GamePage.odds_emoji]
         emojis.extend([GamePage.sites_emojis[site] for site in Sites])
 
-        toggle_emojis = {ids_emoji, keywords_emoji, considered_emoji, GamePage.odds_emoji}
+        toggle_emojis = set()
+        toggle_emojis.add(GamePage.odds_emoji)
         toggle_emojis = toggle_emojis.union(GamePage.sites_emojis.values())
+        toggle_chars = {ids_letter, keywords_letter, considered_letter}
 
-        super().__init__(user, domain, page_message, emojis, toggle_emojis)
+        super().__init__(user, domain, page_message, emojis, toggle_emojis, toggle_chars)
 
         self.league = league
         self.team = team
