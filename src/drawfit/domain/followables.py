@@ -76,7 +76,7 @@ class Followable:
 
 class Game(Followable):
 
-    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team1: Team = None, team2: Team = None,):
+    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team1: Team = None, team2: Team = None):
         
         if keywords is None:
             keywords = []
