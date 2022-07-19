@@ -55,7 +55,7 @@ class Bwin(Site):
         oddsList = []
         now = now_lisbon()
         # Fixtures are information packages on specific games
-        for game in league_info['fisxtures']:
+        for game in league_info['fixtures']:
             # optionMarkets are the available markets to bet on for this game
             for market in game['optionMarkets']:
                 if market['name']['value'] == 'Resultado do jogo':
