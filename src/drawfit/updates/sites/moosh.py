@@ -46,6 +46,8 @@ class Moosh(Site):
                     await websocket.send(self.prepEventsRequest(sportID, leagueID, ptID))
                     odds = self.getLeagueOdds(await websocket.recv())
 
+
+
                 return odds
 
             except:
@@ -133,17 +135,19 @@ class Moosh(Site):
     def getLeagueOdds(self, info):
         odds = []
         info = json.loads(info)
-        events = info["result"]["events"]
-        markets = info["result"]["markets"]
 
-        diff = len(events) - len(markets)
-
-        for i, market in enumerate(markets):
+        for market in info["result"]["markets"]:
             
+            for event in info["result"]["events"]:
+                if event['id'] == market['eventId']:
+                    event_name = event['eventName']
+                    break
+
             for bet in market["selections"]:
                 if bet["name"] == "Empate":
                     odd = bet["displayOdds"]["decimal"]
+                    break
 
-            odds.append(OddSample(self.getTeams(events[i + diff]["eventName"]), float(odd), convertDate(events[i]["startEventDate"]), datetime.now()))
+            odds.append(OddSample(self.getTeams(event_name), float(odd), convertDate(market["startDate"]), datetime.now()))
         
         return odds
