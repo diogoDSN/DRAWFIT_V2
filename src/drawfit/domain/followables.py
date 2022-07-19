@@ -5,7 +5,7 @@ from typing import NoReturn, List, Tuple, Dict, Optional
 
 from drawfit.domain.odd import Odd
 
-from drawfit.utils import Sites, OddSample
+from drawfit.utils import Sites, OddSample, now_lisbon
 
 class Followable:
 
@@ -129,7 +129,7 @@ class Game(Followable):
             return 0
 
         if time is None:
-            time = datetime.now()
+            time = now_lisbon()
 
         delta = self.date - time
         return delta.total_seconds() / 3600

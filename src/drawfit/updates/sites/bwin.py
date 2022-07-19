@@ -1,13 +1,12 @@
 import urllib as u
 
-from datetime import datetime
 from typing import Dict, List, NoReturn
 from requests_html import AsyncHTMLSession
 
 from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
-from drawfit.utils import Sites, OddSample, BwinCode
+from drawfit.utils import Sites, OddSample, BwinCode, now_lisbon
 
 
 class Bwin(Site):
@@ -54,9 +53,9 @@ class Bwin(Site):
         Throws ValueError if there was a failure reading data from the json
         """
         oddsList = []
-        now = datetime.now()
+        now = now_lisbon()
         # Fixtures are information packages on specific games
-        for game in league_info['fixtures']:
+        for game in league_info['fisxtures']:
             # optionMarkets are the available markets to bet on for this game
             for market in game['optionMarkets']:
                 if market['name']['value'] == 'Resultado do jogo':

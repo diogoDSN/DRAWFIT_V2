@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 from datetime import datetime
-from drawfit.utils import Sites
+from drawfit.utils import Sites, now_lisbon
 
 
 if TYPE_CHECKING:
@@ -47,7 +47,7 @@ class GameDto(FollowableDto):
             return 0
 
         if time is None:
-            time = datetime.now()
+            time = now_lisbon()
 
         delta = self.date - time
         return delta.total_seconds() / 3600

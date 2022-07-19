@@ -1,7 +1,6 @@
 import urllib as u
 import json
 import websockets as ws
-from datetime import datetime
 from typing import List, NoReturn
 from requests_html import AsyncHTMLSession
 
@@ -9,7 +8,7 @@ from requests_html import AsyncHTMLSession
 from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
-from drawfit.utils import Sites, OddSample, MooshCode
+from drawfit.utils import Sites, OddSample, MooshCode, now_lisbon
 
 
 class Moosh(Site):
@@ -148,6 +147,6 @@ class Moosh(Site):
                     odd = bet["displayOdds"]["decimal"]
                     break
 
-            odds.append(OddSample(self.getTeams(event_name), float(odd), convertDate(market["startDate"]), datetime.now()))
+            odds.append(OddSample(self.getTeams(event_name), float(odd), convertDate(market["startDate"]), now_lisbon()))
         
         return odds

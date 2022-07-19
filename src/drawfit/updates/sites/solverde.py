@@ -1,7 +1,6 @@
 import urllib as u
 import json
 import websockets as ws
-from datetime import datetime
 from typing import List, NoReturn
 from requests_html import AsyncHTMLSession
 
@@ -9,7 +8,7 @@ from requests_html import AsyncHTMLSession
 from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
-from drawfit.utils import Sites, OddSample, SolverdeCode
+from drawfit.utils import Sites, OddSample, SolverdeCode, now_lisbon
 
 
 def create_stomp_msg(comd="", headers={}, content=""):
@@ -81,7 +80,7 @@ class Solverde(Site):
                         await websocket.send(self.market_query(game['marketTypesToIds']['1'][0]))
                         market = self.parse_stomp_msg(await websocket.recv())
                                 
-                        odds.append(OddSample(self.getTeams(game['name']), float(self.extract_odds(market)), convertDate(event['startTime']), datetime.now()))
+                        odds.append(OddSample(self.getTeams(game['name']), float(self.extract_odds(market)), convertDate(event['startTime']), now_lisbon()))
 
                 return odds
 
