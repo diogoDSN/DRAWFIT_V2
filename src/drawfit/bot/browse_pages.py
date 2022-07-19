@@ -361,12 +361,12 @@ class TeamPage(Page):
 class GamePage(Page):
 
     odds_emoji = '💸'
-    sites_emojis = {Sites.Bwin :   '🟡',
-                    Sites.Betano:  '🟠',
-                    Sites.Betclic: '🔴',
-                    Sites.Solverde:'🟢',
-                    Sites.Moosh:   '🟣',
-                    Sites.Betway:  '⚪'}
+    sites_emojis = {Sites.Bwin :   'bwin',
+                    Sites.Betano:  'betano',
+                    Sites.Betclic: 'betclic',
+                    Sites.Solverde:'solverde',
+                    Sites.Moosh:   'moosh',
+                    Sites.Betway:  'betway'}
     no_team = 'Team not found'
     time = 'time left'
     delta = timedelta(seconds=bot.DrawfitBot.update_cycle)# timedelta(seconds=360) # use timedelta(seconds=bot.DrawfitBot.update_cycle) for the bots update cycle
@@ -380,12 +380,11 @@ class GamePage(Page):
             return odd.date
 
         emojis = [back_emoji, GamePage.odds_emoji]
-        emojis.extend([GamePage.sites_emojis[site] for site in Sites])
 
         toggle_emojis = set()
         toggle_emojis.add(GamePage.odds_emoji)
-        toggle_emojis = toggle_emojis.union(GamePage.sites_emojis.values())
         toggle_chars = {ids_letter, keywords_letter, considered_letter}
+        toggle_chars = toggle_chars.union(GamePage.sites_emojis.values())
 
         super().__init__(user, domain, page_message, emojis, toggle_emojis, toggle_chars)
 
@@ -482,10 +481,6 @@ class GamePage(Page):
             embed.add_field(name='Odds History', value=odds, inline=False)
 
 
-        footer = ''
-        for site in Sites:
-            footer += f'{GamePage.sites_emojis[site]} - {site.name}\n'
-        embed.set_footer(text=footer)
         return embed
     
     async def buttons(self, emoji: str) -> Page:
