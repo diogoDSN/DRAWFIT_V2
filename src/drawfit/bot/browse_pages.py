@@ -491,14 +491,14 @@ class OddsHistoryPage(Page):
 
         current_odds = '```\n'
 
-        current_odds += '\nCurrent odds:\n'
 
         if self.columns[OddsHistoryPage.time] == []:
             last_line = ['This game has no odds.']
         
 
         else:
-            last_line = [self.columns[OddsHistoryPage.time][-1]]
+            last_line = [f'{self.columns[OddsHistoryPage.time][-1]:0>4}']
+
 
             for _, odd in self.game.odds.items():
                 # TODO generate by columns
@@ -506,27 +506,21 @@ class OddsHistoryPage(Page):
                     last_line.append('----')
                 else:
                     last_line.append(f'{odd[-1].value:1.2f}')
-            
-
 
         current_odds += '|'.join(last_line) + '\n```'
 
         embed.add_field(name='Current Odds', value=current_odds, inline=False)
 
-
-        if self.columns[GamePage.time] == []:
-            last_line = ['This game has no odds.']
-        
-        else:
-            last_line = [f'{self.columns[GamePage.time][-1]:0>4}']
+        odds_history = '```\n'
 
         column_labels = ['time']
         for site in self.shownSites:
             column_labels.append(f'{site.small()}')
-        
+
         line = '|'.join(column_labels)
         odds_history += f'{line}\n'
         odds_history += len(line) * '=' + '\n'
+
 
         for i in range(self.first_line, self.next_first_line):
             line = [self.columns[OddsHistoryPage.time][i]]
