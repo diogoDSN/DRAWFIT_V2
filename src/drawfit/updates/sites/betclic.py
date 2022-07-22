@@ -1,6 +1,5 @@
 import urllib as u
 
-from datetime import datetime
 from typing import Dict, List, NoReturn
 from requests_html import AsyncHTMLSession
 from requests.exceptions import JSONDecodeError
@@ -8,7 +7,7 @@ from requests.exceptions import JSONDecodeError
 from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
-from drawfit.utils import Sites, OddSample, BetclicCode
+from drawfit.utils import Sites, OddSample, BetclicCode, now_lisbon
 
 
 class Betclic(Site):
@@ -56,7 +55,7 @@ class Betclic(Site):
                 if market["name"] == "Resultado (Tempo Regulamentar)":
                     for bet in market["selections"]:
                         if bet["name"] == "Empate":
-                            oddsList.append(OddSample(self.getTeams(event["name"]), float(bet["odds"]), convertDate(event["date"]), datetime.now()))
+                            oddsList.append(OddSample(self.getTeams(event["name"]), float(bet["odds"]), convertDate(event["date"]), now_lisbon()))
         
         return oddsList
 

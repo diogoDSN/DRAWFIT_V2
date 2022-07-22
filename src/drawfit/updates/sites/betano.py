@@ -1,6 +1,5 @@
 import urllib as u
 
-from datetime import datetime
 from typing import Dict, List, NoReturn
 from requests_html import AsyncHTMLSession
 from requests.exceptions import JSONDecodeError
@@ -8,7 +7,7 @@ from requests.exceptions import JSONDecodeError
 from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertMilisecondsEpoch
-from drawfit.utils import Sites, OddSample, BetanoCode
+from drawfit.utils import Sites, OddSample, BetanoCode, now_lisbon
 
 
 class Betano(Site):
@@ -58,7 +57,7 @@ class Betano(Site):
                     if market["name"] == "Resultado Final":
                         for bet in market["selections"]:
                             if bet["name"] == "X":
-                                oddsList.append(OddSample(self.getTeams(event["name"]), float(bet["price"]), convertMilisecondsEpoch(event["startTime"]), datetime.now()))
+                                oddsList.append(OddSample(self.getTeams(event["name"]), float(bet["price"]), convertMilisecondsEpoch(event["startTime"]), now_lisbon()))
                                 break
                         break
         return oddsList

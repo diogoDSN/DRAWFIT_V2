@@ -1,5 +1,8 @@
 from datetime import datetime
+from pytz import timezone
 import re
+
+from drawfit.parameters import TIME_ZONE
 
 
 def convertDate(date: str):
@@ -14,7 +17,9 @@ def convertDate(date: str):
 
     components = list(map(int, re.split('[-,:,T]', date[:-1])))
 
-    return datetime(components[0], components[1], components[2], components[3], components[4], 0, 0)
+    tz = timezone(TIME_ZONE)
+
+    return tz.localize(datetime(components[0], components[1], components[2], components[3], components[4], 0, 0))
 
 def convertMilisecondsEpoch(epochValue: int):
     """
@@ -24,4 +29,7 @@ def convertMilisecondsEpoch(epochValue: int):
     """
     date = datetime.fromtimestamp(epochValue/1000)
     date.replace(second=0, microsecond=0)
-    return date
+
+    tz = timezone(TIME_ZONE)
+
+    return tz.localize(date)

@@ -5,7 +5,7 @@ from typing import NoReturn, Tuple, overload
 import drawfit.bot.notify as v
 import drawfit.domain.followables as followables
 
-from drawfit.utils import Sites, OddSample
+from drawfit.utils import Sites, OddSample, now_lisbon
 
 
 class Notification:
@@ -19,7 +19,7 @@ class NewOddNotification(Notification):
 
     def __init__(self, game: followables.Game):
         self.game: followables.Game = game
-        self.creation_time: datetime = datetime.now()
+        self.creation_time: datetime = now_lisbon()
         self.color: int = 0xffffff
 
     async def accept(self, visitor: v.Notify):
