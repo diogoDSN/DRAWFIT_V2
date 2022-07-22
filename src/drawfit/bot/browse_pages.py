@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from abc import abstractmethod
+from math import ceil
 from datetime import datetime, timedelta, MAXYEAR
 from pytz import timezone
 from typing import NoReturn, List, Optional, Set
@@ -93,7 +94,7 @@ class Page:
         try:
             await self.page_message.edit(content=None, embed=self.makeEmbed())
         except:
-            await self.page_message.reply('Fatal Error: Exiting')
+            await self.page_message.reply('Error generating page!')
 
     def isAuthor(self, user: User) -> bool:
         return user == self.user
@@ -145,10 +146,10 @@ class Page:
         if emoji in self.toggles_on:
             self.toggles_on.remove(emoji)
             self.change = True 
+            return self
+        else:
+            return await self.buttons(emoji)
         
-        return self
-
-
     @abstractmethod
     def makeEmbed(self) -> Embed:
         pass
@@ -394,7 +395,6 @@ class GamePage(Page):
     
     async def buttons(self, emoji: str) -> Page:
 
-        print('noi')
         new_page = None
 
         if emoji == back_emoji and self.team is not None:
@@ -404,7 +404,6 @@ class GamePage(Page):
             new_page = LeaguePage(self.user, self.domain, self.league, self.page_message)
 
         elif emoji == GamePage.odds_emoji:
-            print('oi')
             new_page = OddsHistoryPage(self.user, self.domain, self.league, self.game, self.page_message, self.team)
 
         if new_page is None:
@@ -422,6 +421,7 @@ class OddsHistoryPage(Page):
 
     next_emoji = '⏭️'
     previous_emoji = '⏮️'
+    page_lines = 10
 
     sites_emojis = {Sites.Bwin :   'bwin',
                     Sites.Betano:  'betano',
@@ -453,6 +453,7 @@ class OddsHistoryPage(Page):
 
         self.toggles_on = self.toggles_on.union(OddsHistoryPage.sites_emojis.values())
 
+        self.page_number = 1
         self.columns = {site: [] for site in Sites}
         self.columns[OddsHistoryPage.time] = []
 
@@ -495,6 +496,7 @@ class OddsHistoryPage(Page):
         if self.columns[OddsHistoryPage.time] == []:
             last_line = ['This game has no odds.']
         
+
         else:
             last_line = [self.columns[OddsHistoryPage.time][-1]]
 
@@ -505,6 +507,7 @@ class OddsHistoryPage(Page):
                 else:
                     last_line.append(f'{odd[-1].value:1.2f}')
             
+
 
         current_odds += '|'.join(last_line) + '\n```'
 
@@ -521,13 +524,11 @@ class OddsHistoryPage(Page):
         odds_history += f'{line}\n'
         odds_history += len(line) * '=' + '\n'
 
-
-        for i, time in enumerate(self.columns[OddsHistoryPage.time]):
-            line = [time]
+        for i in range(self.first_line, self.next_first_line):
+            line = [self.columns[OddsHistoryPage.time][i]]
 
             for site in self.shownSites:
                 line.append(f'{self.columns[site][i]:>4}')
-            
             line = '|'.join(line)
             odds_history += f'{line}\n'
 
@@ -543,21 +544,15 @@ class OddsHistoryPage(Page):
             new_page = GamePage(self.user, self.domain, self.league, self.game, self.page_message, self.team)
             await new_page.initPage()
             return new_page
+        elif emoji == OddsHistoryPage.previous_emoji:
+            self.page_number = self.page_number - 1 if self.page_number > 1 else self.last_page
+            self.change = True
+        elif emoji == OddsHistoryPage.next_emoji:
+            self.page_number = self.page_number + 1 if self.page_number*OddsHistoryPage.page_lines <= self.total_lines else 1
+            self.change = True
 
         return self
 
-        '''
-        if emoji == OddsHistoryPage.previous_emoji and self.team is not None:
-            new_page = TeamPage(self.user, self.domain, self.league, self.team, self.page_message)
-            await new_page.initPage()
-            return new_page
-        elif emoji == back_emoji:
-            new_page = LeaguePage(self.user, self.domain, self.league, self.page_message)
-            await new_page.initPage()
-            return new_page
-
-        return self
-        '''
 
     async def select(self, number: int) -> Page:
         return self
@@ -565,3 +560,19 @@ class OddsHistoryPage(Page):
     @property
     def shownSites(self) -> List[Sites]:
         return [site for site in Sites if OddsHistoryPage.sites_emojis[site] in self.toggles_on]
+    
+    @property
+    def last_page(self) -> int:
+        return ceil(self.total_lines / OddsHistoryPage.page_lines)
+    
+    @property
+    def first_line(self) -> int:
+        return (self.page_number-1)*OddsHistoryPage.page_lines
+    
+    @property
+    def next_first_line(self) -> int:
+        return self.page_number*OddsHistoryPage.page_lines if self.page_number*OddsHistoryPage.page_lines < self.total_lines else self.total_lines
+    
+    @property
+    def total_lines(self) -> int:
+        return len(self.columns[OddsHistoryPage.time])
