@@ -13,3 +13,6 @@ from drawfit.bot.permissions import Permissions
 PERMISSIONS = {Permissions.OWNER: ['UserOwner#1234'], \
                Permissions.MODERATOR: ['UserModerator#0000'], \
                Permissions.NORMAL: ['UserNormal#4321']}
+
+# Input the bots timezone (pytz name)
+TIME_ZONE = 'Example/Timezone'

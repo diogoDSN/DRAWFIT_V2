@@ -1,7 +1,6 @@
 import urllib as u
 import json
 import websockets as ws
-from datetime import datetime
 from typing import List, NoReturn
 from requests_html import AsyncHTMLSession
 
@@ -9,7 +8,7 @@ from requests_html import AsyncHTMLSession
 from drawfit.updates.sites.site import Site
 from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
-from drawfit.utils import Sites, OddSample, BetwayCode
+from drawfit.utils import Sites, OddSample, BetwayCode, now_lisbon
 
 
 class Betway(Site):
@@ -134,18 +133,20 @@ class Betway(Site):
         odds = []
         info = json.loads(info)
 
-        events = info["result"]["events"]
-        markets = info["result"]["markets"]
 
-        diff = len(events) - len(markets)
-
-
-        for i, market in enumerate(markets):
+        for market in info["result"]["markets"]:
             
+            for event in info["result"]["events"]:
+                if event['id'] == market['eventId']:
+                    event_name = event['eventName']
+                    break
+
             for bet in market["selections"]:
                 if bet["name"] == "Empate":
                     odd = bet["displayOdds"]["decimal"]
+                    break
+            
 
-            odds.append(OddSample(self.getTeams(events[i + diff]["eventName"]), float(odd), convertDate(events[i]["startEventDate"]), datetime.now()))
+            odds.append(OddSample(self.getTeams(event_name), float(odd), convertDate(market["startDate"]), now_lisbon()))
         
         return odds

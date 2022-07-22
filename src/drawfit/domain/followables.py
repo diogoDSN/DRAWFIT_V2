@@ -5,7 +5,7 @@ from typing import NoReturn, List, Tuple, Dict, Optional
 
 from drawfit.domain.odd import Odd
 
-from drawfit.utils import Sites, OddSample
+from drawfit.utils import Sites, OddSample, now_lisbon
 
 class Followable:
 
@@ -76,7 +76,7 @@ class Followable:
 
 class Game(Followable):
 
-    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team1: Team = None, team2: Team = None,):
+    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team1: Team = None, team2: Team = None):
         
         if keywords is None:
             keywords = []
@@ -129,7 +129,7 @@ class Game(Followable):
             return 0
 
         if time is None:
-            time = datetime.now()
+            time = now_lisbon()
 
         delta = self.date - time
         return delta.total_seconds() / 3600

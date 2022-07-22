@@ -6,7 +6,7 @@ from datetime import datetime
 import drawfit.domain.notifications as notf
 from drawfit.domain.followables import Game, Team 
 
-from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCode, LeagueCodeError
+from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCode, LeagueCodeError, now_lisbon
 
 
 class League:
@@ -152,7 +152,7 @@ class League:
 
     def removeRoutine(self) -> NoReturn:
         for game in self.current_games:
-            if game.date <= datetime.now():
+            if game.date <= now_lisbon():
                 self.removeGame(game)
 
 
