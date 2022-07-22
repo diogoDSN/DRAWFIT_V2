@@ -15,7 +15,7 @@ from drawfit.dtos.domain_dto import DomainDto
 from drawfit.dtos.league_dto import LeagueDto
 from drawfit.dtos.followables_dto import FollowableDto, TeamDto, GameDto
 from drawfit.dtos.odd_dto import OddDto
-from drawfit.utils.sites import Sites
+from drawfit.utils import Sites, str_dates
 
 from drawfit.parameters import TIME_ZONE
 
@@ -380,7 +380,7 @@ class GamePage(Page):
     def makeEmbed(self) -> Embed:
 
         embed = Embed(title=self.game.name, \
-                              description=(self.game.date), \
+                              description=str_dates(self.game.date), \
                               color=self.league.color)
 
         teams = '```\n'
@@ -486,7 +486,7 @@ class OddsHistoryPage(Page):
     def makeEmbed(self) -> Embed:
 
         embed = Embed(title=self.game.name, \
-                              description=(self.game.date), \
+                              description=str_dates(self.game.date), \
                               color=self.league.color)
 
         current_odds = '```\n'
