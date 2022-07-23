@@ -171,7 +171,12 @@ class League:
 
                 if notification not in results and notification is not None:
                     results.append(notification)
-            
+                elif notification is not None:
+                    for previous_notification in results:
+                        if previous_notification == notification:
+                            previous_notification.mergeNotifications(notification)
+                            break
+                        
         return results
 
 
@@ -187,9 +192,7 @@ class League:
                 return None
 
             if game.addOdd(sample, site):
-                n = notf.NewOddNotification(game)
-                n.color = self.color
-                return n
+                return notf.NewOddNotification(game, site, self.color)
             return None
 
 
@@ -202,9 +205,7 @@ class League:
                 team.current_game.setId(site, sample.game_id)
                 team.current_game.addOdd(sample, site)
 
-                n = notf.NewOddNotification(team.current_game)
-                n.color = self.color
-                return n
+                return notf.NewOddNotification(team.current_game, site, self.color)
 
             if team.hasGame():
                 return None
@@ -221,9 +222,7 @@ class League:
             if other_team != None:
                 other_team.current_game = new_game
 
-            n = notf.NewOddNotification(new_game)
-            n.color = self.color
-            return n
+            return notf.NewOddNotification(new_game, site, self.color)
 
         # 3 - test if the game could belong to a followed team
         for team_name in sample.game_id:

@@ -308,7 +308,7 @@ async def setBetclicLeagueCode(ctx: commands.Context, *, arguments = ''):
 
 
 # $addTeam league_name::team_name
-@commands.command(aliases=['aT'])
+@commands.command(aliases=['aT', 'at'])
 async def addTeam(ctx: commands.Context, *, arguments = ''):
 
     if not isCommand(ctx):
