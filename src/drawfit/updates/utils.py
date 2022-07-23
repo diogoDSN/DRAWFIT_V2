@@ -17,9 +17,10 @@ def convertDate(date: str):
 
     components = list(map(int, re.split('[-,:,T]', date[:-1])))
 
-    tz = timezone(TIME_ZONE)
-
-    return tz.localize(datetime(components[0], components[1], components[2], components[3], components[4], 0, 0))
+    tz = timezone('UTC')
+    date = tz.localize(datetime(components[0], components[1], components[2], components[3], components[4], 0, 0))
+    
+    return date.astimezone(timezone(TIME_ZONE))
 
 def convertMilisecondsEpoch(epochValue: int):
     """
@@ -30,6 +31,7 @@ def convertMilisecondsEpoch(epochValue: int):
     date = datetime.fromtimestamp(epochValue/1000)
     date.replace(second=0, microsecond=0)
 
-    tz = timezone(TIME_ZONE)
+    tz = timezone('UTC')
+    tz.localize(date)
 
-    return tz.localize(date)
+    return date.astimezone(timezone(TIME_ZONE))
