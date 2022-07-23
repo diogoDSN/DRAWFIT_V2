@@ -10,13 +10,7 @@ if TYPE_CHECKING:
 
 import drawfit.domain.domain_store as ds
 
-from drawfit.updates.sites.site import Site
-from drawfit.updates.sites.bwin import Bwin
-from drawfit.updates.sites.betano import Betano
-from drawfit.updates.sites.solverde import Solverde
-from drawfit.updates.sites.moosh import Moosh
-from drawfit.updates.sites.betway import Betway
-from drawfit.updates.sites.betclic import Betclic
+from drawfit.updates.sites import Site, Bwin, Betano, Solverde, Moosh, Betway, Betclic
 
 from drawfit.utils import Sites
 
