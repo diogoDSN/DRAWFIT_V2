@@ -93,7 +93,8 @@ class Page:
 
         try:
             await self.page_message.edit(content=None, embed=self.makeEmbed())
-        except:
+        except Exception as e:
+            print(e)
             await self.page_message.reply('Error generating page!')
 
     def isAuthor(self, user: User) -> bool:
@@ -431,7 +432,7 @@ class OddsHistoryPage(Page):
                     Sites.Betway:  'betway'}
 
     time = 'time left'
-    delta = timedelta(minutes=6) # use timedelta(seconds=bot.DrawfitBot.update_cycle) for the bots update cycle
+    delta = timedelta(hours=1) # timedelta(minutes=6) # use timedelta(seconds=bot.DrawfitBot.update_cycle) for the bots update cycle
 
     def __init__(self, user: User, domain: DomainDto, league: LeagueDto, game: GameDto, page_message: Message, team: Optional[TeamDto]=None) -> NoReturn:
         
@@ -457,70 +458,69 @@ class OddsHistoryPage(Page):
         self.columns = {site: [] for site in Sites}
         self.columns[OddsHistoryPage.time] = []
 
-        lenghts = {site: len(self.game.odds[site])  for site in Sites}
+
+
+        # TODO correct algorithm -> by time
+        lenghts = {site: len(self.game.odds[site]) for site in Sites}
         current_indexes = {site: 0 for site in Sites}
 
-        odds_buffer = {}
+        odds_buffer = {site: None for site in Sites}
 
         while (current_indexes != lenghts):
-                for site in Sites:
-                    if current_indexes[site] < len(self.game.odds[site]):
-                        odds_buffer[site] = self.game.odds[site][current_indexes[site]]
-                    else:
-                        odds_buffer[site] = None
-                
-                min_odd = min(odds_buffer.values(), key=oddDate)
 
-                odds_buffer = {site: odd for site, odd in odds_buffer.items() if min_odd.date - OddsHistoryPage.delta < oddDate(odd) < min_odd.date + OddsHistoryPage.delta}
+            # Put newest non-processed odd in odds_buffer
+            for site in Sites:
+                if current_indexes[site] < len(self.game.odds[site]):
+                    odds_buffer[site] = self.game.odds[site][current_indexes[site]]
+                else:
+                    odds_buffer[site] = None
+            
 
-                self.columns[OddsHistoryPage.time].append(f'{min_odd.hours_left:02.1f}')
-                
+            # Choose earliest odd and select other odds that are in the acceptable time frame
+            min_odd = min(odds_buffer.values(), key=oddDate)
+            odds_buffer = {site: odd for site, odd in odds_buffer.items() if min_odd.date - OddsHistoryPage.delta < oddDate(odd) < min_odd.date + OddsHistoryPage.delta}
 
-                for site in Sites:
-                    if site in odds_buffer:
-                        current_indexes[site] += 1
-                        self.columns[site].append(f'{odds_buffer[site].value:1.2f}')
-                    else:
-                        self.columns[site].append(f'----')
+            # Generate line of each column
+            self.columns[OddsHistoryPage.time].append(f'{min_odd.hours_left:04.1f}')
+            for site in Sites:
+                if site in odds_buffer:
+                    current_indexes[site] += 1
+                    self.columns[site].append(f'{odds_buffer[site].value:1.2f}')
+                else:
+                    self.columns[site].append(f'----')
     
     def makeEmbed(self) -> Embed:
 
-        embed = Embed(title=self.game.name, \
-                              description=str_dates(self.game.date), \
-                              color=self.league.color)
+        embed = Embed( title=self.game.name, \
+                       description=str_dates(self.game.date), \
+                       color=self.league.color)
+
+        # Create labels string for later use
+
+        labels_list = ['time']
+        for site in self.shownSites:
+            labels_list.append(f'{site.small()}')
+
+        line = '|'.join(labels_list) + '\n'
+        column_labels = line + len(line) * '=' + '\n'
+
+        # Create Current Odds Embed field value
 
         current_odds = '```\n'
 
-
         if self.columns[OddsHistoryPage.time] == []:
             last_line = ['This game has no odds.']
-        
-
         else:
-            last_line = [f'{self.columns[OddsHistoryPage.time][-1]:0>4}']
-
-
-            for _, odd in self.game.odds.items():
-                # TODO generate by columns
-                if odd == []:
-                    last_line.append('----')
-                else:
-                    last_line.append(f'{odd[-1].value:1.2f}')
+            current_odds += column_labels
+            last_line = [f'{self.columns[OddsHistoryPage.time][-1]}']
+            last_line.extend([(f'{self.game.odds[site][-1].value:1.2f}' if self.game.odds[site] != [] else '----') for site in Sites])
 
         current_odds += '|'.join(last_line) + '\n```'
-
         embed.add_field(name='Current Odds', value=current_odds, inline=False)
 
-        odds_history = '```\n'
+        # Create Odds History Embed field value
 
-        column_labels = ['time']
-        for site in self.shownSites:
-            column_labels.append(f'{site.small()}')
-
-        line = '|'.join(column_labels)
-        odds_history += f'{line}\n'
-        odds_history += len(line) * '=' + '\n'
-
+        odds_history = '```\n' + column_labels
 
         for i in range(self.first_line, self.next_first_line):
             line = [self.columns[OddsHistoryPage.time][i]]
@@ -532,7 +532,6 @@ class OddsHistoryPage(Page):
 
         odds_history += '```'
         embed.add_field(name='Odds History', value=odds_history, inline=False)
-
 
         return embed
     
