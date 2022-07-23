@@ -83,4 +83,21 @@ class Notify:
         finally:
             self.bot.endTask(asyncio.current_task())
 
+    async def visitChangedDate(self, notification: notf.DateChangeNotification) -> NoReturn:
+
+        try:
+
+            embed = Embed(title=notification.game.name, color=notification.color)
+
+            embed.add_field(name='❤️‍🔥Game Date Changed!❤️‍🔥', value=str(notification))
+
+            for channel in self.channels:
+                await channel.send(embed=embed)
+            
+        except Exception as e:
+            print("Exception raised in visitNewOdd!")
+            print(e)
+        
+        finally:
+            self.bot.endTask(asyncio.current_task())
     

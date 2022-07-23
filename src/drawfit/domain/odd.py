@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 from datetime import datetime, timedelta
 from typing import NoReturn
 
+import drawfit.domain.followables as f
+
 class Odd:
 
-    def __init__(self, value: float, date: datetime, hours_left: float) -> NoReturn:
+    def __init__(self, value: float, date: datetime, game: f.Game) -> NoReturn:
         self._value: float = value
         self._date: datetime = date
-        self._hours_left: timedelta = hours_left
+        self._game = game
 
     @property
     def value(self) -> float:
@@ -18,7 +22,7 @@ class Odd:
     
     @property
     def hours_left(self) -> float:
-        return self._hours_left
+        return self._game.hoursLeft(time=self.date)
 
     def __eq__(self, o):
         if o.__class__ == self.__class__:

@@ -481,7 +481,7 @@ class OddsHistoryPage(Page):
             odds_buffer = {site: odd for site, odd in odds_buffer.items() if min_odd.date - OddsHistoryPage.delta < oddDate(odd) < min_odd.date + OddsHistoryPage.delta}
 
             # Generate line of each column
-            self.columns[OddsHistoryPage.time].append(f'{min_odd.hours_left:02.1f}')
+            self.columns[OddsHistoryPage.time].append(f'{min_odd.hours_left:04.1f}')
             for site in Sites:
                 if site in odds_buffer:
                     current_indexes[site] += 1
@@ -512,8 +512,8 @@ class OddsHistoryPage(Page):
             last_line = ['This game has no odds.']
         else:
             current_odds += column_labels
-            last_line = [f'{self.columns[OddsHistoryPage.time][-1]:0>4}']
-            last_line.extend([(f'{self.game.odds[site][-1].value:0>4}' if self.game.odds[site] != [] else '----') for site in Sites])
+            last_line = [f'{self.columns[OddsHistoryPage.time][-1]}']
+            last_line.extend([(f'{self.game.odds[site][-1].value:1.2f}' if self.game.odds[site] != [] else '----') for site in Sites])
 
         current_odds += '|'.join(last_line) + '\n```'
         embed.add_field(name='Current Odds', value=current_odds, inline=False)

@@ -190,6 +190,9 @@ class League:
             if sample.start_time <= sample.sample_time:
                 self.removeGame(game)
                 return None
+            
+            if game.updateDate(sample):
+                return notf.DateChangeNotification(game, site, self.color)
 
             if game.addOdd(sample, site):
                 return notf.NewOddNotification(game, site, self.color)
