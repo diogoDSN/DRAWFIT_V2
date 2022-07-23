@@ -513,7 +513,7 @@ class OddsHistoryPage(Page):
         else:
             current_odds += column_labels
             last_line = [f'{self.columns[OddsHistoryPage.time][-1]:0>4}']
-            last_line.extend([(str(self.game.odds[site][-1].value) if self.game.odds[site] != [] else '----') for site in Sites])
+            last_line.extend([(f'{self.game.odds[site][-1].value:0>4}' if self.game.odds[site] != [] else '----') for site in Sites])
 
         current_odds += '|'.join(last_line) + '\n```'
         embed.add_field(name='Current Odds', value=current_odds, inline=False)
