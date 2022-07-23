@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta
 from typing import NoReturn, List, Tuple, Dict, Optional
 
-from drawfit.domain.odd import Odd
+import drawfit.domain.odd as o
 
 from drawfit.utils import Sites, OddSample, now_lisbon
 
@@ -104,7 +104,7 @@ class Game(Followable):
             self._date = date
     
     @property
-    def odds(self) -> Dict[Sites, List[Odd]]:
+    def odds(self) -> Dict[Sites, List[o.Odd]]:
         return self._odds
 
     @property
@@ -138,11 +138,18 @@ class Game(Followable):
         if isinstance(o, Game):
             return self.name == o.name and self.date == o.date
         return False
+    
+    def updateDate(self, sample: OddSample) -> bool:
+        if self.date != sample.start_time:
+            self._date = sample.start_time
+            return True
+        
+        return False
 
     def addOdd(self, sample: OddSample, site: Sites) -> bool:
 
         if  self.odds[site] == [] or self.odds[site][-1].value != sample.odd:
-            self._odds[site].append(Odd(sample.odd, sample.sample_time, self.hoursLeft(sample.sample_time)))
+            self._odds[site].append(o.Odd(sample.odd, sample.sample_time, self))
             return True
         
         return False

@@ -7,7 +7,7 @@ from typing import NoReturn, Tuple
 import drawfit.bot.notify as v
 import drawfit.domain.followables as followables
 
-from drawfit.utils import Sites, OddSample, now_lisbon
+from drawfit.utils import Sites, OddSample, now_lisbon, str_dates
 
 
 class Notification:
@@ -49,7 +49,7 @@ class NewOddNotification(Notification):
                 odd = 'No Odd'
                 info += f'> {site.name:-<10s}{odd:->8}\n'
             else:
-                init_symb = '>' if not self.sites_updated[site] else '+' if len(self.game.odds[site]) == 1 or self.game.odds[site][-1] > self.game.odds[site][-2] else '-'
+                init_symb = '>' if not self.sites_updated[site] else '+' if len(self.game.odds[site]) == 1 or self.game.odds[site][-1].value > self.game.odds[site][-2].value else '-'
                 odd = self.game.odds[site][-1].value
                 info += f'{init_symb} {site.name:-<10s}{odd:->8.2f}\n'
             
@@ -107,3 +107,20 @@ class PossibleTeamNotification(PossibleNotification):
     
     def __repr__(self) -> str:
         return str(self)
+
+class DateChangeNotification(Notification):
+
+    def __init__(self, game: followables.Game, sample: OddSample, color: int):
+        self.game = game
+        self.sample = sample
+        self.color = color
+    
+    def __eq__(self, o) -> bool:
+        if isinstance(o, DateChangeNotification):
+            return self.game == o.game
+
+    async def accept(self, visitor: v.Notify):
+        await visitor.visitChangedDate(self)
+    
+    def __str__(self) -> str:
+        return f'```\n❗️New Date:❗️\n{str_dates(self.game.date)}\n```'
