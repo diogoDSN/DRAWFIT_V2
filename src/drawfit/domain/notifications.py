@@ -49,9 +49,9 @@ class NewOddNotification(Notification):
                 odd = 'No Odd'
                 info += f'> {site.name:-<10s}{odd:->8}\n'
             else:
-                init_symb = '>' if not self.sites_updated[site] else '+' if len(self.game.odds[site]) == 1 or self.game.odds[site][-1].value > self.game.odds[site][-2].value else '-'
+                init_symb, last_symb = ('>', '') if not self.sites_updated[site] else ('+', '🟢') if len(self.game.odds[site]) == 1 or self.game.odds[site][-1].value > self.game.odds[site][-2].value else ('-', '🔴')
                 odd = self.game.odds[site][-1].value
-                info += f'{init_symb} {site.name:-<10s}{odd:->8.2f}\n'
+                info += f'{init_symb} {site.name:-<10s}{odd:->8.2f} {last_symb}\n'
             
         
         return info + '```'
