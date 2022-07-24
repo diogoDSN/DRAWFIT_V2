@@ -531,7 +531,7 @@ class OddsHistoryPage(Page):
             odds_history += f'{line}\n'
 
         odds_history += '```'
-        embed.add_field(name='Odds History', value=odds_history, inline=False)
+        embed.add_field(name=f'Odds History ({self.page_number}/{self.last_page})', value=odds_history, inline=False)
 
         return embed
     
