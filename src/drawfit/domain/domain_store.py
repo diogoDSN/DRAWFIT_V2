@@ -140,6 +140,14 @@ class DomainStore:
         else:
             return False
 
+    def eraseTeam(self, league_id: str, team_id: str) -> bool:
+
+        league = self.getLeague(league_id)
+
+        if league is not None:
+            return league.eraseTeam(team_id)
+        else:
+            return False
 
     def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
         league = next((league for league in self.known_leagues if league.name == league_name), None)

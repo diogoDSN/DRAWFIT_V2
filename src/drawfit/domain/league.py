@@ -125,6 +125,20 @@ class League:
         
         return False
     
+    def eraseTeam(self, team_name) -> bool:
+
+        for index, team in enumerate(self.followed_teams):
+            if team.name == team_name:
+                self.followed_teams.pop(index)
+                return True
+        
+        for index, team in enumerate(self.inactive_teams):
+            if team.name == team_name:
+                self.inactive_teams.pop(index)
+                return True
+        
+        return False
+    
     def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites) -> NoReturn:
 
         team = next((team for team in self.followed_teams if team.name == team_name), None)
