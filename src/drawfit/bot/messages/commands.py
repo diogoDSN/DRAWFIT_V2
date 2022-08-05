@@ -4,8 +4,8 @@ def EmptyArgument(command: str):
 def addLeagueUsage():
     return 'Correct usage:\n```.addLeague (league_name)```'
 
-def seeLeagueUsage():
-    return 'Correct usage:\n```.seeLeague (league_name)```'
+def eraseLeagueUsage():
+    return 'Correct usage:\n```.eraseLeague (league_name)```'
 
 def changeLeagueColorCorrectUsage():
     return 'Correct usage:\n```.changeLeagueColorCorrectUsage (league_name)'
@@ -18,6 +18,9 @@ def activateTeamUsage():
 
 def deactivateTeamUsage():
     return 'Correct usage:\n```.deactivateTeam (league_name)::(team_name)```'
+
+def eraseTeamUsage():
+    return 'Correct usage:\n```.eraseTeam (league_name)::(team_name)```'
 
 def addTeamKeywordsUsage():
     return 'Correct usage:\n```.addTeamKeywords (league_name)::(team_name)::(keyword1) (keyword2) (keyword3) ...```'

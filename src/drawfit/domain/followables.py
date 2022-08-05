@@ -72,6 +72,22 @@ class Followable:
                     return True
         
         return False
+    
+    def eraseId(self, id_to_erase: str) -> bool:
+
+        ret = False
+
+        id_to_erase = (id_to_erase,)
+
+        for site, ids in self.considered.items():
+            if id_to_erase in ids:
+                ret = True
+                ids.remove(id_to_erase)
+                if id_to_erase == self.ids[site]:
+                    self._ids[site] = None
+            
+        return ret
+
 
 
 class Game(Followable):

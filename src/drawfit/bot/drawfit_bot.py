@@ -8,7 +8,7 @@ from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn
 import discord
 from discord.ext import commands
 
-from drawfit.parameters import PERMISSIONS, SAVE_PATH, COMMAND_CHANNELS, UPDATES_CHANNELS
+from drawfit.parameters import PERMISSIONS, SAVE_PATH, COMMAND_CHANNELS, UPDATES_CHANNELS, QUERIES_CHANNELS
 
 import drawfit.domain.domain_store as store
 import drawfit.updates.update_handler as updates
@@ -39,6 +39,7 @@ class DrawfitBot(commands.Bot):
         
         self.pending_queries: List[asyncio.Task] = []
         self.routines: List[asyncio.Task] = []
+        self.setup = False
 
         self.configureCommands()
     
@@ -72,11 +73,17 @@ class DrawfitBot(commands.Bot):
 
         all_channels = self.getChannels(COMMAND_CHANNELS)
         all_channels.extend(self.getChannels(UPDATES_CHANNELS))
+        all_channels.extend(self.getChannels(QUERIES_CHANNELS))
 
         for channel in all_channels:
             await channel.send(DrawfitBot.greeting)    
 
     async def on_ready(self):
+
+        if self.setup:
+            return
+        
+        self.setup = True
 
         self.perms: Dict[Permissions, List[discord.User]] = self.setInitialPermissions()
 

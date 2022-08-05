@@ -5,7 +5,7 @@ def TimedOut():
     return "The request has timed out."
 
 def Yes():
-    return "👍"
+    return "✅"
 
 def No():
-    return "👎"
+    return "❌"

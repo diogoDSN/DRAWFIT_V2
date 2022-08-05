@@ -102,6 +102,26 @@ async def addLeague(ctx: commands.Context, *, arguments = ''):
     ctx.bot.store.addLeague(arguments)
     await ctx.send(f'New league: `{arguments}` added!')
 
+
+@commands.command(aliases=['eL', 'el'])
+async def eraseLeague(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+    
+    if not hasPermission(ctx, Permissions.MODERATOR):
+        await ctx.send(NoPermission(Permissions.MODERATOR.value))
+        return
+    
+    checkAnyArguments(arguments, eraseLeagueUsage())
+
+    if ctx.bot.store.eraseLeague(arguments):
+        response = f'The following league was erased: `{arguments}`\n'
+        await ctx.send(response)
+    else:
+        await ctx.send('The given league couldn\'t be erased!')
+
+
 # $changeLeagueColor color league_name
 @commands.command(aliases=['cLC','color'])
 async def changeLeagueColor(ctx: commands.Context, *, arguments = ''):
@@ -385,9 +405,7 @@ async def deactivateTeam(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.NORMAL.value))
         return
 
-    args = checkNNameArguments(arguments, 2, deactivateTeamUsage())
-
-    league_id, team_id = args
+    league_id, team_id = checkNNameArguments(arguments, 2, deactivateTeamUsage())
 
     if ctx.bot.store.deactivateTeam(league_id, team_id):
         
@@ -395,6 +413,43 @@ async def deactivateTeam(ctx: commands.Context, *, arguments = ''):
         await ctx.send(response)
     else:
         await ctx.send('The given team couldn\'t be deactivated')
+
+@commands.command(aliases=['eT', 'et'])
+async def eraseTeam(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+    
+    if not hasPermission(ctx, Permissions.MODERATOR):
+        await ctx.send(NoPermission(Permissions.MODERATOR.value))
+        return
+    
+    league_id, team_id = checkNNameArguments(arguments, 2, eraseTeamUsage())
+
+    if ctx.bot.store.eraseTeam(league_id, team_id):
+        response = f'The following team was erased: `{team_id}`\n'
+        await ctx.send(response)
+    else:
+        await ctx.send('The given team couldn\'t be erased!')
+
+
+@commands.command(aliases=['eI', 'ei'])
+async def eraseId(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+    
+    if not hasPermission(ctx, Permissions.MODERATOR):
+        await ctx.send(NoPermission(Permissions.MODERATOR.value))
+        return
+    
+    league_id, team_id, id = checkNNameArguments(arguments, 3, eraseTeamUsage())
+
+    if ctx.bot.store.eraseId(league_id, team_id, id):
+        response = f'The following id was erased: `{id}`\n'
+        await ctx.send(response)
+    else:
+        await ctx.send('The given id couldn\'t be erased!')
 
 @commands.command(aliases=['s'])
 async def save(ctx: commands.Context, *, arguments = ''):

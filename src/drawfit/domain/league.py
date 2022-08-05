@@ -125,6 +125,20 @@ class League:
         
         return False
     
+    def eraseTeam(self, team_name) -> bool:
+
+        for index, team in enumerate(self.followed_teams):
+            if team.name == team_name:
+                self.followed_teams.pop(index)
+                return True
+        
+        for index, team in enumerate(self.inactive_teams):
+            if team.name == team_name:
+                self.inactive_teams.pop(index)
+                return True
+        
+        return False
+    
     def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites) -> NoReturn:
 
         team = next((team for team in self.followed_teams if team.name == team_name), None)
@@ -142,6 +156,21 @@ class League:
         if game is not None:
             game.setId(site, game_id)
     
+    def eraseId(self, team_name: str, id_to_erase: str) -> bool:
+
+        for _, team in enumerate(self.followed_teams):
+            if team.name == team_name:
+                team.eraseId(id_to_erase)
+                return True
+        
+        for _, team in enumerate(self.inactive_teams):
+            if team.name == team_name:
+                team.eraseId(id_to_erase)
+                return True
+        
+        return False
+
+
     def removeGame(self, game: Game) -> NoReturn:
         if game.team1 is not None:
             game.team1.current_game = None
@@ -210,11 +239,12 @@ class League:
 
                 return notf.NewOddNotification(team.current_game, site, self.color)
 
-            if team.hasGame():
+            if team.hasGame() and team.current_game.date < sample.start_time:
                 return None
-
-            # check if the game belongs to any other registered team
-            other_team = next((t for t in self.followed_teams if (t.isId(site, sample.team1_id) or t.isId(site, sample.team2_id)) and t != team), None)
+            
+            else:
+                self.current_games.remove(team.current_game)
+                
 
             new_game = Game(sample.game_name, date=sample.start_time, team1=team, team2=other_team)
             new_game.setId(site, sample.game_id)
@@ -222,8 +252,6 @@ class League:
 
             self._current_games.append(new_game)
             team.current_game = new_game
-            if other_team != None:
-                other_team.current_game = new_game
 
             return notf.NewOddNotification(new_game, site, self.color)
 
@@ -235,14 +263,14 @@ class League:
 
             if possible_team is not None:
                 possible_team.addConsidered(site, team_id)
-                return notf.PossibleTeamNotification(possible_team, sample, team_id, site)
+                return notf.PossibleTeamNotification(possible_team, sample, team_id, site, self.color)
         
         # 4 - test if the game could be a singled out inputed game
         possible_game = next((game for game in self.current_games if game.couldBeId(site, sample.game_id)), None)
 
         if possible_game is not None:
             possible_game.addConsidered(site, sample.game_id)
-            return notf.PossibleGameNotification(possible_game, sample, site)
+            return notf.PossibleGameNotification(possible_game, sample, site, self.color)
         
         return None
 
