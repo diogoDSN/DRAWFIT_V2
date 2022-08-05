@@ -210,11 +210,12 @@ class League:
 
                 return notf.NewOddNotification(team.current_game, site, self.color)
 
-            if team.hasGame():
+            if team.hasGame() and team.current_game.date < sample.start_time:
                 return None
-
-            # check if the game belongs to any other registered team
-            other_team = next((t for t in self.followed_teams if (t.isId(site, sample.team1_id) or t.isId(site, sample.team2_id)) and t != team), None)
+            
+            else:
+                self.current_games.remove(team.current_game)
+                
 
             new_game = Game(sample.game_name, date=sample.start_time, team1=team, team2=other_team)
             new_game.setId(site, sample.game_id)
@@ -222,8 +223,6 @@ class League:
 
             self._current_games.append(new_game)
             team.current_game = new_game
-            if other_team != None:
-                other_team.current_game = new_game
 
             return notf.NewOddNotification(new_game, site, self.color)
 
