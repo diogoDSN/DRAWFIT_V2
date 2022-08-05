@@ -52,17 +52,18 @@ class NewOddNotification(Notification):
                 init_symb = '>' if not self.sites_updated[site] else '+' if len(self.game.odds[site]) == 1 or self.game.odds[site][-1].value > self.game.odds[site][-2].value else '-'
                 odd = self.game.odds[site][-1].value
                 info += f'{init_symb} {site.name:-<10s}{odd:->8.2f}\n'
-            
+
         
         return info + '```'
 
 
 class PossibleNotification(Notification):
 
-    def __init__(self, sample: OddSample, possible_id: Tuple[str], site: Sites):
+    def __init__(self, sample: OddSample, possible_id: Tuple[str], site: Sites, color: int):
         self.sample = sample
         self.possible_id = possible_id
         self.site = site
+        self.color = color
     
     @property
     @abstractmethod
@@ -71,39 +72,32 @@ class PossibleNotification(Notification):
 
     def __eq__(self, o) -> bool:
         return False
+    
+    def __str__(self):
+        return '> ' + ' vs '.join(self.possible_id)
 
     async def accept(self, visitor: v.Notify):
         await visitor.visitPossible(self)
 
 class PossibleGameNotification(PossibleNotification):
 
-    def __init__(self, game: followables.Game, sample: OddSample, site: Sites):
-        super().__init__(sample, sample.game_id, site)
+    def __init__(self, game: followables.Game, sample: OddSample, site: Sites, color: int):
+        super().__init__(sample, sample.game_id, site, color)
         self._game = game
     
     @property
     def followable(self) -> followables.Followable:
         return self._game
-    
-    def __str__(self):
-        return f'I may have found a match for the game `{self.game.name}` in the site `{self.site.name}`.\n Does this odd belong to the game you want to track?\n \
-                    Name: `{self.sample.game_name}`\n \
-                    Date: `{self.sample.start_time}`\n'
 
 class PossibleTeamNotification(PossibleNotification):
 
-    def __init__(self, team: followables.Team, sample: OddSample, team_id: Tuple[str], site: Sites):
-        super().__init__(sample, team_id, site)
+    def __init__(self, team: followables.Team, sample: OddSample, team_id: Tuple[str], site: Sites, color: int):
+        super().__init__(sample, team_id, site, color)
         self._team = team
     
     @property
     def followable(self) -> followables.Followable:
         return self._team
-
-    def __str__(self) -> str:
-        return f'I may have found a match for the team `{self._team.name}` in the site `{self.site.name}`.\n Does the following team match the team you want to track?\n \
-                    Team Name in {self.site.name}: `{self.possible_id[0]}`\n \
-                    Game where the name was found: `{self.sample.game_name}`\n'
     
     def __repr__(self) -> str:
         return str(self)

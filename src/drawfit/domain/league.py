@@ -235,14 +235,14 @@ class League:
 
             if possible_team is not None:
                 possible_team.addConsidered(site, team_id)
-                return notf.PossibleTeamNotification(possible_team, sample, team_id, site)
+                return notf.PossibleTeamNotification(possible_team, sample, team_id, site, self.color)
         
         # 4 - test if the game could be a singled out inputed game
         possible_game = next((game for game in self.current_games if game.couldBeId(site, sample.game_id)), None)
 
         if possible_game is not None:
             possible_game.addConsidered(site, sample.game_id)
-            return notf.PossibleGameNotification(possible_game, sample, site)
+            return notf.PossibleGameNotification(possible_game, sample, site, self.color)
         
         return None
 

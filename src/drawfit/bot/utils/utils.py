@@ -1,4 +1,9 @@
-from typing import List, NoReturn
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, List, NoReturn
+
+if TYPE_CHECKING:
+    from drawfit.bot.drawfit_bot import DrawfitBot
 
 import discord
 from discord.ext import commands
@@ -24,12 +29,16 @@ class MessageCheck:
 
 class ReactionAnswerCheck:
 
-    def __init__(self, messages: List[discord.Message], bot: discord.User):
+    def __init__(self, messages: List[discord.Message], bot: DrawfitBot):
         self.messages = messages
         self.bot = bot
+        self.message_ids = [msg.id for msg in messages]
         
-    def check(self, reaction: discord.Reaction, user: discord.User):
-        return user != self.bot and reaction.message in self.messages and str(reaction.emoji) in (Yes(), No())
+    def check(self, payload: discord.RawReactionActionEvent):
+        return payload.member     != self.bot.user and \
+               payload.message_id in self.message_ids and \
+               str(payload.emoji) in (Yes(), No()) and \
+               payload.member     in self.bot.getUsersWithPermission(Permissions.MODERATOR)
 
 class ReactionCheck:
 
