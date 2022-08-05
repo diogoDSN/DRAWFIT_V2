@@ -102,6 +102,26 @@ async def addLeague(ctx: commands.Context, *, arguments = ''):
     ctx.bot.store.addLeague(arguments)
     await ctx.send(f'New league: `{arguments}` added!')
 
+
+@commands.command(aliases=['eL', 'el'])
+async def eraseLeague(ctx: commands.Context, *, arguments = ''):
+
+    if not isCommand(ctx):
+        return
+    
+    if not hasPermission(ctx, Permissions.MODERATOR):
+        await ctx.send(NoPermission(Permissions.MODERATOR.value))
+        return
+    
+    checkAnyArguments(arguments, eraseLeagueUsage())
+
+    if ctx.bot.store.eraseLeague(arguments):
+        response = f'The following league was erased: `{arguments}`\n'
+        await ctx.send(response)
+    else:
+        await ctx.send('The given league couldn\'t be erased!')
+
+
 # $changeLeagueColor color league_name
 @commands.command(aliases=['cLC','color'])
 async def changeLeagueColor(ctx: commands.Context, *, arguments = ''):
