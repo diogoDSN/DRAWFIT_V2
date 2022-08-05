@@ -404,12 +404,11 @@ async def eraseTeam(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.MODERATOR.value))
         return
     
-    league_id, team_id = checkNNameArguments(arguments, 2, deactivateTeamUsage())
+    league_id, team_id = checkNNameArguments(arguments, 2, eraseTeamUsage())
 
     if ctx.bot.store.eraseTeam(league_id, team_id):
         response = f'The following team was erased: `{team_id}`\n'
         await ctx.send(response)
-        
     else:
         await ctx.send('The given team couldn\'t be erased!')
 

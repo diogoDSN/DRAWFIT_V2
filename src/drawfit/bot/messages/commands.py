@@ -19,6 +19,9 @@ def activateTeamUsage():
 def deactivateTeamUsage():
     return 'Correct usage:\n```.deactivateTeam (league_name)::(team_name)```'
 
+def eraseTeamUsage():
+    return 'Correct usage:\n```.erase (league_name)::(team_name)```'
+
 def addTeamKeywordsUsage():
     return 'Correct usage:\n```.addTeamKeywords (league_name)::(team_name)::(keyword1) (keyword2) (keyword3) ...```'
 
