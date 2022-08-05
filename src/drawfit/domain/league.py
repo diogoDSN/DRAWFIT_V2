@@ -156,6 +156,21 @@ class League:
         if game is not None:
             game.setId(site, game_id)
     
+    def eraseId(self, team_name: str, id_to_erase: str) -> bool:
+
+        for _, team in enumerate(self.followed_teams):
+            if team.name == team_name:
+                team.eraseId(id_to_erase)
+                return True
+        
+        for _, team in enumerate(self.inactive_teams):
+            if team.name == team_name:
+                team.eraseId(id_to_erase)
+                return True
+        
+        return False
+
+
     def removeGame(self, game: Game) -> NoReturn:
         if game.team1 is not None:
             game.team1.current_game = None

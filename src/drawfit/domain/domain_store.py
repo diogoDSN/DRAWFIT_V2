@@ -159,11 +159,15 @@ class DomainStore:
             return league.eraseTeam(team_id)
         else:
             return False
+    
+    def eraseId(self, league_id: str, team_id: str, id_to_erase: str) -> bool:
 
-    def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
-        league = next((league for league in self.known_leagues if league.name == league_name), None)
-        if league != None:
-            league.setTeamId(team_name, team_id, site)
+        league = self.getLeague(league_id)
+
+        if league is not None:
+            return league.eraseId(team_id, id_to_erase)
+        
+        return False
 
     def setGameId(self, game_name: str, game_id: Tuple[str], site: Sites, league_name: str):
         league = next((league for league in self.known_leagues if league.name == league_name), None)
