@@ -39,6 +39,7 @@ class DrawfitBot(commands.Bot):
         
         self.pending_queries: List[asyncio.Task] = []
         self.routines: List[asyncio.Task] = []
+        self.setup = False
 
         self.configureCommands()
     
@@ -78,6 +79,11 @@ class DrawfitBot(commands.Bot):
             await channel.send(DrawfitBot.greeting)    
 
     async def on_ready(self):
+
+        if self.setup:
+            return
+        
+        self.setup = True
 
         self.perms: Dict[Permissions, List[discord.User]] = self.setInitialPermissions()
 
