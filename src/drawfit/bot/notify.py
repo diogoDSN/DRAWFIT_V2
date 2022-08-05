@@ -25,7 +25,7 @@ class Notify:
         self.updates_channels = bot.getChannels(UPDATES_CHANNELS)
         self.queries_channels = bot.getChannels(QUERIES_CHANNELS)
         self.mods = bot.getUsersWithPermission(Permissions.MODERATOR)
-        self.timeout = 60
+        self.timeout = 43200
 
     async def visitNewOdd(self, notification: notf.NewOddNotification) -> NoReturn:
 
@@ -52,7 +52,6 @@ class Notify:
 
             sent_messages = []
 
-            #TODO embed creation for notification
             embed = Embed(title=notification.followable.name, color=notification.color)
             embed.add_field(name=f'Name found for `{notification.site.name}`', value=str(notification))
 
@@ -66,19 +65,11 @@ class Notify:
             
             answer = ReactionAnswerCheck(sent_messages, self.bot)
             payload = await self.bot.wait_for("raw_reaction_add", check=answer.check, timeout=self.timeout)
-
-            for msg in sent_messages:
-                await msg.delete()
             
             if str(payload.emoji) == Yes():
                 notification.followable.setId(notification.site, notification.possible_id)            
 
         except TimeoutError:
-
-            for msg in sent_messages:
-                await msg.reply(TimedOut())
-            
-            print('TimedOut')
             notification.followable.removeConsidered(notification.site, notification.possible_id)
         
         except Exception as e:
@@ -86,6 +77,10 @@ class Notify:
             print(e)
 
         finally:
+
+            for msg in sent_messages:
+                await msg.delete()
+
             self.bot.endTask(asyncio.current_task())
 
 

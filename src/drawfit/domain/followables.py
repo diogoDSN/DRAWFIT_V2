@@ -40,8 +40,6 @@ class Followable:
         self._considered[site].append(considered)
     
     def removeConsidered(self, site: Sites, considered: Tuple[str]):
-        print(considered)
-        print(self._considered[site])
         self._considered[site].remove(considered)
     
     @property
