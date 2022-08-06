@@ -242,11 +242,11 @@ class League:
             if team.hasGame() and team.current_game.date < sample.start_time:
                 return None
             
-            else:
+            elif team.hasGame():
                 self.current_games.remove(team.current_game)
                 
 
-            new_game = Game(sample.game_name, date=sample.start_time, team1=team, team2=other_team)
+            new_game = Game(sample.game_name, date=sample.start_time, team1=team)
             new_game.setId(site, sample.game_id)
             new_game.addOdd(sample, site)
 
