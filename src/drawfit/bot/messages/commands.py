@@ -43,5 +43,7 @@ def setBetwayLeagueCodeUsage():
 def setBetclicLeagueCodeUsage():
     return 'Correct usage:\n```.setBetclicLeagueCode (league_id) (league_name|league_number)```'
 
+def eraseIdCorrectUsage():
+    return 'Correct usage:\n```.eraseId (league_id)::(team_name)::(id_to_erase)```'
 
     

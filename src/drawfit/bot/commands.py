@@ -443,7 +443,7 @@ async def eraseId(ctx: commands.Context, *, arguments = ''):
         await ctx.send(NoPermission(Permissions.MODERATOR.value))
         return
     
-    league_id, team_id, id = checkNNameArguments(arguments, 3, eraseTeamUsage())
+    league_id, team_id, id = checkNNameArguments(arguments, 3, eraseIdCorrectUsage())
 
     if ctx.bot.store.eraseId(league_id, team_id, id):
         response = f'The following id was erased: `{id}`\n'
