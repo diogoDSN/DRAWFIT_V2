@@ -156,7 +156,7 @@ class Game(Followable):
         return False
     
     def updateDate(self, sample: OddSample) -> bool:
-        if self.date != sample.start_time:
+        if self.date < sample.start_time:
             self._date = sample.start_time
             return True
         

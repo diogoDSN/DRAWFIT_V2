@@ -113,6 +113,9 @@ class DateChangeNotification(Notification):
         if isinstance(o, DateChangeNotification):
             return self.game == o.game
 
+    def mergeNotifications(self, new_notf: Notification) -> NoReturn:
+        pass
+
     async def accept(self, visitor: v.Notify):
         await visitor.visitChangedDate(self)
     
