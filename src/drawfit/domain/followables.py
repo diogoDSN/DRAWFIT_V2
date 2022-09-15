@@ -172,11 +172,6 @@ class Game(Followable):
             previous_odds = dict(current_odds)
             previous_odds[site] = 0 if len(self.odds[site]) == 1 else self.odds[site][-2].value
 
-            print('--------------------------------------------')
-            print(list(previous_odds.values()))
-            print(list(current_odds.values()))
-            print('--------------------------------------------')
-
             # Notification is sent when: 
             #  #1 A new odd becomes the current highest 
             #  #2 An odd rises to match the highest
