@@ -166,7 +166,23 @@ class Game(Followable):
 
         if  self.odds[site] == [] or self.odds[site][-1].value != sample.odd:
             self._odds[site].append(o.Odd(sample.odd, sample.sample_time, self))
-            return True
+
+            current_odds = {each_site: (0 if self.odds[each_site] == [] else self.odds[each_site][-1].value) for each_site in Sites}
+
+            previous_odds = dict(current_odds)
+            previous_odds[site] = 0 if len(self.odds[site]) == 1 else self.odds[site][-2].value
+
+            print('--------------------------------------------')
+            print(list(previous_odds.values()))
+            print(list(current_odds.values()))
+            print('--------------------------------------------')
+
+            # Notification is sent when: 
+            #  #1 A new odd becomes the current highest 
+            #  #2 An odd rises to match the highest
+            if all(self.odds[site][-1].value >= value for value in current_odds.values()) or \
+              (all(previous_odds[site] >= value for value in previous_odds.values()) and any(current_odds[site] < value for value in current_odds.values())):
+                return True
         
         return False
         
