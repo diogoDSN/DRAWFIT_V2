@@ -102,7 +102,7 @@ CREATE TABLE odd(
     game_name       VARCHAR(80)             NOT NULL,
     game_date       SMALLDATETIME           NOT NULL,
     site_name       VARCHAR(80)             NOT NULL,
-    value           DECIMAL(4, 2)           NOT NULL,
+    value           UNSIGNED DECIMAL(4, 2)           NOT NULL,
     date            SMALLDATETIME           NOT NULL,
 
     CONSTRAINT pk_odd           PRIMARY KEY(game_name, game_date, site_name),
@@ -110,3 +110,37 @@ CREATE TABLE odd(
     CONSTRAINT fk_odd_site      FOREIGN KEY(site_name) REFERENCES site(name)
 );
 
+
+----------------------------------------
+-- Integrity Constraints
+----------------------------------------
+
+DROP TRIGGER IF EXISTS check_odd_sampled_before_game_update_trigger ON odd;
+DROP TRIGGER IF EXISTS check_odd_sampled_before_game_insert_trigger ON odd;
+
+--(IC-1) An odd's datetime must be before the game's start datetime
+CREATE OR REPLACE FUNCTION check_odd_sampled_before_game() 
+RETURNS TRIGGER AS
+$$
+DECLARE unidades_var INTEGER;
+
+BEGIN
+    IF NEW.date >= NEW.game_date THEN
+        RAISE EXCEPTION 'Tried adding/changing odd on game %.  The new (game_date, odd_date) pair is invalid: (%, %)',
+                        NEW.game_name, NEW.game_date, New.date;
+    END IF;
+
+    RETURN new;
+END
+$$
+LANGUAGE plpgsql;
+
+CREATE TRIGGER check_odd_sampled_before_game_update_trigger 
+BEFORE UPDATE OF game_date, date ON odd
+FOR EACH ROW WHEN (OLD.* IS DISTINCT FROM NEW.*)
+EXECUTE PROCEDURE check_odd_sampled_before_game();
+
+CREATE TRIGGER check_odd_sampled_before_game_insert_trigger 
+BEFORE INSERT ON odd
+FOR EACH ROW
+EXECUTE PROCEDURE check_odd_sampled_before_game();
