@@ -3,3 +3,4 @@ discord==1.7.3
 requests-html==0.10.0
 pytest==7.1.2
 pytz>=2022.1
+psycopg2==2.9.5
