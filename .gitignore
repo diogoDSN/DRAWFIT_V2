@@ -160,4 +160,5 @@ cython_debug/
 #.idea/
 
 src/drawfit/parameters.py
+src/drawfit/token.txt
 .DS_Store
