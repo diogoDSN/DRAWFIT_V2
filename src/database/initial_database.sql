@@ -129,3 +129,20 @@ CREATE TRIGGER check_odd_sampled_before_game_insert_trigger
 BEFORE INSERT ON odd
 FOR EACH ROW
 EXECUTE PROCEDURE check_odd_sampled_before_game();
+
+----------------------------------------
+-- Role Creation
+----------------------------------------
+
+DROP ROLE IF EXISTS drawfit_bot;
+CREATE ROLE drawfit_bot WITH LOGIN ENCRYPTED PASSWORD 'example-password';
+
+GRANT SELECT ON color TO drawfit_bot;
+GRANT SELECT ON site TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON game TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON league TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON league_code TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON odd TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON plays_in TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON team TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON team_id TO drawfit_bot;
