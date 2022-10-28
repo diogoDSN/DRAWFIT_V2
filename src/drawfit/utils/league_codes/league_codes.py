@@ -112,4 +112,18 @@ class BetclicCode(LeagueCode):
     def __str__(self) -> str:
         return f'{self.id}'
 
+def LeagueCodesFactory(site: Sites, raw_code: str) -> Optional[LeagueCode]:
+    if site == Sites.Bwin:
+        return BwinCode(raw_code)
+    elif site == Sites.Betano:
+        return BetanoCode(raw_code)
+    elif site == Sites.Betclic:
+        return BetclicCode(raw_code)
+    elif site == Sites.Solverde:
+        return SolverdeCode(raw_code)
+    elif site == Sites.Moosh:
+        return MooshCode(raw_code)
+    elif site == Sites.Betway:
+        return BetwayCode(raw_code)
+
         
