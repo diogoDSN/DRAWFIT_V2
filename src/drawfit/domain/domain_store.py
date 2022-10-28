@@ -74,7 +74,7 @@ class DomainStore:
         
         return False
 
-    def changeLeagueCode(self, league_id: str, site: Sites, newCode: str) -> bool:
+    def changeLeagueCode(self, league_id: str, site: Sites, newCode: LeagueCode) -> bool:
 
         league = self.getLeague(league_id)
 
