@@ -44,15 +44,15 @@ CREATE TABLE color(
 
 CREATE TABLE league(
     name            VARCHAR(80)     NOT NULL UNIQUE,
-    color_name      VARCHAR(80)     NOT NULL,
+    color_code      INTEGER         NOT NULL,
 
     CONSTRAINT pk_league PRIMARY KEY(name),
-    CONSTRAINT fk_league_color FOREIGN KEY(color_name) REFERENCES color(name)
+    CONSTRAINT fk_league_color FOREIGN KEY(color_code) REFERENCES color(hex_code)
 );
 
 CREATE TABLE league_code(
-    league_name         VARCHAR(80)             NOT NULL UNIQUE,
-    site_name           VARCHAR(80)             NOT NULL UNIQUE,
+    league_name         VARCHAR(80)             NOT NULL,
+    site_name           VARCHAR(80)             NOT NULL,
     code                VARCHAR(80)             NOT NULL,
 
     CONSTRAINT pk_league_code           PRIMARY KEY(league_name, site_name),
