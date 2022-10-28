@@ -1,4 +1,7 @@
 from enum import Enum
+from typing import Generator
+
+valid_sites = []
 
 class Sites(Enum):
 
@@ -22,4 +25,7 @@ class Sites(Enum):
             return 'MOSH'
         elif self == Sites.Betway:
             return 'BWAY'
+    
+    def __iter__(self) -> Generator[Site]:
+        return (site for site in Sites if site in valid_sites)
         
