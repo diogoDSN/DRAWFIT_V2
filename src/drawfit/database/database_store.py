@@ -1,7 +1,8 @@
 from __future__ import annotations
 import asyncio
 from typing import Dict, List, Tuple, NoReturn, TYPE_CHECKING, Optional
-from psycopg2 import connect
+from psycopg2 import connect, connection
+from functools import wraps
 
 if TYPE_CHECKING:
     from drawfit.domain.league import League
@@ -9,6 +10,8 @@ if TYPE_CHECKING:
 import drawfit.domain.notifications as notf
 import drawfit.domain.league as l
 from drawfit.dtos import LeagueDto, DomainDto
+from drawfit.database.drawfit_database_error import DrawfitDatabaseError
+from drawfit.database.db_messages import *
 
 from drawfit.utils import Sites, OddSample, LeagueCode
 
@@ -16,25 +19,55 @@ class DatabaseStore:
     
     def __init__(self) -> NoReturn:
         # No caching
-        self.cursor = connect("dbname='template1' user='dbuser' host='localhost' password='dbpass'")
+        self._db_connection = None
+    
+    def __enter__(self) -> DatabaseStore:
+        self._db_connection = connect(dbname='drawfit_mock', user='drawfit_bot', host='localhost', password='McMahaeWsNoBeat')
+        return self
 
-    def getLeague(self, league_id: str) -> Optional[League]:
-        try:
-            index = int(league_id)-1
+    def __exit__(self) -> NoReturn:
+        self._db_connection.rollback()
+        self._db_connection.close()
+        self._db_connection = None
+    
+    @property
+    def db_connection() -> Optional[connection]:
+        return _db_connection
+
+    def getAllSites() -> List[str]:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM site;")
+            stored_sites = cursor.fetchall()
+        
+        return [site for site in Sites if (site.value,) in stored_sites]
+
+
+    def getAllColors() -> Tuple[Tuple[str, int]]:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("SELECT * FROM color;")
+            stored_colors = cursor.fetchall()
+        
+        return tuple(color_tuple for color_tuple in stored_colors)
+        
+
+    def getLeague(self, league_name: str, ghost: bool =False) -> Optional[League]:
+        with self.db_connection.cursor() as cursor:
             
-            if index >= len(self.known_leagues):
-                return None
+            cursor.execute("SELECT * FROM league WHERE name=(%s);", (league_id))
+            result = cursor.fetchall()
+            if len(result) != 1:
+                raise DrawfitDatabaseError(LeagueNotFound(league_id))
             
-            return self.known_leagues[index]
-
-        except ValueError:
-            return next((league for league in self.known_leagues if league.name == league_id), None)
-
-
-
-
-
-
+            league = l.League(result[0][0])
+            league.color = result[0][1]
+            
+            cursor.execute("SELECT site_name, code FROM league_code WHERE league_name = (%s);", (league_id))
+            
+            
+            
+            if ghost:
+                return league
+            
 
     async def removeRoutine(self) -> NoReturn:
         pass
