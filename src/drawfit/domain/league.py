@@ -11,11 +11,11 @@ from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCode, LeagueCodeEr
 
 class League:
 
-    def __init__(self, name: str):
+    def __init__(self, name: str, color: int = 0xffffff):
         
         self._name: str = name
         self._active: bool = True
-        self._color: int = 0xffffff
+        self._color: int = color
 
         self._current_games: List[Game] = []
 
