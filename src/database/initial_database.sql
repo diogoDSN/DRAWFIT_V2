@@ -21,6 +21,7 @@ CREATE TABLE site(
 
 CREATE TABLE team(
     name        VARCHAR(80)     NOT NULL UNIQUE,
+    active      BOOLEAN         NOT NULL,
 
     CONSTRAINT  pk_team PRIMARY KEY(name)
 );
@@ -72,9 +73,9 @@ CREATE TABLE plays_in(
 
 CREATE TABLE game(
     name            VARCHAR(80)             NOT NULL,
-    date            TIMESTAMPTZ             NOT NULL,
+    date            TIMESTAMP               NOT NULL,
     team1_name      VARCHAR(80)             NOT NULL,
-    team2_name      VARCHAR(80)             ,
+    team2_name      VARCHAR(80)                     ,
     league_name     VARCHAR(80)             NOT NULL,
 
     CONSTRAINT pk_game          PRIMARY KEY(name, date),
@@ -85,10 +86,10 @@ CREATE TABLE game(
 
 CREATE TABLE odd(
     game_name       VARCHAR(80)             NOT NULL,
-    game_date       TIMESTAMPTZ             NOT NULL,
+    game_date       TIMESTAMP               NOT NULL,
     site_name       VARCHAR(80)             NOT NULL,
-    value           NUMERIC(4, 2)  NOT NULL,
-    date            TIMESTAMPTZ             NOT NULL,
+    value           NUMERIC(4, 2)           NOT NULL,
+    date            TIMESTAMP               NOT NULL,
 
     CONSTRAINT pk_odd           PRIMARY KEY(game_name, game_date, site_name),
     CONSTRAINT fk_odd_game      FOREIGN KEY(game_name, game_date) REFERENCES game(name, date),
