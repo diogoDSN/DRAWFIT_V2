@@ -1,3 +1,4 @@
+from .sites import valid_sites
 from .sites import Sites
 from .odd_sample import OddSample
 
