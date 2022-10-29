@@ -223,7 +223,7 @@ class League:
             if game.updateDate(sample):
                 return notf.DateChangeNotification(game, site, self.color)
 
-            if game.addOdd(sample, site):
+            if game.addOdd(sample.odd, sample.sample_time, site):
                 return notf.NewOddNotification(game, site, self.color)
             return None
 
@@ -235,7 +235,7 @@ class League:
 
             if team.isGameByDate(sample.start_time):
                 team.current_game.setId(site, sample.game_id)
-                team.current_game.addOdd(sample, site)
+                team.current_game.addOdd(sample.odd, sample.sample_time, site)
 
                 return notf.NewOddNotification(team.current_game, site, self.color)
 
@@ -248,7 +248,7 @@ class League:
 
             new_game = Game(sample.game_name, date=sample.start_time, team1=team)
             new_game.setId(site, sample.game_id)
-            new_game.addOdd(sample, site)
+            new_game.addOdd(sample.odd, sample.sample_time, site)
 
             self._current_games.append(new_game)
             team.current_game = new_game

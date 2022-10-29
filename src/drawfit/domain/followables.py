@@ -92,7 +92,7 @@ class Followable:
 
 class Game(Followable):
 
-    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team1: Team = None, team2: Team = None):
+    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team: Team = None):
         
         if keywords is None:
             keywords = []
@@ -103,7 +103,7 @@ class Game(Followable):
         self._name: str = name
         self._date: datetime = date
         self._odds = {site: [] for site in Sites}
-        self._teams = [team1, team2]
+        self._team = team
         
 
     @property
@@ -124,20 +124,12 @@ class Game(Followable):
         return self._odds
 
     @property
-    def team1(self) -> Team:
-        return self._teams[0]
+    def team(self) -> Optional[Team]:
+        return self._team
 
-    @team1.setter  
-    def team1(self, team: Team) -> NoReturn:
-        self._teams[0] = team
-
-    @property
-    def team2(self) -> Team:
-        return self._teams[1]
-
-    @team2.setter  
-    def team2(self, team: Team) -> NoReturn:
-        self._teams[1] = team
+    @team.setter  
+    def team(self, team: Team) -> NoReturn:
+        self._team = team
 
     def hoursLeft(self, time: datetime = None) -> float:
 
@@ -162,10 +154,10 @@ class Game(Followable):
         
         return False
 
-    def addOdd(self, sample: OddSample, site: Sites) -> bool:
+    def addOdd(self, odd_value: float, odd_datetime: datetime, site: Sites) -> bool:
 
-        if  self.odds[site] == [] or self.odds[site][-1].value != sample.odd:
-            self._odds[site].append(o.Odd(sample.odd, sample.sample_time, self))
+        if  self.odds[site] == [] or self.odds[site][-1].value != odd_value:
+            self._odds[site].append(o.Odd(odd_value, odd_datetime, self))
 
             current_odds = {each_site: (0 if self.odds[each_site] == [] else self.odds[each_site][-1].value) for each_site in Sites}
 
