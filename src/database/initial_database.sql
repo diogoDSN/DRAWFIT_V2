@@ -27,8 +27,8 @@ CREATE TABLE team(
 );
 
 CREATE TABLE team_id(
-    team_name   VARCHAR(80)     NOT NULL UNIQUE,
-    site_name   VARCHAR(80)     NOT NULL UNIQUE,
+    team_name   VARCHAR(80)     NOT NULL,
+    site_name   VARCHAR(80)     NOT NULL,
     id          VARCHAR(80)     NOT NULL,
 
     CONSTRAINT pk_team_id       PRIMARY KEY(team_name, site_name),
@@ -82,6 +82,17 @@ CREATE TABLE game(
     CONSTRAINT fk_game_team1    FOREIGN KEY(team_name) REFERENCES team(name),
     CONSTRAINT fk_game_league   FOREIGN KEY(league_name) REFERENCES league(name),
     CONSTRAINT fk_plays_in      FOREIGN KEY(team_name, league_name) REFERENCES plays_in(team_name, league_name)
+);
+
+CREATE TABLE game_id(
+    game_name   VARCHAR(80)     NOT NULL,
+    game_date   TIMESTAMP       NOT NULL,
+    site_name   VARCHAR(80)     NOT NULL,
+    id          VARCHAR(80)     NOT NULL,
+
+    CONSTRAINT pk_game_id       PRIMARY KEY(game_name, game_date, site_name),
+    CONSTRAINT fk_game_id_game  FOREIGN KEY(game_name, game_date) REFERENCES game(name, date),
+    CONSTRAINT fk_game_id_site  FOREIGN KEY(site_name) REFERENCES site(name)
 );
 
 CREATE TABLE odd(
@@ -182,3 +193,4 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON odd TO drawfit_bot;
 GRANT SELECT, INSERT, UPDATE, DELETE ON plays_in TO drawfit_bot;
 GRANT SELECT, INSERT, UPDATE, DELETE ON team TO drawfit_bot;
 GRANT SELECT, INSERT, UPDATE, DELETE ON team_id TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON game_id TO drawfit_bot;
