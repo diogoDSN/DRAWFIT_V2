@@ -78,10 +78,12 @@ CREATE TABLE game(
     team2_name      VARCHAR(80)                     ,
     league_name     VARCHAR(80)             NOT NULL,
 
-    CONSTRAINT pk_game          PRIMARY KEY(name, date),
-    CONSTRAINT fk_game_team1    FOREIGN KEY(team1_name) REFERENCES team(name),
-    CONSTRAINT fk_game_team2    FOREIGN KEY(team2_name) REFERENCES team(name),
-    CONSTRAINT fk_game_league   FOREIGN KEY(league_name) REFERENCES league(name)
+    CONSTRAINT pk_game                  PRIMARY KEY(name, date),
+    CONSTRAINT one_team1_at_timestamp   UNIQUE (date, team1_name),
+    CONSTRAINT one_team2_at_timestamp   UNIQUE (date, team2_name),
+    CONSTRAINT fk_game_team1            FOREIGN KEY(team1_name) REFERENCES team(name),
+    CONSTRAINT fk_game_team2            FOREIGN KEY(team2_name) REFERENCES team(name),
+    CONSTRAINT fk_game_league           FOREIGN KEY(league_name) REFERENCES league(name)
 );
 
 CREATE TABLE odd(
