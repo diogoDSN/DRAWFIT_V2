@@ -72,18 +72,16 @@ CREATE TABLE plays_in(
 );
 
 CREATE TABLE game(
+    team_name       VARCHAR(80)             NOT NULL,
     name            VARCHAR(80)             NOT NULL,
     date            TIMESTAMP               NOT NULL,
-    team1_name      VARCHAR(80)             NOT NULL,
-    team2_name      VARCHAR(80)                     ,
     league_name     VARCHAR(80)             NOT NULL,
 
-    CONSTRAINT pk_game                  PRIMARY KEY(name, date),
-    CONSTRAINT one_team1_at_timestamp   UNIQUE (date, team1_name),
-    CONSTRAINT one_team2_at_timestamp   UNIQUE (date, team2_name),
-    CONSTRAINT fk_game_team1            FOREIGN KEY(team1_name) REFERENCES team(name),
-    CONSTRAINT fk_game_team2            FOREIGN KEY(team2_name) REFERENCES team(name),
-    CONSTRAINT fk_game_league           FOREIGN KEY(league_name) REFERENCES league(name)
+    CONSTRAINT pk_game          PRIMARY KEY (team_name, date),
+    CONSTRAINT game_name_date   UNIQUE (name, date),
+    CONSTRAINT fk_game_team1    FOREIGN KEY(team_name) REFERENCES team(name),
+    CONSTRAINT fk_game_league   FOREIGN KEY(league_name) REFERENCES league(name),
+    CONSTRAINT fk_plays_in      FOREIGN KEY(team_name, league_name) REFERENCES plays_in(team_name, league_name)
 );
 
 CREATE TABLE odd(
@@ -106,7 +104,7 @@ CREATE TABLE odd(
 DROP TRIGGER IF EXISTS check_odd_sampled_before_game_update_trigger ON odd;
 DROP TRIGGER IF EXISTS check_odd_sampled_before_game_insert_trigger ON odd;
 
---(IC-1) An odd's datetime must be before the game's start datetime
+--(IC-1) An odd's datetime must be before the game's start datetime--
 CREATE OR REPLACE FUNCTION check_odd_sampled_before_game() 
 RETURNS TRIGGER AS
 $$
@@ -132,6 +130,41 @@ CREATE TRIGGER check_odd_sampled_before_game_insert_trigger
 BEFORE INSERT ON odd
 FOR EACH ROW
 EXECUTE PROCEDURE check_odd_sampled_before_game();
+
+
+DROP TRIGGER IF EXISTS check_only_current_game_update_trigger ON game;
+DROP TRIGGER IF EXISTS check_only_current_game_insert_trigger ON game;
+
+--(IC-2) Each team can only have one game registered in the future--
+CREATE OR REPLACE FUNCTION check_only_current_game() 
+RETURNS TRIGGER AS
+$$
+DECLARE unidades_var INTEGER;
+
+BEGIN
+    -- Checks if the inserted/updated game is in the future and if there exists another game in the future for the same team
+    IF NEW.date > current_timestamp and 
+       EXISTS(SELECT * FROM game WHERE team_name = NEW.team_name AND date > current_timestamp) 
+    THEN
+        RAISE EXCEPTION 'Tried insertign/updating game %. The new games date is invalid: %. There is another current game for the same team.',
+                        NEW.name, NEW.date;
+    END IF;
+
+    RETURN new;
+END
+$$
+LANGUAGE plpgsql;
+
+
+CREATE TRIGGER check_only_current_game_update_trigger 
+BEFORE UPDATE OF date ON game
+FOR EACH ROW WHEN (OLD.* IS DISTINCT FROM NEW.*)
+EXECUTE PROCEDURE check_only_current_game();
+
+CREATE TRIGGER check_only_current_game_insert_trigger 
+BEFORE INSERT ON game
+FOR EACH ROW
+EXECUTE PROCEDURE check_only_current_game();
 
 ----------------------------------------
 -- Role Creation
