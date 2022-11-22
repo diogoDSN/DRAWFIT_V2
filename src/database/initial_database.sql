@@ -102,7 +102,7 @@ CREATE TABLE odd(
     value           NUMERIC(4, 2)           NOT NULL,
     date            TIMESTAMP               NOT NULL,
 
-    CONSTRAINT pk_odd           PRIMARY KEY(game_name, game_date, site_name),
+    CONSTRAINT pk_odd           PRIMARY KEY(game_name, game_date, site_name, date),
     CONSTRAINT fk_odd_game      FOREIGN KEY(game_name, game_date) REFERENCES game(name, date),
     CONSTRAINT fk_odd_site      FOREIGN KEY(site_name) REFERENCES site(name)
 );
