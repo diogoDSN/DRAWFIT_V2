@@ -1,6 +1,6 @@
 import asyncio
 
-from typing import List, Tuple, NoReturn, Dict
+from typing import List, Tuple, NoReturn, Dict, Set
 from datetime import datetime
 
 import drawfit.domain.notifications as notf
@@ -19,7 +19,7 @@ class League:
 
         self._current_games: List[Game] = []
 
-        self._followed_teams: List[Team] = []
+        self._teams: Dict[str, Team] = {}
         self._inactive_teams: List[Team] = []
 
         self._league_codes: Dict[Sites, LeagueCode] = {site: None for site in Sites}
@@ -45,8 +45,8 @@ class League:
         return self._current_games
 
     @property
-    def followed_teams(self) -> List[Team]:
-        return self._followed_teams
+    def teams(self) -> Set[Team]:
+        return self._teams
     
     @property
     def inactive_teams(self) -> List[Team]:
@@ -55,6 +55,9 @@ class League:
     @property
     def codes(self) -> List[LeagueCode]:
         return self._league_codes
+
+    def addTeam(self, team: Team) -> NoReturn:
+        self._teams[team.name] = team
     
     def setCode(self, code: LeagueCode) -> NoReturn:
         self._league_codes[code.getSite()] = code
@@ -63,16 +66,6 @@ class League:
         new_game = Game(name, date)
         if new_game not in self.current_games:
             self._current_games.append(new_game)
-        
-    def addGameKeywords(self, game_name: str, keywords: List[str]) -> bool:
-
-        game = next((game for game in self.current_games if game.name == game_name), None)
-
-        if game is not None:
-            game.addKeywords(keywords)
-            return True
-        
-        return False
 
     def registerTeam(self, name: str) -> bool:
 
@@ -201,51 +194,59 @@ class League:
                 if notification not in results and notification is not None:
                     results.append(notification)
                 elif notification is not None:
-                    for previous_notification in results:
-                        if previous_notification == notification:
-                            previous_notification.mergeNotifications(notification)
-                            break
+                    results[results.index(notification)].mergeNotifications(notification)
                         
         return results
 
 
     def processSample(self, site: Sites, sample: OddSample) -> notf.Notification:
+        # TODO database integration
 
         # 1 - sample's game name is being monitored so the odd is added
-        game = next((game for game in self.current_games if game.isId(site, sample.game_id)), None)
+        team = next((team for team in self.teams.values() \
+                if not team.current_game is None and team.current_game.isId(site, sample.game_id)\
+                    ), None)
 
-        if game is not None:
+        if team is not None:
+            game = team.current_game
 
+            # Odd after game start
             if sample.start_time <= sample.sample_time:
-                self.removeGame(game)
+                self.endGame(game)
                 return None
             
+            # New date
             if game.updateDate(sample):
                 return notf.DateChangeNotification(game, site, self.color)
 
+            # Add odd to game
             if game.addOdd(sample.odd, sample.sample_time, site):
                 return notf.NewOddNotification(game, site, self.color)
             return None
 
 
         # 2 - test if the game has a team that is recognized
-        team = next((team for team in self.followed_teams if team.isId(site, sample.team1_id) or team.isId(site, sample.team2_id)), None)
+        team = next((team for team in self.teams \
+                if team.isId(site, sample.team1_id) or team.isId(site, sample.team2_id)\
+                    ), None)
         
         if team is not None and sample.start_time >= sample.sample_time:
 
+            # Is current game but with different date (may vary by site)
             if team.isGameByDate(sample.start_time):
                 team.current_game.setId(site, sample.game_id)
                 team.current_game.addOdd(sample.odd, sample.sample_time, site)
 
                 return notf.NewOddNotification(team.current_game, site, self.color)
 
+            # Different game at a later date
             if team.hasGame() and team.current_game.date < sample.start_time:
                 return None
             
+            # Different game earlier than previously registered game
             elif team.hasGame():
                 self.current_games.remove(team.current_game)
-                
-
+            
             new_game = Game(sample.game_name, date=sample.start_time, team1=team)
             new_game.setId(site, sample.game_id)
             new_game.addOdd(sample.odd, sample.sample_time, site)
@@ -264,13 +265,6 @@ class League:
             if possible_team is not None:
                 possible_team.addConsidered(site, team_id)
                 return notf.PossibleTeamNotification(possible_team, sample, team_id, site, self.color)
-        
-        # 4 - test if the game could be a singled out inputed game
-        possible_game = next((game for game in self.current_games if game.couldBeId(site, sample.game_id)), None)
-
-        if possible_game is not None:
-            possible_game.addConsidered(site, sample.game_id)
-            return notf.PossibleGameNotification(possible_game, sample, site, self.color)
         
         return None
 

@@ -1,5 +1,6 @@
 import re
 from abc import abstractmethod
+from typing import Optional
 
 from drawfit.utils.sites import Sites
 from drawfit.utils.league_codes.league_code_error import LeagueCodeError

@@ -4,50 +4,117 @@ from typing import Dict, List, Tuple, NoReturn, TYPE_CHECKING, Optional
 
 if TYPE_CHECKING:
     from drawfit.domain.league import League
+    from drawfit.domain.followables import Team
 
 import drawfit.domain.notifications as notf
 import drawfit.domain.league as l
+import drawfit.database.database_store as d
 from drawfit.dtos import LeagueDto, DomainDto
 
 from drawfit.utils import Sites, OddSample, LeagueCode
 
 class DomainStore:
 
-    colors_list = (
-        ('White', 0xFFFFFF),
-        ('Red', 0xFF0000),
-        ('Orange', 0xFF7000),
-        ('Yellow', 0xFFFF00),
-        ('Cyan', 0x42D4F4),
-        ('Blue', 0x4363D8),
-        ('Navy', 0x000075),
-        ('Green', 0x3CB44B),
-        ('Lime', 0xBFEF45),
-        ('Mint', 0xAAFFC3),
-        ('Pink', 0xF032E6),
-        ('Purple', 0x800080),
-        ('Lavender', 0xDCBEFF),
-        ('Maroon', 0x800000),
-        ('Olive', 0x808000),
-        ('Apricot', 0xFFD8B1),
-        ('Brown', 0x9A6324),
-        ('Gray', 0x808080)
-    )
+
+    #----------------------------------------------------------------------
+    #-------------- Initialization Methods
+    #----------------------------------------------------------------------
 
     def __init__(self) -> NoReturn:
-        self.known_leagues = []
+        self.db_store = d.DatabaseStore()
+        
+        with self.db_store as db:
+            # set all valid colors
+            DomainStore.colors_list = db.getAllColors()
+        
+        self.teams = []
+        
+        # fetch all leagues and teams
+        self.leagues = {league.name: league for league in self.loadAllLeagues()}
+        self.teams = {team.name: team for team in self.loadAllTeams()}
 
-    def getLeague(self, league_id: str) -> Optional[League]:
-        try:
-            index = int(league_id)-1
+        # fetch current game for each team if any
+        with self.db_store as db:
+            for team in self.teams.values():
+                team.current_game = db.getCurrentGame(team.name)    
+    
+    def loadAllLeagues(self) -> List[League]:
+        with self.db_store as db:
+            # fetch leagues
+            leagues = db.getAllLeagues()
             
-            if index >= len(self.known_leagues):
-                return None
+            # add registered teams to corresponding leagues
+            for league in leagues:
+                team_names = db.getTeamNamesFromLeague(league.name)
+                
+                for team_name in team_names:
+                    if team_name in self.teams:
+                        league.addTeam(self.teams[team_name])
+                        self.teams[team_name].addLeague(league)
+        
+        return leagues
+    
+    def loadAllTeams(self) -> List[Team]:
+        with self.db_store as db:
+            # fetch leagues
+            teams = db.getAllTeams()
             
-            return self.known_leagues[index]
+            # add registered teams to corresponding leagues
+            for team in teams:
+                league_names = db.getLeagueNamesFromTeam(team.name)
+                
+                for league_name in league_names:
+                    if league_name in self.leagues:
+                        team.addLeague(self.leagues[league_name])
+                        self.leagues[league_name].addTeam(team)
+        
+        return teams
+    
+    #----------------------------------------------------------------------
+    #-------------- Update Methods
+    #----------------------------------------------------------------------
+    
+    def updateLeaguesOdds(self, results: Dict[str, List[List[OddSample]]]) -> List[notf.Notification]:
 
-        except ValueError:
-            return next((league for league in self.known_leagues if league.name == league_id), None)
+        notifications = []
+
+        for league_name, odd_samples in results.items():
+            league = self.getLeague(league_name)
+            notifications.extend(league.UpdateOdds(odds_sample))
+        
+        return notifications
+    
+    #----------------------------------------------------------------------
+    #-------------- Registration Methods
+    #----------------------------------------------------------------------
+    
+    def registerLeague(self, league_name: str) -> None:
+        with self.db_store as db:
+            db.registerLeague(league_name, 0xfffff)
+            self.leagues[league_name] = db.getLeague(league_name)
+        
+    
+    def registerTeam(self, team_name: str) -> None:
+        with self.db_store as db:
+            db.registerTeam(team_name)
+            self.teams[team_name] = db.getTeam(team_name)
+    
+    def registerLeagueCode(self, league_name: str, site: Site, code: LeagueCode) -> None:
+        with self.db_store as db:
+            if self.leagues[league_name].codes[site] is None:
+                db.addLeagueCode(league_name, site, str(code))
+            else:
+                db.updateLeagueCode()
+        
+        self.leagues[league_name].setCode(code)
+    
+    
+    
+        
+    
+    #----------------------------------------------------------------------
+    #-------------- Old Store
+    #----------------------------------------------------------------------
 
 
     async def removeRoutine(self) -> NoReturn:
@@ -124,15 +191,6 @@ class DomainStore:
         
         return result
 
-    def updateLeaguesOdds(self, results: Dict[str, List[List[OddSample]]]) -> List[notf.Notification]:
-
-        notifications = []
-
-        for league_id, odds_sample in results.items():
-            league = next(league for league in self.known_leagues if league.name == league_id)
-            notifications.extend(league.updateOdds(odds_sample))
-        
-        return notifications
 
     def activateTeam(self, league_id: str, team_id: str) -> bool:
         league = self.getLeague(league_id)

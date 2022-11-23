@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 import asyncio
-import pickle
 
 from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn
 
 import discord
 from discord.ext import commands
 
-from drawfit.parameters import PERMISSIONS, SAVE_PATH, COMMAND_CHANNELS, UPDATES_CHANNELS, QUERIES_CHANNELS
+from drawfit.parameters import PERMISSIONS, COMMAND_CHANNELS, UPDATES_CHANNELS, QUERIES_CHANNELS
 
-import drawfit.domain.database_store as db_store
+import drawfit.database.database_store as db_store
 import drawfit.domain.domain_store as store
 import drawfit.updates.update_handler as updates
 
@@ -33,19 +32,11 @@ class DrawfitBot(commands.Bot):
         intents.members = True
         super().__init__(command_prefix='.', intents=intents)
 
-
-        db_store = db_store.DatabaseStore()
         global valid_sites
-        with db_store:
-            valid_sites.extend(db_store.getAllSites())
+        with db_store.DatabaseStore() as db:
+            valid_sites.extend(db.getAllSites())
         
-
-        try:
-            with open(SAVE_PATH, 'rb') as f:
-                self.store = pickle.load(f)
-        except Exception:
-            #TODO add database_store to domain store __init__
-            self.store = store.DomainStore()
+        self.store = store.DomainStore()
         
         self.pending_queries: List[asyncio.Task] = []
         self.routines: List[asyncio.Task] = []

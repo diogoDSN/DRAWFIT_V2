@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import NoReturn, List, Tuple, Dict, Optional
+from typing import NoReturn, List, Tuple, Dict, Optional, TYPE_CHECKING
 
 import drawfit.domain.odd as o
+
+if TYPE_CHECKING:
+    from drawfit.domain.league import League
 
 from drawfit.utils import Sites, OddSample, now_lisbon
 
@@ -183,6 +186,7 @@ class Team(Followable):
         self._name = name
         self._active: bool = True
         self._current_game = None
+        self._leagues = {}
     
     @property
     def name(self) -> str:
@@ -203,6 +207,13 @@ class Team(Followable):
     @current_game.setter
     def current_game(self, game: Optional[Game]) -> NoReturn:
         self._current_game = game
+    
+    @property
+    def leagues(self) -> Dict[League]:
+        return self._leagues
+    
+    def addLeague(self, league: League) -> NoReturn:
+        self._leagues[league.name] = league
     
     def hasGame(self) -> bool:
         return self.current_game != None

@@ -1,5 +1,7 @@
+from __future__ import annotations
+
 from enum import Enum
-from typing import Generator
+from typing import Generator, Optional
 
 valid_sites = []
 
@@ -27,7 +29,7 @@ class Sites(Enum):
             return 'BWAY'
     
     @classmethod
-    def SiteFromName(site_name: str) -> Optional[Sites]:
+    def SiteFromName(cls, site_name: str) -> Optional[Sites]:
         return next((site for site in Sites if site.value == site_name), None)
     
     def __iter__(self) -> Generator[Site]:
