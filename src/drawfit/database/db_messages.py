@@ -1,6 +1,9 @@
 def SiteNotFound(name: str) -> str:
     return f'The given site: [{name}], was not found in the database.'
 
+def ColorNotFound(name: str) -> str:
+    return f'The given color: [{name}] was not found in the database.'
+
 def LeagueNotFound(name: str) -> str:
     return f'The given league: [{name}], was not found in the database.'
 

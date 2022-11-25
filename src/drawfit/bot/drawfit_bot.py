@@ -133,9 +133,6 @@ class DrawfitBot(commands.Bot):
 
     def teamIdAccepted(self, team_name: str, team_id: Tuple[str], site: Sites, league_name: str):
         self.store.setTeamId(team_name, team_id, site, league_name)
-        
-    def gameIdAccepted(self, game_name: str, game_id: Tuple[str], site: Sites, league_name: str):
-        self.store.setGameId(game_name, game_id, site, league_name)
     
     def endTask(self, task: asyncio.Task):
         self.notify_tasks.remove(task)

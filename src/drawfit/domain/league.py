@@ -1,10 +1,15 @@
+from __future__ import annotations
+
 import asyncio
 
-from typing import List, Tuple, NoReturn, Dict, Set
+from typing import List, Tuple, NoReturn, Dict, Set, TYPE_CHECKING
 from datetime import datetime
 
 import drawfit.domain.notifications as notf
 from drawfit.domain.followables import Game, Team 
+
+if TYPE_CHECKING:
+    from drawfit.database.database_store import DatabaseStore
 
 from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCode, LeagueCodeError, now_lisbon
 
@@ -14,7 +19,6 @@ class League:
     def __init__(self, name: str, color: int = 0xffffff):
         
         self._name: str = name
-        self._active: bool = True
         self._color: int = color
 
         self._current_games: List[Game] = []
@@ -27,10 +31,6 @@ class League:
     @property
     def name(self) -> str:
         return self._name
-    
-    @property
-    def active(self) -> bool:
-        return self._active
     
     @property
     def color(self) -> int:
@@ -61,11 +61,6 @@ class League:
     
     def setCode(self, code: LeagueCode) -> NoReturn:
         self._league_codes[code.getSite()] = code
-
-    def registerGame(self, name: str, date: datetime = None) -> NoReturn:
-        new_game = Game(name, date)
-        if new_game not in self.current_games:
-            self._current_games.append(new_game)
 
     def registerTeam(self, name: str) -> bool:
 
@@ -132,22 +127,14 @@ class League:
         
         return False
     
-    def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites) -> NoReturn:
+    def setTeamId(self, team_name: str, team_id: Tuple[str], site: Sites, db_store: DatabaseStore) -> NoReturn:
 
-        team = next((team for team in self.followed_teams if team.name == team_name), None)
+        team = next((team for team in self.teams.values() if team.name == team_name), None)
         if team is not None:
+            with db_store as db:
+                db.addTeamId(team_name, site, team_id)
             team.setId(site, team_id)
             return
-
-        team = next((team for team in self.inactive_teams if team.name == team_name), None)
-        if team is not None:
-            team.setId(site, team_id)
-
-    def setGameId(self, game_name: str, game_id: Tuple[str], site: Sites) -> NoReturn:
-        
-        game = next((game for game in self.current_games if game.name == game_name), None)
-        if game is not None:
-            game.setId(site, game_id)
     
     def eraseId(self, team_name: str, id_to_erase: str) -> bool:
 
@@ -178,7 +165,7 @@ class League:
                 self.removeGame(game)
 
 
-    def updateOdds(self, samples_by_site: Dict[Sites, List[OddSample]]) -> List[notf.Notification]:
+    def updateOdds(self, samples_by_site: Dict[Sites, List[OddSample]], db_store: DatabaseStore) -> List[notf.Notification]:
 
         results = []
 
@@ -189,7 +176,7 @@ class League:
                 continue
 
             for sample in site_samples:
-                notification = self.processSample(site, sample)
+                notification = self.processSample(site, sample, db_store)
 
                 if notification not in results and notification is not None:
                     results.append(notification)
@@ -199,12 +186,11 @@ class League:
         return results
 
 
-    def processSample(self, site: Sites, sample: OddSample) -> notf.Notification:
+    def processSample(self, site: Sites, sample: OddSample, db_store: DatabaseStore) -> notf.Notification:
         # TODO database integration
-
         # 1 - sample's game name is being monitored so the odd is added
         team = next((team for team in self.teams.values() \
-                if not team.current_game is None and team.current_game.isId(site, sample.game_id)\
+                if (not team.current_game is None) and team.current_game.isId(site, sample.game_id)\
                     ), None)
 
         if team is not None:
@@ -212,21 +198,26 @@ class League:
 
             # Odd after game start
             if sample.start_time <= sample.sample_time:
-                self.endGame(game)
+                team.current_game = None
                 return None
             
             # New date
-            if game.updateDate(sample):
+            if game.canUpdateDate(sample):
+                with db_store as db:
+                    db.updateGameDate(self, sample.start_time)
+                game.updateDate(sample)
                 return notf.DateChangeNotification(game, site, self.color)
 
-            # Add odd to game
-            if game.addOdd(sample.odd, sample.sample_time, site):
-                return notf.NewOddNotification(game, site, self.color)
+            if game.canAddOdd(sample.odd, sample.sample_time, site):
+                with db_store as db:
+                    db.registerOdd(game.name, game.date, site, sample.odd, sample.sample_time)
+                # Add odd to game
+                if game.addOdd(sample.odd, sample.sample_time, site):
+                    return notf.NewOddNotification(game, site, self.color)
             return None
 
-
         # 2 - test if the game has a team that is recognized
-        team = next((team for team in self.teams \
+        team = next((team for team in self.teams.values() \
                 if team.isId(site, sample.team1_id) or team.isId(site, sample.team2_id)\
                     ), None)
         
@@ -234,6 +225,12 @@ class League:
 
             # Is current game but with different date (may vary by site)
             if team.isGameByDate(sample.start_time):
+                game = team.current_game
+                with db_store as db:
+                    db.addGameId(game.name, game.date, site, sample.game_id)
+                    if game.canAddOdd(sample.odd, sample.sample_time, site):
+                        db.registerOdd(game.name, game.date, site, sample.odd, sample.sample_time)
+                
                 team.current_game.setId(site, sample.game_id)
                 team.current_game.addOdd(sample.odd, sample.sample_time, site)
 
@@ -247,7 +244,13 @@ class League:
             elif team.hasGame():
                 self.current_games.remove(team.current_game)
             
-            new_game = Game(sample.game_name, date=sample.start_time, team1=team)
+            new_game = Game(sample.game_name, sample.start_time, team)
+            
+            with db_store as db:
+                db.registerGame(team.name, new_game.name, new_game.date, self.name)
+                db.addGameId(new_game.name, new_game.date, site, sample.game_id)
+                db.registerOdd(new_game.name, new_game.date, site, sample.odd, sample.sample_time)
+            
             new_game.setId(site, sample.game_id)
             new_game.addOdd(sample.odd, sample.sample_time, site)
 
@@ -260,11 +263,11 @@ class League:
         for team_name in sample.game_id:
 
             team_id = (team_name, )
-            possible_team = next((team for team in self.followed_teams if team.couldBeId(site, team_id)), None)
+            possible_team = next((team for team in self.teams.values() if team.couldBeId(site, team_id)), None)
 
             if possible_team is not None:
                 possible_team.addConsidered(site, team_id)
-                return notf.PossibleTeamNotification(possible_team, sample, team_id, site, self.color)
+                return notf.PossibleTeamNotification(possible_team, sample, team_id, site, self.color, db_store)
         
         return None
 

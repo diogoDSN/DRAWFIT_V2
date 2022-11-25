@@ -6,6 +6,7 @@ from typing import NoReturn, Tuple
 
 import drawfit.bot.notify as v
 import drawfit.domain.followables as followables
+import drawfit.database.database_store as d
 
 from drawfit.utils import Sites, OddSample, now_lisbon, str_dates
 
@@ -55,20 +56,28 @@ class NewOddNotification(Notification):
             
         
         return info + '```'
+    
 
+class PossibleTeamNotification(Notification):
 
-class PossibleNotification(Notification):
-
-    def __init__(self, sample: OddSample, possible_id: Tuple[str], site: Sites, color: int):
+    def __init__(self, team: followables.Team, sample: OddSample, team_id: Tuple[str], site: Sites, color: int, db_store: d.DatabaseStore):
+        self.db_store = db_store
+        self.team = team
         self.sample = sample
-        self.possible_id = possible_id
+        self.possible_id = team_id
         self.site = site
         self.color = color
     
-    @property
-    @abstractmethod
-    def followable(self) -> followables.Followable:
-        pass
+    def registerId(self) -> NoReturn:
+        with self.db_store as db:
+            db.addTeamId(self.team.name, self.site, self.possible_id)
+        self.team.setId(self.site, self.possible_id)
+    
+    def removeConsidered(self) -> NoReturn:
+        self.team.removeConsidered(self.site, self.possible_id)
+    
+    def __repr__(self) -> str:
+        return str(self)
 
     def __eq__(self, o) -> bool:
         return False
@@ -77,30 +86,7 @@ class PossibleNotification(Notification):
         return '> ' + ' vs '.join(self.possible_id)
 
     async def accept(self, visitor: v.Notify):
-        await visitor.visitPossible(self)
-
-class PossibleGameNotification(PossibleNotification):
-
-    def __init__(self, game: followables.Game, sample: OddSample, site: Sites, color: int):
-        super().__init__(sample, sample.game_id, site, color)
-        self._game = game
-    
-    @property
-    def followable(self) -> followables.Followable:
-        return self._game
-
-class PossibleTeamNotification(PossibleNotification):
-
-    def __init__(self, team: followables.Team, sample: OddSample, team_id: Tuple[str], site: Sites, color: int):
-        super().__init__(sample, team_id, site, color)
-        self._team = team
-    
-    @property
-    def followable(self) -> followables.Followable:
-        return self._team
-    
-    def __repr__(self) -> str:
-        return str(self)
+        await visitor.visitPossibleTeam(self)
 
 class DateChangeNotification(Notification):
 

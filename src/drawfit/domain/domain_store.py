@@ -23,10 +23,6 @@ class DomainStore:
     def __init__(self) -> NoReturn:
         self.db_store = d.DatabaseStore()
         
-        with self.db_store as db:
-            # set all valid colors
-            DomainStore.colors_list = db.getAllColors()
-        
         self.teams = []
         
         # fetch all leagues and teams
@@ -36,7 +32,7 @@ class DomainStore:
         # fetch current game for each team if any
         with self.db_store as db:
             for team in self.teams.values():
-                team.current_game = db.getCurrentGame(team.name)    
+                team.current_game = db.getCurrentGame(team) 
     
     def loadAllLeagues(self) -> List[League]:
         with self.db_store as db:
@@ -79,38 +75,85 @@ class DomainStore:
         notifications = []
 
         for league_name, odd_samples in results.items():
-            league = self.getLeague(league_name)
-            notifications.extend(league.UpdateOdds(odds_sample))
+            league = self.leagues[league_name]
+            notifications.extend(league.updateOdds(odd_samples, self.db_store))
         
         return notifications
     
     #----------------------------------------------------------------------
-    #-------------- Registration Methods
+    #-------------- Write Methods
     #----------------------------------------------------------------------
     
-    def registerLeague(self, league_name: str) -> None:
+    def registerLeague(self, league_name: str) -> NoReturn:
         with self.db_store as db:
             db.registerLeague(league_name, 0xfffff)
-            self.leagues[league_name] = db.getLeague(league_name)
         
+        self.leagues[league_name] = db.getLeague(league_name)
     
-    def registerTeam(self, team_name: str) -> None:
+    def registerTeam(self, team_name: str) -> NoReturn:
         with self.db_store as db:
             db.registerTeam(team_name)
-            self.teams[team_name] = db.getTeam(team_name)
+        
+        self.teams[team_name] = db.getTeam(team_name)
     
-    def registerLeagueCode(self, league_name: str, site: Site, code: LeagueCode) -> None:
+    def setLeagueCode(self, league_name: str, site: Site, code: LeagueCode) -> NoReturn:
         with self.db_store as db:
             if self.leagues[league_name].codes[site] is None:
                 db.addLeagueCode(league_name, site, str(code))
             else:
-                db.updateLeagueCode()
+                db.updateLeagueCode(league_name, site, str(code))
         
         self.leagues[league_name].setCode(code)
     
+    def setLeagueColor(self, league_name: str, color_name: str) -> NoReturn:
+        with self.db_store as db:
+            new_color = db.getColor(color_name)
+            db.updateLeagueColor(league_name, new_color)
+        
+        self.leagues[league_name].color = new_color
     
+    
+    def addTeamToLeague(self, team_name: str, league_name: str) -> NoReturn:
+        with self.db_store as db:
+            db.addTeamToLeague(team_name, league_name)
+        
+        team = self.teams[teams_name]
+        league = self.leagues[league_name]
+        team.leagues[league_name] = league
+        league.teams[team_name] = team
+    
+    def addTeamKeywords(self, team_name: str, keywords: List[str]) -> NoReturn:
+        self.teams[team_name].addKeywords(keywords)
+    
+    def activateTeam(self, team_name: str) -> NoReturn:
+        with self.db_store as db:
+            db.activateTeam(team_name)
+        
+        self.teams
+
+    def deactivateTeam(self, league_id: str, team_id: str) -> bool:
+        
+        league = self.getLeague(league_id)
+
+        if league is not None:
+            return league.deactivateTeam(team_id)
+        else:
+            return False
     
         
+    #----------------------------------------------------------------------
+    #-------------- Read Methods
+    #----------------------------------------------------------------------
+    
+    def getAllLeagueCodes(self) -> Dict[str, List[str]]:
+
+        result = {}
+
+        for league in self.leagues.values():
+            result[league.name] = league.codes.copy()
+        
+        return result
+
     
     #----------------------------------------------------------------------
     #-------------- Old Store
@@ -120,15 +163,7 @@ class DomainStore:
     async def removeRoutine(self) -> NoReturn:
         while True:
             await asyncio.sleep(3600)
-            for league in self.known_leagues:
-                league.removeRoutine()
-
-    def addLeague(self, league_name: str) -> NoReturn:
-
-        league = next((league for league in self.known_leagues if league.name == league_name), None)
-
-        if league is None:
-            self.known_leagues.append(l.League(league_name))
+            # TODO remove past games and erase their ids from the db
     
 
     def eraseLeague(self, league_id: str) -> bool:
@@ -141,29 +176,10 @@ class DomainStore:
         
         return False
 
-    def changeLeagueCode(self, league_id: str, site: Sites, newCode: LeagueCode) -> bool:
-
-        league = self.getLeague(league_id)
-
-        if league is not None:
-            league.codes[site] = newCode
-            return True
-        
-        return False
-
-    def changeLeagueColor(self, league_id: str, new_color: int) -> bool:
-
-        league = self.getLeague(league_id)
-
-        if league is not None and 0 <= new_color < len(DomainStore.colors_list):
-            league.color = DomainStore.colors_list[new_color][1]
-            return True
-        
-        return False
-
     def getDomain(self) -> DomainDto:
         return DomainDto(self.known_leagues)
 
+    
     def getLeagues(self) -> List:
 
         leagues = []
@@ -182,33 +198,6 @@ class DomainStore:
 
         return league.codes.copy()
 
-    def getAllLeagueCodes(self) -> Dict[str, List[str]]:
-
-        result = {}
-
-        for league in self.known_leagues:
-            result[league.name] = league.codes.copy()
-        
-        return result
-
-
-    def activateTeam(self, league_id: str, team_id: str) -> bool:
-        league = self.getLeague(league_id)
-
-        if league is not None:
-            return league.activateTeam(team_id)
-        else:
-            return False
-
-    def deactivateTeam(self, league_id: str, team_id: str) -> bool:
-        
-        league = self.getLeague(league_id)
-
-        if league is not None:
-            return league.deactivateTeam(team_id)
-        else:
-            return False
-
     def eraseTeam(self, league_id: str, team_id: str) -> bool:
 
         league = self.getLeague(league_id)
@@ -226,11 +215,6 @@ class DomainStore:
             return league.eraseId(team_id, id_to_erase)
         
         return False
-
-    def setGameId(self, game_name: str, game_id: Tuple[str], site: Sites, league_name: str):
-        league = next((league for league in self.known_leagues if league.name == league_name), None)
-        if league != None:
-            league.setGameId(game_name, game_id, site)
     
     def setLeagueCode(self, league_name: str, code: LeagueCode) -> NoReturn:
 
@@ -255,11 +239,3 @@ class DomainStore:
         
         return league.registerTeam(team_name)
     
-    def addTeamKeywords(self, league_id: str, team_name: str, keywords: List[str]) -> bool:
-
-        league = self.getLeague(league_id)
-
-        if league is None:
-            return False
-        
-        return league.addTeamKeywords(team_name, keywords)

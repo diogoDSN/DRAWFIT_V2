@@ -8,3 +8,7 @@ def str_dates(date: datetime) -> str:
 
 def now_lisbon():
     return datetime.now(timezone(TIME_ZONE))
+
+def utc_aware(t: datetime) -> datetime:
+    tz = timezone(TIME_ZONE)
+    return tz.localize(t)

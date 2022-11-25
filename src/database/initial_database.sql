@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS league cascade;
 DROP TABLE IF EXISTS league_code cascade;
 DROP TABLE IF EXISTS plays_in cascade;
 DROP TABLE IF EXISTS game cascade;
+DROP TABLE IF EXISTS game_id cascade;
 DROP TABLE IF EXISTS odd cascade;
 
 
@@ -88,7 +89,8 @@ CREATE TABLE game_id(
     game_name   VARCHAR(80)     NOT NULL,
     game_date   TIMESTAMP       NOT NULL,
     site_name   VARCHAR(80)     NOT NULL,
-    id          VARCHAR(80)     NOT NULL,
+    id0         VARCHAR(80)     NOT NULL,
+    id1         VARCHAR(80)     NOT NULL,
 
     CONSTRAINT pk_game_id       PRIMARY KEY(game_name, game_date, site_name),
     CONSTRAINT fk_game_id_game  FOREIGN KEY(game_name, game_date) REFERENCES game(name, date),

@@ -15,7 +15,7 @@ from drawfit.dtos import LeagueDto, DomainDto
 from drawfit.database.drawfit_database_error import DrawfitDatabaseError
 from drawfit.database.db_messages import *
 
-from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCodesFactory, str_dates
+from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCodesFactory, str_dates, utc_aware
 
 class DatabaseStore:
     
@@ -58,6 +58,16 @@ class DatabaseStore:
             stored_colors = cursor.fetchall()
         
         return tuple(color_tuple for color_tuple in stored_colors)
+    
+    def getColor(self, color_name: str) -> int:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("SELECT hex_code FROM color WHERE name=(%s)", (color_name,))
+            result = cursor.fetchall()
+        
+            if len(result) != 1:
+                raise DrawfitDatabaseError(ColorNotFound(color_name))
+            
+        return result[0][0]
 
     def getLeague(self, league_name: str) -> l.League:
         with self.db_connection.cursor() as cursor:
@@ -135,25 +145,24 @@ class DatabaseStore:
             for site_name, team_id in result:
                 site = Sites.SiteFromName(site_name)
                 if not site is None:
-                    team.setId(site, team_id)
+                    team.setId(site, (team_id,))
             
         return team
 
-    def getCurrentGame(self, team_name: str) -> Optional[f.Game]:
+    def getCurrentGame(self, team: f.Team) -> Optional[f.Game]:
         with self.db_connection.cursor() as cursor:
             
             # Fetch team and active status
-            cursor.execute("SELECT name, date FROM game WHERE team_name = (%s) and date > (%s);", (team_name, datetime.utcnow()))
+            cursor.execute("SELECT name, date FROM game WHERE team_name = (%s) and date > (%s);", (team.name, datetime.utcnow()))
             result = cursor.fetchall()
             
             if len(result) != 1:
                 return None
             
-            game = f.Game(result[0][0])
-            game.date = result[0][1]
+            game = f.Game(result[0][0], utc_aware(result[0][1]), team)
             
             # Fetch all odds from game
-            cursor.execute("SELECT site_name, value, date FROM odd WHERE game_name = (%s) AND game_date = (%s);", (game.name, game.date))
+            cursor.execute("SELECT site_name, value, date FROM odd WHERE game_name = (%s) AND game_date = (%s);", (game.name, game.utc_date))
             results = cursor.fetchall()
             
             # sort by date
@@ -162,16 +171,15 @@ class DatabaseStore:
             for site_name, odd_value, odd_datetime in results:
                 site = Sites.SiteFromName(site_name)
                 if not site is None:
-                    game.addOdd(odd_value, odd_datetime, site)
+                    game.addOdd(float(odd_value), utc_aware(odd_datetime), site)
             
             # Fetch game's ids
-            cursor.execute("SELECT site_name, id FROM game_id WHERE game_name = (%s) AND game_date = (%s);", (game.name, game.date))
+            cursor.execute("SELECT site_name, id0, id1 FROM game_id WHERE game_name = (%s) AND game_date = (%s);", (game.name, game.utc_date))
             results = cursor.fetchall()
-            
-            for site_name, game_id in results:
+            for site_name, game_id0, game_id1 in results:
                 site = Sites.SiteFromName(site_name)
                 if not site is None:
-                    game.setId(site, game_id)            
+                    game.setId(site, (game_id0, game_id1))            
             
         return game
     
@@ -210,10 +218,10 @@ class DatabaseStore:
                 cursor.execute("INSERT INTO game VALUES ((%s), (%s), (%s), (%s));", (team_name, game_name, game_date, league_name))
                 
         except UniqueViolation as e:
-            if team_name in e.pgerror:
-                raise DrawfitDatabaseError(TeamAlreadyHasGame(team_name, str_dates(game_date)))
-            else:
+            if game_name in e.pgerror:
                 raise DrawfitDatabaseError(GameAlreadyRegistered(game_name, str_dates(game_date)))
+            else:
+                raise DrawfitDatabaseError(TeamAlreadyHasGame(team_name, str_dates(game_date)))
             
         except ForeignKeyViolation as e:
             if team_name in e.pgerror and league_name in e.pgerror:
@@ -235,7 +243,7 @@ class DatabaseStore:
         except UniqueViolation:
             raise DrawfitDatabaseError(DuplicateOdd(game_name, site.value, str_dates(date)))
         
-        except ForeignKeyViolation:
+        except ForeignKeyViolation as e:
             if game_name in e.pgerror:
                 raise DrawfitDatabaseError(GameNotFound(game_name, str_dates(game_date)))
             else:
@@ -276,14 +284,18 @@ class DatabaseStore:
             else:
                 raise DrawfitDatabaseError(SiteNotFound(site.value))
     
+    def updateLeagueColor(self, league_name: str, color: int) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("UPDATE league SET color=(%s) WHERE name=(%s)", (color, league_name))
+    
     def updateLeagueCode(self, league_name: str, site: Site, code: str) -> NoReturn:
-        with db_connection.cursor() as cursor:
+        with self.db_connection.cursor() as cursor:
             cursor.execute("UPDATE league_code SET code=(%s) WHERE league_name=(%s) and site_name=(%s)", (code, league_name, site.value))
     
     def addTeamId(self, team_name: str, site: Site, id: str) -> NoReturn:
         try:
-            with self.db_connection.cursor as cursor:
-                cursor.execute("INSERT INTO team_id VALUES ((%s), (%s), (%s));", (team_name, site.value, id))
+            with self.db_connection.cursor() as cursor:
+                cursor.execute("INSERT INTO team_id VALUES ((%s), (%s), (%s));", (team_name, site.value, id[0]))
         
         except UniqueViolation:
             raise DrawfitDatabaseError(DuplicateTeamId(team_name, site.value))
@@ -294,11 +306,11 @@ class DatabaseStore:
             else:
                 raise DrawfitDatabaseError(SiteNotFound(site.value))
     
-    def addGameId(self, game_name: str, game_date: datetime, site: Site, id: str) -> NoReturn:
+    def addGameId(self, game_name: str, game_date: datetime, site: Site, id: Tuple[str, str]) -> NoReturn:
         try:
             with self.db_connection.cursor() as cursor:
-                cursor.execute("INSERT INTO game_id VALUES ((%s), (%s), (%s), (%s));",\
-                        (game_name, game_date, site.value, id))
+                cursor.execute("INSERT INTO game_id VALUES ((%s), (%s), (%s), (%s), (%s));",\
+                        (game_name, game_date, site.value, id[0], id[1]))
             
         except UniqueViolation:
             raise DrawfitDatabaseError(DuplicateGameId(game_name, str_dates(game_date), site.value))
@@ -308,3 +320,15 @@ class DatabaseStore:
                 raise DrawfitDatabaseError(GameNotFound(game_name, str_dates(game_date)))
             else:
                 raise DrawfitDatabaseError(SiteNotFound(site.value))
+
+    def updateGameDate(self, game: f.Game, new_date: datetime):
+        try:
+            with self.db_connection.cursor() as cursor:
+                cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) and date=(%s)", (new_date, game.name, game.utc_date))
+        
+        except UniqueViolation as e:
+            if game.name in e.pgerror:
+                raise DrawfitDatabaseError(GameAlreadyRegistered(game.name, str_dates(new_date)))
+            else:
+                raise DrawfitDatabaseError(TeamAlreadyHasGame(game.team.name, str_dates(new_date)))
+            

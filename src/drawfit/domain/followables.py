@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from pytz import timezone
 from typing import NoReturn, List, Tuple, Dict, Optional, TYPE_CHECKING
 
 import drawfit.domain.odd as o
@@ -49,7 +50,7 @@ class Followable:
     def ids(self) -> Dict[Sites, Optional[Tuple[str]]]:
         return self._ids
     
-    def setId(self, site: Sites, id: str) -> NoReturn:
+    def setId(self, site: Sites, id: Tuple[str]) -> NoReturn:
         self._ids[site] = id
 
         if None not in self._ids:
@@ -95,7 +96,7 @@ class Followable:
 
 class Game(Followable):
 
-    def __init__(self, name: str, date: datetime = None, keywords: List[Tuple[str]] = None, team: Team = None):
+    def __init__(self, name: str, date: datetime, team: Team, keywords: List[Tuple[str]] = None):
         
         if keywords is None:
             keywords = []
@@ -121,6 +122,10 @@ class Game(Followable):
     def date(self, date: datetime) -> NoReturn:
         if self.date == None:
             self._date = date
+    
+    @property
+    def utc_date(self) -> datetime:
+        return self._date.astimezone(timezone('UTC'))
     
     @property
     def odds(self) -> Dict[Sites, List[o.Odd]]:
@@ -150,16 +155,22 @@ class Game(Followable):
             return self.name == o.name and self.date == o.date
         return False
     
+    def canUpdateDate(self, sample: OddSample) -> bool:
+        return self.date < sample.start_time
+    
     def updateDate(self, sample: OddSample) -> bool:
-        if self.date < sample.start_time:
+        if self.canUpdateDate(sample):
             self._date = sample.start_time
             return True
-        
         return False
+    
+    def canAddOdd(self, odd_value: float, odd_datetime: datetime, site: Sites) -> bool:
+        return self.odds[site] == [] or self.odds[site][-1].value != odd_value
+            
 
     def addOdd(self, odd_value: float, odd_datetime: datetime, site: Sites) -> bool:
 
-        if  self.odds[site] == [] or self.odds[site][-1].value != odd_value:
+        if self.canAddOdd(odd_value, odd_datetime, site):
             self._odds[site].append(o.Odd(odd_value, odd_datetime, self))
 
             current_odds = {each_site: (0 if self.odds[each_site] == [] else self.odds[each_site][-1].value) for each_site in Sites}
@@ -216,7 +227,7 @@ class Team(Followable):
         self._leagues[league.name] = league
     
     def hasGame(self) -> bool:
-        return self.current_game != None
+        return not self.current_game is None
     
     def isGameByDate(self, date: datetime) -> bool:
         return self.hasGame() and self.current_game.date - Team.delta  < date < self.current_game.date + Team.delta

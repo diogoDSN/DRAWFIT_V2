@@ -46,14 +46,14 @@ class Notify:
 
         
     
-    async def visitPossible(self, notification: notf.PossibleNotification) -> NoReturn:
+    async def visitPossibleTeam(self, notification: notf.PossibleTeamNotification) -> NoReturn:
 
         try:
 
             sent_messages = []
 
-            embed = Embed(title=notification.followable.name, color=notification.color)
-            embed.add_field(name=f'Name found for `{notification.site.name}`', value=str(notification))
+            embed = Embed(title=notification.team.name, color=notification.color)
+            embed.add_field(name=f'Name found for `{notification.site.value}`', value=str(notification))
 
             for channel in self.queries_channels:
 
@@ -67,10 +67,10 @@ class Notify:
             payload = await self.bot.wait_for("raw_reaction_add", check=answer.check, timeout=self.timeout)
             
             if str(payload.emoji) == Yes():
-                notification.followable.setId(notification.site, notification.possible_id)            
+                notification.registerId()          
 
         except TimeoutError:
-            notification.followable.removeConsidered(notification.site, notification.possible_id)
+            notification.removeConsidered()
         
         except Exception as e:
             print("Exception raised in visitPossible!")
