@@ -96,18 +96,16 @@ class Followable:
 
 class Game(Followable):
 
-    def __init__(self, name: str, date: datetime, team: Team, keywords: List[Tuple[str]] = None):
-        
-        if keywords is None:
-            keywords = []
+    def __init__(self, name: str, date: datetime, team: Team, league: l.League):
 
-        super().__init__(keywords)
+        super().__init__([])
 
         # Set universal undefined values
         self._name: str = name
         self._date: datetime = date
         self._odds = {site: [] for site in Sites}
         self._team = team
+        self._league = league
         
 
     @property
@@ -120,24 +118,19 @@ class Game(Followable):
     
     @date.setter
     def date(self, date: datetime) -> NoReturn:
-        if self.date == None:
-            self._date = date
-    
-    @property
-    def utc_date(self) -> datetime:
-        return self._date.astimezone(timezone('UTC'))
+        self.date = date
     
     @property
     def odds(self) -> Dict[Sites, List[o.Odd]]:
         return self._odds
 
     @property
-    def team(self) -> Optional[Team]:
+    def team(self) -> Team:
         return self._team
-
-    @team.setter  
-    def team(self, team: Team) -> NoReturn:
-        self._team = team
+    
+    @property
+    def league(self) -> l.League:
+        return self._league
 
     def hoursLeft(self, time: datetime = None) -> float:
 
@@ -157,12 +150,6 @@ class Game(Followable):
     
     def canUpdateDate(self, sample: OddSample) -> bool:
         return self.date < sample.start_time
-    
-    def updateDate(self, sample: OddSample) -> bool:
-        if self.canUpdateDate(sample):
-            self._date = sample.start_time
-            return True
-        return False
     
     def canAddOdd(self, odd_value: float, odd_datetime: datetime, site: Sites) -> bool:
         return self.odds[site] == [] or self.odds[site][-1].value != odd_value
@@ -229,8 +216,8 @@ class Team(Followable):
     def hasGame(self) -> bool:
         return not self.current_game is None
     
-    def isGameByDate(self, date: datetime) -> bool:
-        return self.hasGame() and self.current_game.date - Team.delta  < date < self.current_game.date + Team.delta
+    def isCurrentGame(self, date: datetime, league: l.League) -> bool:
+        return self.hasGame() and self.current_game.date - Team.delta  < date < self.current_game.date + Team.delta and league is self.current_game.league
     
     def __eq__(self, o) -> bool:
         if isinstance(o, Team):
@@ -239,4 +226,4 @@ class Team(Followable):
         return False
     
     def __repr__(self) -> str:
-        return f'Name: {self.name}; Game: {self.current_game(self, game)};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self._ids}; Complete: {self.complete}'
+        return f'Name: {self.name}; Game: {self.current_game};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self._ids}; Complete: {self.complete}'

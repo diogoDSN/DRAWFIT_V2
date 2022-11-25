@@ -45,7 +45,7 @@ class League:
         return self._current_games
 
     @property
-    def teams(self) -> Set[Team]:
+    def teams(self) -> Dict[str, Team]:
         return self._teams
     
     @property
@@ -170,7 +170,6 @@ class League:
         results = []
 
         for site, site_samples in samples_by_site.items():
-
             # site is not active or an error ocurred
             if site_samples is None:
                 continue

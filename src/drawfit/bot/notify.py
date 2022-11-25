@@ -52,7 +52,7 @@ class Notify:
 
             sent_messages = []
 
-            embed = Embed(title=notification.team.name, color=notification.color)
+            embed = Embed(title=notification.team_name, color=notification.color)
             embed.add_field(name=f'Name found for `{notification.site.value}`', value=str(notification))
 
             for channel in self.queries_channels:
@@ -67,10 +67,19 @@ class Notify:
             payload = await self.bot.wait_for("raw_reaction_add", check=answer.check, timeout=self.timeout)
             
             if str(payload.emoji) == Yes():
-                notification.registerId()          
+                self.bot.store.setTeamId(\
+                    notification.team_name,\
+                    notification.site,\
+                    notification.possible_id,\
+                    notification.league_name\
+                )       
 
         except TimeoutError:
-            notification.removeConsidered()
+            self.bot.store.removeConsideredId(\
+                notification.team_name,\
+                notification.site,\
+                notification.possible_id\
+            )
         
         except Exception as e:
             print("Exception raised in visitPossible!")

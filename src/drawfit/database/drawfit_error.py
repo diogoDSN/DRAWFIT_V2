@@ -1,4 +1,4 @@
-class DrawfitDatabaseError(Exception):
+class DrawfitError(Exception):
 
     def __init__(self, message: str):
         self.error_message = message

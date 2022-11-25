@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from abc import abstractmethod
 from datetime import datetime
-from typing import NoReturn, Tuple
+from typing import NoReturn, Tuple, Optional
 
 import drawfit.bot.notify as v
 import drawfit.domain.followables as followables
@@ -60,21 +60,13 @@ class NewOddNotification(Notification):
 
 class PossibleTeamNotification(Notification):
 
-    def __init__(self, team: followables.Team, sample: OddSample, team_id: Tuple[str], site: Sites, color: int, db_store: d.DatabaseStore):
-        self.db_store = db_store
-        self.team = team
+    def __init__(self, team_name: str, sample: OddSample, team_id: Tuple[str], site: Sites, color: int, league_name: str):
+        self.team_name = team_name
         self.sample = sample
         self.possible_id = team_id
         self.site = site
         self.color = color
-    
-    def registerId(self) -> NoReturn:
-        with self.db_store as db:
-            db.addTeamId(self.team.name, self.site, self.possible_id)
-        self.team.setId(self.site, self.possible_id)
-    
-    def removeConsidered(self) -> NoReturn:
-        self.team.removeConsidered(self.site, self.possible_id)
+        self.league_name = league_name
     
     def __repr__(self) -> str:
         return str(self)

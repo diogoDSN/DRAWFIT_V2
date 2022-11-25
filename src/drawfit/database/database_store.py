@@ -5,17 +5,14 @@ from psycopg2 import connect
 from psycopg2.errors import UniqueViolation, ForeignKeyViolation, RaiseException
 from datetime import datetime
 
-if TYPE_CHECKING:
-    from drawfit.domain.league import League
-
 import drawfit.domain.notifications as notf
 import drawfit.domain.league as l
 import drawfit.domain.followables as f
 from drawfit.dtos import LeagueDto, DomainDto
-from drawfit.database.drawfit_database_error import DrawfitDatabaseError
+from drawfit.database.drawfit_error import DrawfitError
 from drawfit.database.db_messages import *
 
-from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCodesFactory, str_dates, utc_aware
+from drawfit.utils import Sites, OddSample, LeagueCode, LeagueCodesFactory, str_dates, tz_aware, to_utc
 
 class DatabaseStore:
     
@@ -65,7 +62,7 @@ class DatabaseStore:
             result = cursor.fetchall()
         
             if len(result) != 1:
-                raise DrawfitDatabaseError(ColorNotFound(color_name))
+                raise DrawfitError(ColorNotFound(color_name))
             
         return result[0][0]
 
@@ -77,7 +74,7 @@ class DatabaseStore:
             result = cursor.fetchall()
             
             if len(result) != 1:
-                raise DrawfitDatabaseError(LeagueNotFound(league_name))
+                raise DrawfitError(LeagueNotFound(league_name))
             
             league = l.League(result[0][0], color=result[0][1])
             
@@ -133,7 +130,7 @@ class DatabaseStore:
             result = cursor.fetchall()
             
             if len(result) != 1:
-                raise DrawfitDatabaseError(TeamNotFound(team_name))
+                raise DrawfitError(TeamNotFound(team_name))
             
             team = f.Team(team_name)
             team.active = result[0][1]
@@ -149,20 +146,20 @@ class DatabaseStore:
             
         return team
 
-    def getCurrentGame(self, team: f.Team) -> Optional[f.Game]:
+    def getCurrentGame(self, team: f.Team, leagues: Dict[str, l.League]) -> Optional[f.Game]:
         with self.db_connection.cursor() as cursor:
             
             # Fetch team and active status
-            cursor.execute("SELECT name, date FROM game WHERE team_name = (%s) and date > (%s);", (team.name, datetime.utcnow()))
+            cursor.execute("SELECT name, date, league_name FROM game WHERE team_name = (%s) AND date > (%s);", (team.name, datetime.utcnow()))
             result = cursor.fetchall()
             
             if len(result) != 1:
                 return None
             
-            game = f.Game(result[0][0], utc_aware(result[0][1]), team)
+            game = f.Game(result[0][0], tz_aware(result[0][1]), team, leagues[result[0][2]])
             
             # Fetch all odds from game
-            cursor.execute("SELECT site_name, value, date FROM odd WHERE game_name = (%s) AND game_date = (%s);", (game.name, game.utc_date))
+            cursor.execute("SELECT site_name, value, date FROM odd WHERE game_name = (%s) AND game_date = (%s);", (game.name, to_utc(game.date)))
             results = cursor.fetchall()
             
             # sort by date
@@ -171,10 +168,10 @@ class DatabaseStore:
             for site_name, odd_value, odd_datetime in results:
                 site = Sites.SiteFromName(site_name)
                 if not site is None:
-                    game.addOdd(float(odd_value), utc_aware(odd_datetime), site)
+                    game.addOdd(float(odd_value), tz_aware(odd_datetime), site)
             
             # Fetch game's ids
-            cursor.execute("SELECT site_name, id0, id1 FROM game_id WHERE game_name = (%s) AND game_date = (%s);", (game.name, game.utc_date))
+            cursor.execute("SELECT site_name, id0, id1 FROM game_id WHERE game_name = (%s) AND game_date = (%s);", (game.name, to_utc(game.date)))
             results = cursor.fetchall()
             for site_name, game_id0, game_id1 in results:
                 site = Sites.SiteFromName(site_name)
@@ -201,16 +198,16 @@ class DatabaseStore:
                 cursor.execute("INSERT INTO league VALUES ((%s), (%s))", (league_name, league_color))
         
         except UniqueViolation:
-            raise DrawfitDatabaseError(DuplicateLeague(league_name))
+            raise DrawfitError(DuplicateLeague(league_name))
         except ForeignKeyViolation:
-            raise DrawfitDatabaseError(InvalidColor(league_color))
+            raise DrawfitError(InvalidColor(league_color))
     
     def registerTeam(self, team_name: str) -> NoReturn:
         try:
             with self.db_connection.cursor() as cursor:
                 cursor.execute("INSERT INTO team VALUES ((%s), true);", (team_name,))
         except UniqueViolation:
-            raise DrawfitDatabaseError(DuplicateTeam(team_name))
+            raise DrawfitError(DuplicateTeam(team_name))
     
     def registerGame(self, team_name: str, game_name: str, game_date: datetime, league_name: str) -> NoReturn:
         try:
@@ -219,20 +216,20 @@ class DatabaseStore:
                 
         except UniqueViolation as e:
             if game_name in e.pgerror:
-                raise DrawfitDatabaseError(GameAlreadyRegistered(game_name, str_dates(game_date)))
+                raise DrawfitError(GameAlreadyRegistered(game_name, str_dates(game_date)))
             else:
-                raise DrawfitDatabaseError(TeamAlreadyHasGame(team_name, str_dates(game_date)))
+                raise DrawfitError(TeamAlreadyHasGame(team_name, str_dates(game_date)))
             
         except ForeignKeyViolation as e:
             if team_name in e.pgerror and league_name in e.pgerror:
-                raise DrawfitDatabaseError(TeamNotInLeague(team_name, league_name))
+                raise DrawfitError(TeamNotInLeague(team_name, league_name))
             elif team_name in e.pgerror:
-                raise DrawfitDatabaseError(TeamNotFound(team_name))
+                raise DrawfitError(TeamNotFound(team_name))
             else:
-                raise DrawfitDatabaseError(LeagueNotFound(league_name))
+                raise DrawfitError(LeagueNotFound(league_name))
         
         except RaiseException as e:
-            raise DrawfitDatabaseError(e.pgerror)
+            raise DrawfitError(e.pgerror)
     
     def registerOdd(self, game_name: str, game_date: datetime, site: Site, value: float, date: datetime):
         try:
@@ -241,16 +238,16 @@ class DatabaseStore:
                     (game_name, game_date, site.value, value, date))
                 
         except UniqueViolation:
-            raise DrawfitDatabaseError(DuplicateOdd(game_name, site.value, str_dates(date)))
+            raise DrawfitError(DuplicateOdd(game_name, site.value, str_dates(date)))
         
         except ForeignKeyViolation as e:
             if game_name in e.pgerror:
-                raise DrawfitDatabaseError(GameNotFound(game_name, str_dates(game_date)))
+                raise DrawfitError(GameNotFound(game_name, str_dates(game_date)))
             else:
-                raise DrawfitDatabaseError(SiteNotFound(site.value))
+                raise DrawfitError(SiteNotFound(site.value))
         
         except RaiseException as e:
-            raise DrawfitDatabaseError(e.pgerror)
+            raise DrawfitError(e.pgerror)
     
     def addTeamToLeague(self, team_name: str, league_name: str) -> NoReturn:
         try:
@@ -262,9 +259,9 @@ class DatabaseStore:
         
         except ForeignKeyViolation as e:
             if team_name in e.pgerror:
-                raise DrawfitDatabaseError(TeamNotFound(team_name))
+                raise DrawfitError(TeamNotFound(team_name))
             else:
-                raise DrawfitDatabaseError(LeagueNotFound(league_name))
+                raise DrawfitError(LeagueNotFound(league_name))
     
     def addLeagueCode(self, league_name: str, site: Site, code: str) -> NoReturn:
         try:
@@ -274,15 +271,15 @@ class DatabaseStore:
         
         except UniqueViolation as e:
             if league_name in e.pgerror:
-                raise DrawfitDatabaseError(DuplicateLeagueCode(league_name, site.value))
+                raise DrawfitError(DuplicateLeagueCode(league_name, site.value))
             else:
-                raise DrawfitDatabaseError(RepeatedSiteCode(site.value, code))
+                raise DrawfitError(RepeatedSiteCode(site.value, code))
         
         except ForeignKeyViolation as e:
             if league_name in e.pgerror:
-                raise DrawfitDatabaseError(LeagueNotFound(league_name))
+                raise DrawfitError(LeagueNotFound(league_name))
             else:
-                raise DrawfitDatabaseError(SiteNotFound(site.value))
+                raise DrawfitError(SiteNotFound(site.value))
     
     def updateLeagueColor(self, league_name: str, color: int) -> NoReturn:
         with self.db_connection.cursor() as cursor:
@@ -290,7 +287,7 @@ class DatabaseStore:
     
     def updateLeagueCode(self, league_name: str, site: Site, code: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE league_code SET code=(%s) WHERE league_name=(%s) and site_name=(%s)", (code, league_name, site.value))
+            cursor.execute("UPDATE league_code SET code=(%s) WHERE league_name=(%s) AND site_name=(%s)", (code, league_name, site.value))
     
     def addTeamId(self, team_name: str, site: Site, id: str) -> NoReturn:
         try:
@@ -298,13 +295,13 @@ class DatabaseStore:
                 cursor.execute("INSERT INTO team_id VALUES ((%s), (%s), (%s));", (team_name, site.value, id[0]))
         
         except UniqueViolation:
-            raise DrawfitDatabaseError(DuplicateTeamId(team_name, site.value))
+            raise DrawfitError(DuplicateTeamId(team_name, site.value))
         
         except ForeignKeyViolation as e:
             if team_name in e.pgerror:
-                raise DrawfitDatabaseError(TeamNotFound(team_name))
+                raise DrawfitError(TeamNotFound(team_name))
             else:
-                raise DrawfitDatabaseError(SiteNotFound(site.value))
+                raise DrawfitError(SiteNotFound(site.value))
     
     def addGameId(self, game_name: str, game_date: datetime, site: Site, id: Tuple[str, str]) -> NoReturn:
         try:
@@ -313,22 +310,41 @@ class DatabaseStore:
                         (game_name, game_date, site.value, id[0], id[1]))
             
         except UniqueViolation:
-            raise DrawfitDatabaseError(DuplicateGameId(game_name, str_dates(game_date), site.value))
+            raise DrawfitError(DuplicateGameId(game_name, str_dates(game_date), site.value))
         
         except ForeignKeyViolation as e:
             if game_name in e.pgerror:
-                raise DrawfitDatabaseError(GameNotFound(game_name, str_dates(game_date)))
+                raise DrawfitError(GameNotFound(game_name, str_dates(game_date)))
             else:
-                raise DrawfitDatabaseError(SiteNotFound(site.value))
+                raise DrawfitError(SiteNotFound(site.value))
 
     def updateGameDate(self, game: f.Game, new_date: datetime):
         try:
             with self.db_connection.cursor() as cursor:
-                cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) and date=(%s)", (new_date, game.name, game.utc_date))
+                cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s)", (new_date, game.name, to_utc(game.date)))
         
         except UniqueViolation as e:
             if game.name in e.pgerror:
-                raise DrawfitDatabaseError(GameAlreadyRegistered(game.name, str_dates(new_date)))
+                raise DrawfitError(GameAlreadyRegistered(game.name, str_dates(new_date)))
             else:
-                raise DrawfitDatabaseError(TeamAlreadyHasGame(game.team.name, str_dates(new_date)))
-            
+                raise DrawfitError(TeamAlreadyHasGame(game.team.name, str_dates(new_date)))
+    
+    def activateTeam(self, team_name: str) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("UPDATE team SET active=true WHERE name=(%s)", team_name)
+    
+    def deactivateTeam(self, team_name: str) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("UPDATE team SET active=false WHERE name=(%s)", team_name)
+    
+    def deleteGameIds(self, game: f.Game) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("DELETE FROM game_id WHERE game_name=(%s) AND game_date=(%s)", (game.name, to_utc(game.date)))
+    
+    def deleteGameOdds(self, game: f.Game) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("DELETE FROM odd WHERE game_name=(%s) AND game_date=(%s)", (game.name, to_utc(game.date)))
+    
+    def updateGameDate(self, game: f.Game, new_date: datetime) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s)", (new_date, game.name, to_utc(game.date)))
