@@ -375,12 +375,12 @@ class DatabaseStore:
 
     def deleteLeague(self, league_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("DELETE FROM league WHERE name=(%s);" (league_name,))
+            cursor.execute("DELETE FROM league WHERE name=(%s);", (league_name,))
     
     def deleteTeam(self, team_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("DELETE FROM team WHERE name=(%s);" (team_name,))
+            cursor.execute("DELETE FROM team WHERE name=(%s);", (team_name,))
     
     def deleteTeamIds(self, team_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("DELETE FROM team_id WHERE team_name=(%s);" (team_name,))
+            cursor.execute("DELETE FROM team_id WHERE team_name=(%s);", (team_name,))
