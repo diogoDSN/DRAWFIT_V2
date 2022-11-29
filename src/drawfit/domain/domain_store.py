@@ -12,7 +12,7 @@ import drawfit.domain.followables as f
 import drawfit.database.database_store as d
 from drawfit.dtos import LeagueDto, DomainDto
 from drawfit.database.drawfit_error import DrawfitError
-from drawfit.database.db_messages import TeamNotFound
+from drawfit.database.db_messages import TeamNotFound, LeagueNotFound
 
 from drawfit.utils import Sites, OddSample, LeagueCode, now_lisbon
 
@@ -21,7 +21,7 @@ class DomainStore:
     remove_routine_time = 900
 
     #----------------------------------------------------------------------
-    #-------------- Initialization Methods
+    #-------------- Initialization Methods and Properties
     #----------------------------------------------------------------------
 
     def __init__(self) -> NoReturn:
@@ -38,19 +38,15 @@ class DomainStore:
             for team in self.teams.values():
                 team.current_game = db.getCurrentGame(team, self.leagues) 
     
+    @property
+    def colors_list(self) -> Tuple[Tuple(str, int)]:
+        with self.db_store as db:
+            return db.getAllColors()
+    
     def loadAllLeagues(self) -> List[League]:
         with self.db_store as db:
             # fetch leagues
             leagues = db.getAllLeagues()
-            
-            # add registered teams to corresponding leagues
-            for league in leagues:
-                team_names = db.getTeamNamesFromLeague(league.name)
-                
-                for team_name in team_names:
-                    if team_name in self.teams:
-                        league.addTeam(self.teams[team_name])
-                        self.teams[team_name].addLeague(league)
         
         return leagues
     
@@ -197,7 +193,7 @@ class DomainStore:
                 
                 if team.current_game.date < now_lisbon():
                     with self.db_store as db:
-                        db.deleteGameIds(team.current_game)
+                        db.deleteGameIds(team.current_game.name, team.current_game.date)
                     team.current_game = None
     
     #----------------------------------------------------------------------
@@ -208,16 +204,15 @@ class DomainStore:
     
     def registerLeague(self, league_name: str) -> NoReturn:
         with self.db_store as db:
-            db.registerLeague(league_name, 0xfffff)
-        
-        self.leagues[league_name] = db.getLeague(league_name)
+            db.registerLeague(league_name, 0xffffff)
+            self.leagues[league_name] = db.getLeague(league_name)
     
-    def setLeagueCode(self, league_name: str, site: Site, code: LeagueCode) -> NoReturn:
+    def setLeagueCode(self, league_name: str, code: LeagueCode) -> NoReturn:
         with self.db_store as db:
-            if self.leagues[league_name].codes[site] is None:
-                db.addLeagueCode(league_name, site, str(code))
+            if self.leagues[league_name].codes[code.getSite()] is None:
+                db.addLeagueCode(league_name, code.getSite(), str(code))
             else:
-                db.updateLeagueCode(league_name, site, str(code))
+                db.updateLeagueCode(league_name, code.getSite(), str(code))
         
         self.leagues[league_name].setCode(code)
         
@@ -228,16 +223,39 @@ class DomainStore:
         
         self.leagues[league_name].color = new_color
     
+    
+    def eraseLeague(self, league_name: str) -> NoReturn:
+
+        try:
+            with self.db_store as db:
+                    
+                for game_name, game_date in db.getAllLeagueGamesIds(league_name):
+                    db.deleteGameOdds(game_name, game_date)
+                    db.deleteGameIds(game_name, game_date)
+                    db.deleteGame(game_name, game_date)
+                
+                db.deleteLeague(league_name)
+                    
+                for team in self.leagues[league_name].teams:
+                    if (not team.current_game is None) and team.current_game.league is self.leagues[league_name]:
+                        team.current_game = None
+                    
+        except KeyError:
+            raise DrawfitError(LeagueNotFound(league_name))
+    
     #--- Read Methods
     
     def getAllLeagueCodes(self) -> Dict[str, List[str]]:
-
         result = {}
 
         for league in self.leagues.values():
             result[league.name] = league.codes.copy()
         
         return result
+    
+    def getLeagueTotalGames(self, league_name: str) -> int:
+        with self.db_store as db:
+            return db.getTotalLeagueGames(league_name)
         
         
     #----------------------------------------------------------------------
@@ -249,8 +267,7 @@ class DomainStore:
     def registerTeam(self, team_name: str) -> NoReturn:
         with self.db_store as db:
             db.registerTeam(team_name)
-        
-        self.teams[team_name] = db.getTeam(team_name)
+            self.teams[team_name] = db.getTeam(team_name)
     
     def addTeamKeywords(self, team_name: str, keywords: List[str]) -> NoReturn:
         self.teams[team_name].addKeywords(keywords)
@@ -269,23 +286,50 @@ class DomainStore:
         self.teams[team_name].removeConsidered(site, team_id)
     
     def activateTeam(self, team_name: str) -> NoReturn:
-        if team_name not in self.teams:
-            raise DrawfitError(TeamNotFound(team_name))
-            
         with self.db_store as db:
             db.activateTeam(team_name)
     
         self.teams[team_name].active = True
 
-    def deactivateTeam(self, league_id: str, team_id: str) -> bool:
-        if team_name not in self.teams:
-            raise DrawfitError(TeamNotFound(team_name))
-            
+    def deactivateTeam(self, team_id: str) -> NoReturn:
         with self.db_store as db:
             db.deactivateTeam(team_name)
+            if not (game := self.teams[team_name].current_game) is None:
+                db.deleteGameIds(game.name, game.date)
+                db.deleteGameOdds(game.name, game.date)
+                db.deleteGame(game.name, game.date)
     
         self.teams[team_name].active = False
+        self.teams[team_name].current_game = None
     
+    def eraseTeam(self, team_name: str) -> NoReturn:
+        try:
+            with self.db_store as db:
+                    
+                for game_name, game_date in db.getAllTeamGamesIds(team_name):
+                    db.deleteGameOdds(game_name, game_date)
+                    db.deleteGameIds(game_name, game_date)
+                    db.deleteGame(game_name, game_date)
+                
+                db.deleteTeam(team_name)
+                self.teams[team_name].current_game = None
+            
+        except KeyError:
+            raise DrawfitError(TeamNotFound(team_name))
+    
+    def resetTeamIds(self, team_name: str) -> bool:
+        try:
+            with self.db_store as db:
+                db.deleteTeamIds(team_name)
+                self.teams[team_name].resetIds()
+                
+        except KeyError:
+            raise DrawfitError(TeamNotFound(team_name))
+    
+    #--- Read Methods
+    def getTotalTeamGames(self, team_name: str) -> int:
+        with self.db_store as db:
+            return db.getTeamTotalGames(team_name)
         
     #----------------------------------------------------------------------
     #-------------- Other Methods
@@ -305,8 +349,8 @@ class DomainStore:
     def updateGameDate(self, game: f.Game, new_date: datetime) -> NoReturn:
         with self.db_store as db:
             # delete conflicts from foreign key constraints
-            db.deleteGameIds(game)
-            db.deleteGameOds(game)
+            db.deleteGameIds(game.name, game.date)
+            db.deleteGameOdds(game.name, game.date)
             
             # update date
             db.updateGameDate(game, new_date)
@@ -321,59 +365,9 @@ class DomainStore:
                     db.addGameId(game.name, game.date, site, game_id)
                     
         game.date = new_date
-        
-    #----------------------------------------------------------------------
-    #-------------- Old Store
-    #----------------------------------------------------------------------
     
-
-    def eraseLeague(self, league_id: str) -> bool:
-
-        league = self.getLeague(league_id)
-
-        if league is not None:
-            self.known_leagues.remove(league)
-            return True
-        
-        return False
-
+    #--- Read Methods
+    
     def getDomain(self) -> DomainDto:
-        return DomainDto(self.known_leagues)
-
-    
-    def getLeagues(self) -> List:
-
-        leagues = []
-
-        for league in self.known_leagues:
-            leagues.append(LeagueDto(league.name, league.active))
-        
-        return leagues
-    
-    def getLeagueCodes(self, leagueName: str) -> List:
-
-        league = self.getLeague(leagueName)
-
-        if league is None:
-            return []
-
-        return league.codes.copy()
-
-    def eraseTeam(self, league_id: str, team_id: str) -> bool:
-
-        league = self.getLeague(league_id)
-
-        if league is not None:
-            return league.eraseTeam(team_id)
-        else:
-            return False
-    
-    def eraseId(self, league_id: str, team_id: str, id_to_erase: str) -> bool:
-
-        league = self.getLeague(league_id)
-
-        if league is not None:
-            return league.eraseId(team_id, id_to_erase)
-        
-        return False
+        return DomainDto(self.leagues, self.teams)
     

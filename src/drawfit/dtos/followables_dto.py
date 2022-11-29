@@ -17,7 +17,6 @@ class FollowableDto:
         self.keywords = {}
         self.considered = {}
         self.ids = {}
-        self.complete = followable.complete
 
         for site in Sites:
             self.keywords = followable.keywords.copy()
@@ -31,8 +30,8 @@ class GameDto(FollowableDto):
 
         self.name = game.name
         self.date = game.date
-        self.team1 = None if game.team1 is None else game.team1.name
-        self.team2 = None if game.team2 is None else game.team2.name
+        self.team = None
+        self.league = None
 
         self.odds = {}
 
@@ -59,7 +58,10 @@ class TeamDto(FollowableDto):
 
         self.name = team.name
         self.active = team.active
+        self.leagues = []
         self.current_game = None if team.current_game is None else GameDto(team.current_game)
+        if not self.current_game is None:
+            self.current_game.team = self
 
 
 

@@ -1,5 +1,6 @@
 import urllib as u
 import json
+import traceback
 import websockets as ws
 from typing import List, NoReturn
 from requests_html import AsyncHTMLSession
@@ -75,7 +76,6 @@ class Solverde(Site):
                     for event in events["groups"][0]["events"]:
                         await websocket.send(self.game_query(event['id']))
                         game = self.parse_stomp_msg(await websocket.recv())
-                        
 
                         await websocket.send(self.market_query(game['marketTypesToIds']['1'][0]))
                         market = self.parse_stomp_msg(await websocket.recv())
@@ -84,7 +84,8 @@ class Solverde(Site):
 
                 return odds
 
-            except:
+            except Exception:
+                print(traceback.format_exc())
                 return None
                 #raise SiteError(Sites.Solverde.name)
 
@@ -94,7 +95,7 @@ class Solverde(Site):
     
     def league_query(self, id: str = '19328', country_code: str = 'it'):
 
-        id_destination = "/api/eventgroups/soccer-" + country_code + "-sb_type_" + id + "-all-match-events-grouped-by-type"
+        id_destination = "/api/eventgroups/t-soccer-" + country_code + "-sb_type_" + id + "-all-match-events-grouped-by-type"
         return create_stomp_msg("SUBSCRIBE", {"id":id_destination, "destination":id_destination, "locale":"pt"})
 
     def game_query(self, ID=4914891889):
@@ -108,7 +109,6 @@ class Solverde(Site):
         return create_stomp_msg("SUBSCRIBE", {"id":id_destination, "destination":id_destination, "locale":"pt"})
 
     def parse_stomp_msg(self, msg):
-
 
         if len(msg) < 10:
             return {}

@@ -11,39 +11,37 @@ def changeLeagueColorCorrectUsage():
     return 'Correct usage:\n```.changeLeagueColorCorrectUsage (league_name)'
 
 def addTeamUsage():
-    return 'Correct usage:\n```.addTeam (league_name)::(team_name)```'
+    return 'Correct usage:\n```.addTeam (team_name)```'
 
 def activateTeamUsage():
-    return 'Correct usage:\n```.activateTeam (league_name)::(team_name)```'
+    return 'Correct usage:\n```.activateTeam (team_name)```'
 
 def deactivateTeamUsage():
-    return 'Correct usage:\n```.deactivateTeam (league_name)::(team_name)```'
+    return 'Correct usage:\n```.deactivateTeam (team_name)```'
 
 def eraseTeamUsage():
-    return 'Correct usage:\n```.eraseTeam (league_name)::(team_name)```'
+    return 'Correct usage:\n```.eraseTeam (team_name)```'
 
 def addTeamKeywordsUsage():
-    return 'Correct usage:\n```.addTeamKeywords (league_name)::(team_name)::(keyword1) (keyword2) (keyword3) ...```'
+    return 'Correct usage:\n```.addTeamKeywords (team_name)::(keyword1) (keyword2) (keyword3) ...```'
 
 def setBwinLeagueCodeUsage():
-    return 'Correct usage:\n```.setBwinLeagueCode (region_id),(competition_id) (league_name|league_number)```'
+    return 'Correct usage:\n```.setBwinLeagueCode (region_id),(competition_id) (league_name)```'
 
 def setBetanoLeagueCodeUsage():
-    return 'Correct usage:\n```.setBetanoLeagueCode (league_id) (league_name|league_number)```'
+    return 'Correct usage:\n```.setBetanoLeagueCode (league_id) (league_name)```'
 
 def setSolverdeLeagueCodeUsage():
-    return 'Correct usage:\n```.setSolverdeLeagueCode (country_code),(league_id) (league_name|league_number)```'
+    return 'Correct usage:\n```.setSolverdeLeagueCode (country_code),(league_id) (league_name)```'
 
 def setMooshLeagueCodeUsage():
-    return 'Correct usage:\n```.setMooshLeagueCode (league_id)::(league_name|league_number)```'
+    return 'Correct usage:\n```.setMooshLeagueCode (league_id)::(league_name)```'
 
 def setBetwayLeagueCodeUsage():
-    return 'Correct usage:\n```.setBetwayLeagueCode (league_id)::(league_name|league_number)```'
+    return 'Correct usage:\n```.setBetwayLeagueCode (league_id)::(league_name)```'
 
 def setBetclicLeagueCodeUsage():
-    return 'Correct usage:\n```.setBetclicLeagueCode (league_id) (league_name|league_number)```'
+    return 'Correct usage:\n```.setBetclicLeagueCode (league_id) (league_name)```'
 
-def eraseIdCorrectUsage():
-    return 'Correct usage:\n```.eraseId (league_id)::(team_name)::(id_to_erase)```'
-
-    
+def resetIdsCorrectUsage():
+    return 'Correct usage:\n```.resetIds (team_name)```'

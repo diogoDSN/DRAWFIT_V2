@@ -22,7 +22,6 @@ class Followable:
         self._keywords: List[str] = keywords
         self._considered: Dict[Sites, List[Tuple[str]]] = {site: [] for site in Sites}
         self._ids: Dict[Sites, Optional[Tuple[str]]] = {site: None for site in Sites}
-        self._complete: bool = False
 
     # properties
 
@@ -53,13 +52,6 @@ class Followable:
     def setId(self, site: Sites, id: Tuple[str]) -> NoReturn:
         self._ids[site] = id
 
-        if None not in self._ids:
-            self._complete = True
-    
-    @property
-    def complete(self) -> bool:
-        return self._complete
-
     # followable logic
     
     def isId(self, site: Sites, id: Tuple[str]) -> bool:
@@ -77,20 +69,9 @@ class Followable:
         
         return False
     
-    def eraseId(self, id_to_erase: str) -> bool:
-
-        ret = False
-
-        id_to_erase = (id_to_erase,)
-
-        for site, ids in self.considered.items():
-            if id_to_erase in ids:
-                ret = True
-                ids.remove(id_to_erase)
-                if id_to_erase == self.ids[site]:
-                    self._ids[site] = None
-            
-        return ret
+    def resetIds(self) -> NoReturn:
+        self._ids = {site: None for site in Sites}
+        
 
 
 
@@ -226,4 +207,4 @@ class Team(Followable):
         return False
     
     def __repr__(self) -> str:
-        return f'Name: {self.name}; Game: {self.current_game};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self._ids}; Complete: {self.complete}'
+        return f'Name: {self.name}; Game: {self.current_game};\nKeywords: {self.keywords}; Considered: {self.considered}; Ids: {self._ids};'

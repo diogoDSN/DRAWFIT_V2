@@ -15,8 +15,6 @@ from drawfit.dtos.domain_dto import DomainDto
 
 from drawfit.parameters import COMMAND_CHANNELS
 
-BROWSE_TIMEOUT = 60
-
 def isCommand(ctx: commands.Context) -> bool:
 
     if ctx.guild:
@@ -35,7 +33,7 @@ def checkEmptyArguments(arguments: str, command: str) -> NoReturn:
         raise commands.BadArgument(message=EmptyArgument(command))
 
 def checkAnyArguments(arguments: str, message: str) -> NoReturn:
-    if arguments == '':
+    if arguments == '' or '::' in arguments:
         raise commands.BadArgument(message=message)
 
 def checkNNameArguments(arguments: str, n: int, message: str) -> List[str]:

@@ -58,7 +58,7 @@ class DatabaseStore:
     
     def getColor(self, color_name: str) -> int:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("SELECT hex_code FROM color WHERE name=(%s)", (color_name,))
+            cursor.execute("SELECT hex_code FROM color WHERE name=(%s);", (color_name,))
             result = cursor.fetchall()
         
             if len(result) != 1:
@@ -195,7 +195,7 @@ class DatabaseStore:
     def registerLeague(self, league_name: str, league_color: int) -> NoReturn:
         try:
             with self.db_connection.cursor() as cursor:
-                cursor.execute("INSERT INTO league VALUES ((%s), (%s))", (league_name, league_color))
+                cursor.execute("INSERT INTO league VALUES ((%s), (%s));", (league_name, league_color))
         
         except UniqueViolation:
             raise DrawfitError(DuplicateLeague(league_name))
@@ -283,11 +283,11 @@ class DatabaseStore:
     
     def updateLeagueColor(self, league_name: str, color: int) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE league SET color=(%s) WHERE name=(%s)", (color, league_name))
+            cursor.execute("UPDATE league SET color=(%s) WHERE name=(%s);", (color, league_name))
     
     def updateLeagueCode(self, league_name: str, site: Site, code: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE league_code SET code=(%s) WHERE league_name=(%s) AND site_name=(%s)", (code, league_name, site.value))
+            cursor.execute("UPDATE league_code SET code=(%s) WHERE league_name=(%s) AND site_name=(%s);", (code, league_name, site.value))
     
     def addTeamId(self, team_name: str, site: Site, id: str) -> NoReturn:
         try:
@@ -321,7 +321,7 @@ class DatabaseStore:
     def updateGameDate(self, game: f.Game, new_date: datetime):
         try:
             with self.db_connection.cursor() as cursor:
-                cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s)", (new_date, game.name, to_utc(game.date)))
+                cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s);", (new_date, game.name, to_utc(game.date)))
         
         except UniqueViolation as e:
             if game.name in e.pgerror:
@@ -331,20 +331,56 @@ class DatabaseStore:
     
     def activateTeam(self, team_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE team SET active=true WHERE name=(%s)", team_name)
+            cursor.execute("UPDATE team SET active=true WHERE name=(%s);", team_name)
     
     def deactivateTeam(self, team_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE team SET active=false WHERE name=(%s)", team_name)
+            cursor.execute("UPDATE team SET active=false WHERE name=(%s);", team_name)
     
-    def deleteGameIds(self, game: f.Game) -> NoReturn:
+    def deleteGameIds(self, game_name: str, game_date: datetime) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("DELETE FROM game_id WHERE game_name=(%s) AND game_date=(%s)", (game.name, to_utc(game.date)))
+            cursor.execute("DELETE FROM game_id WHERE game_name=(%s) AND game_date=(%s);", (game_name, to_utc(game_date)))
     
-    def deleteGameOdds(self, game: f.Game) -> NoReturn:
+    def deleteGameOdds(self, game_name: str, game_date: datetime) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("DELETE FROM odd WHERE game_name=(%s) AND game_date=(%s)", (game.name, to_utc(game.date)))
+            cursor.execute("DELETE FROM odd WHERE game_name=(%s) AND game_date=(%s);", (game_name, to_utc(game_date)))
     
     def updateGameDate(self, game: f.Game, new_date: datetime) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s)", (new_date, game.name, to_utc(game.date)))
+            cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s);", (new_date, game.name, to_utc(game.date)))
+    
+    def deleteGame(self, game_name: str, game_date: datetime) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("DELETE FROM game WHERE game_name=(%s) AND game_date=(%s);", (game_name, to_utc(game_date)))
+    
+    def getTotalLeagueGames(self, league_name: str) -> int:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(name) FROM game WHERE league_name=(%s);", (league_name,))
+            return cursor.fetchall()[0][0]
+    
+    def getTotalTeamGames(self, team_name: str) -> int:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("SELECT COUNT(name) FROM game WHERE team_name=(%s);", (team_name,))
+            return cursor.fetchall()[0][0]
+    
+    def getAllLeagueGamesIds(self, league_name: str) -> Tuple[Tuple[str, datetime]]:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("SELECT name, date FROM game WHERE league_name=(%s);", (league_name,))
+            return cursor.fetchall()
+    
+    def getAllTeamGamesIds(self, team_name: str) -> Tuple[Tuple[str, datetime]]:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("SELECT name, date FROM game WHERE team_name=(%s);", (team_name,))
+            return cursor.fetchall()
+
+    def deleteLeague(self, league_name: str) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("DELETE FROM league WHERE name=(%s);" (league_name,))
+    
+    def deleteTeam(self, team_name: str) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("DELETE FROM team WHERE name=(%s);" (team_name,))
+    
+    def deleteTeamIds(self, team_name: str) -> NoReturn:
+        with self.db_connection.cursor() as cursor:
+            cursor.execute("DELETE FROM team_id WHERE team_name=(%s);" (team_name,))
