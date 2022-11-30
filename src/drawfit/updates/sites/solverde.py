@@ -12,12 +12,12 @@ from drawfit.updates.utils import convertDate
 from drawfit.utils import Sites, OddSample, SolverdeCode, now_lisbon
 
 
-def create_stomp_msg(comd="", headers={}, content=""):
+def create_stomp_msg(comd="", headers=[], content=""):
 
     result = "[\"" + comd + "\\n"
 
-    for header in headers:
-        result += str(header) + ":" + str(headers[header]) + "\\n"
+    for header, header_content in headers:
+        result += str(header) + ":" + str(header_content) + "\\n"
     
     result += "\\n" + content + "\\u0000\"]"
 
@@ -32,9 +32,9 @@ class Solverde(Site):
 
     # Types of STOMP Messages to send
 
-    CONNECT = create_stomp_msg("CONNECT", {"protocol-version":"1.5", "accept-version":"1.1,1.0", "heart-beat":"10000,10000"})
-    SUB_REQRES = create_stomp_msg("SUBSCRIBE", {"id":"/user/request-response", "destination":"/user/request-response"})
-    SUB_ERR = create_stomp_msg("SUBSCRIBE", {"id":"/user/error", "destination":"/user/error"})
+    CONNECT = create_stomp_msg("CONNECT", [("protocol-version","1.5"), ("accept-version","1.1,1.0"), ("heart-beat","10000,10000")])
+    SUB_REQRES = create_stomp_msg("SUBSCRIBE", [("id","/user/request-response"), ("destination","/user/request-response")])
+    SUB_ERR = create_stomp_msg("SUBSCRIBE", [("id","/user/error"), ("destination","/user/error")])
 
     def __init__(self) -> NoReturn:
         super().__init__([' - '])
@@ -54,7 +54,7 @@ class Solverde(Site):
 
                 odds = []
 
-                async with ws.connect("wss://apostas.solverde.pt/api/374/0iiv1wey/websocket", open_timeout=Solverde.timeout) as websocket:
+                async with ws.connect("wss://apostas.solverde.pt/api/735/palzf22q/websocket", open_timeout=Solverde.timeout) as websocket:
 
                     # get "o" to confirm connetion
                     await websocket.recv() 
@@ -67,10 +67,18 @@ class Solverde(Site):
                     await websocket.send(Solverde.SUB_REQRES)
                     await websocket.send(Solverde.SUB_ERR)
                     answer = await websocket.recv()
+                
+                    # Get league prefix
+                    await websocket.send(self.country_prefix_query(league_code.country_code))
 
+                    if (competition := self.parse_stomp_msg(await websocket.recv())) == {}:
+                        return []
+                    
                     # Subscribe to league api and obtain event codes
-                    await websocket.send(self.league_query(league_code.league_id, league_code.country_code))
-                    events = self.parse_stomp_msg(await websocket.recv())
+                    await websocket.send(self.league_query(league_code.league_id, league_code.country_code, competition["prefix"]))
+
+                    if (events := self.parse_stomp_msg(await websocket.recv())) == {} or len(events["groups"]) == 0:
+                        return []
 
                     # Extract odds of all games in league
                     for event in events["groups"][0]["events"]:
@@ -93,22 +101,27 @@ class Solverde(Site):
             return None
 
     
-    def league_query(self, id: str = '19328', country_code: str = 'it'):
-
-        id_destination = "/api/eventgroups/t-soccer-" + country_code + "-sb_type_" + id + "-all-match-events-grouped-by-type"
-        return create_stomp_msg("SUBSCRIBE", {"id":id_destination, "destination":id_destination, "locale":"pt"})
+    def country_prefix_query(self, country_code: str = 'it'):
+        id_destination = "/api/container/soccer-" + country_code + "-competitions"
+        return create_stomp_msg("SUBSCRIBE", [("id", id_destination), ("destination", id_destination), ("locale", "pt")])
+    
+    def league_query(self, id: str = '19328', country_code: str = 'it', country_prefix: str = '-t'):
+        
+        id_destination = "/api/eventgroups/"+ country_prefix + "soccer-" + country_code + "-sb_type_" + id + "-all-match-events-grouped-by-type"
+        return create_stomp_msg("SUBSCRIBE", [("id",id_destination), ("destination",id_destination), ("locale","pt")])
 
     def game_query(self, ID=4914891889):
 
         id_destination = "/api/events/" + str(ID)
-        return create_stomp_msg("SUBSCRIBE", {"id":id_destination, "destination":id_destination, "locale":"pt"})
+        return create_stomp_msg("SUBSCRIBE", [("id",id_destination), ("destination",id_destination), ("locale","pt")])
     
     def market_query(self, ID=4914893549):
 
         id_destination = "/api/markets/" + str(ID)
-        return create_stomp_msg("SUBSCRIBE", {"id":id_destination, "destination":id_destination, "locale":"pt"})
+        return create_stomp_msg("SUBSCRIBE", [("id",id_destination), ("destination",id_destination), ("locale","pt")])
 
     def parse_stomp_msg(self, msg):
+
 
         if len(msg) < 10:
             return {}

@@ -12,9 +12,9 @@ import drawfit.domain.followables as f
 import drawfit.database.database_store as d
 from drawfit.dtos import LeagueDto, DomainDto
 from drawfit.database.drawfit_error import DrawfitError
-from drawfit.database.db_messages import TeamNotFound, LeagueNotFound
+from drawfit.database.db_messages import TeamNotFound, LeagueNotFound, GameAlreadyRegistered
 
-from drawfit.utils import Sites, OddSample, LeagueCode, now_lisbon
+from drawfit.utils import Sites, OddSample, LeagueCode, now_lisbon, str_dates
 
 class DomainStore:
     
@@ -102,7 +102,7 @@ class DomainStore:
     def processSample(self, league: l.League, site: Sites, sample: OddSample) -> notf.Notification:
         # 1 - sample's game name is being monitored so the odd is added
         team = next((team for team in league.teams.values() \
-                if (not team.current_game is None) and team.current_game.isId(site, sample.game_id)\
+                if (team.active) and (not team.current_game is None) and team.current_game.isId(site, sample.game_id)\
                     ), None)
 
         if team is not None:
@@ -128,7 +128,7 @@ class DomainStore:
 
         # 2 - test if the game has a team that is recognized
         team = next((team for team in self.teams.values() \
-                if team.isId(site, sample.team1_id) or team.isId(site, sample.team2_id)\
+                if team.active and (team.isId(site, sample.team1_id) or team.isId(site, sample.team2_id))\
                     ), None)
         
         if team is not None and sample.start_time >= sample.sample_time:
@@ -156,10 +156,36 @@ class DomainStore:
             
             new_game = f.Game(sample.game_name, sample.start_time, team, league)
             
-            with self.db_store as db:
-                db.registerGame(team.name, new_game.name, new_game.date, league.name)
-                db.addGameId(new_game.name, new_game.date, site, sample.game_id)
-                db.registerOdd(new_game.name, new_game.date, site, sample.odd, sample.sample_time)
+            try:
+
+                with self.db_store as db:
+                    db.registerGame(team.name, new_game.name, new_game.date, league.name)
+                    db.addGameId(new_game.name, new_game.date, site, sample.game_id)
+                    db.registerOdd(new_game.name, new_game.date, site, sample.odd, sample.sample_time)
+            
+            except DrawfitError as e:
+                if e.error_message == GameAlreadyRegistered(new_game.name, str_dates(new_game.date)):
+                    correct_team_id = sample.team1_id if team.isId(site, sample.team2_id) else sample.team2_id
+                    print(f"correct_team_id: {correct_team_id};wrong team: {team.name}: site: {site};")
+                    
+                    try:
+                        possible_team = next(team2 for team2 in self.teams.values() \
+                            if team.active and team2.isId(site, correct_team_id))
+                        with self.db_store as db:
+                            db.addTeamId(correct_team.name, site, correct_team_id)
+                            db.addGameId(new_game.name, new_game.date, site, sample.game_id)
+
+                        correct_team.setId(site, correct_team_id)
+                        correct_team.current_game.setId(site, sample.game_id)
+                        return None
+                    except StopIteration:
+                        possible_team = next(team2 for team2 in self.teams.values() \
+                            if team.active and team2.couldBeId(site, correct_team_id))
+                        
+                        return notf.PossibleTeamNotification(possible_team.name, sample, correct_team_id, site, league.color, league.name)
+                else:
+                    raise e
+
             
             new_game.setId(site, sample.game_id)
             new_game.addOdd(sample.odd, sample.sample_time, site)
@@ -208,21 +234,26 @@ class DomainStore:
             self.leagues[league_name] = db.getLeague(league_name)
     
     def setLeagueCode(self, league_name: str, code: LeagueCode) -> NoReturn:
-        with self.db_store as db:
-            if self.leagues[league_name].codes[code.getSite()] is None:
-                db.addLeagueCode(league_name, code.getSite(), str(code))
-            else:
-                db.updateLeagueCode(league_name, code.getSite(), str(code))
-        
-        self.leagues[league_name].setCode(code)
+        try:
+            with self.db_store as db:
+                if self.leagues[league_name].codes[code.getSite()] is None:
+                    db.addLeagueCode(league_name, code.getSite(), str(code))
+                else:
+                    db.updateLeagueCode(league_name, code.getSite(), str(code))
+            
+            self.leagues[league_name].setCode(code)
+        except KeyError:
+            raise DrawfitError(LeagueNotFound(league_name))
         
     def setLeagueColor(self, league_name: str, color_name: str) -> NoReturn:
-        with self.db_store as db:
-            new_color = db.getColor(color_name)
-            db.updateLeagueColor(league_name, new_color)
-        
-        self.leagues[league_name].color = new_color
-    
+        try:
+            with self.db_store as db:
+                new_color = db.getColor(color_name)
+                db.updateLeagueColor(league_name, new_color)
+            
+            self.leagues[league_name].color = new_color
+        except KeyError:
+            raise DrawfitError(LeagueNotFound(league_name))
     
     def eraseLeague(self, league_name: str) -> NoReturn:
 
@@ -270,37 +301,52 @@ class DomainStore:
             self.teams[team_name] = db.getTeam(team_name)
     
     def addTeamKeywords(self, team_name: str, keywords: List[str]) -> NoReturn:
-        self.teams[team_name].addKeywords(keywords)
+        try:
+            self.teams[team_name].addKeywords(keywords)
+        except KeyError:
+            raise DrawfitError(TeamNotFound(team_name))
     
     def setTeamId(self, team_name: str, site: Sites, team_id: Tuple[str], league_name: str) -> NoReturn:
-        team = self.teams[team_name]
-        
-        with self.db_store as db:
-            db.addTeamId(team.name, site, team_id)
+        try:
+            team = self.teams[team_name]
             
-        if not league_name in team.leagues:
-            self.addTeamToLeague(team_name, league_name)
-        team.setId(site, team_id)
+            with self.db_store as db:
+                db.addTeamId(team.name, site, team_id)
+                
+            if not league_name in team.leagues:
+                self.addTeamToLeague(team_name, league_name)
+            team.setId(site, team_id)
+        except KeyError:
+            raise DrawfitError(TeamNotFound(team_name))
     
     def removeConsideredId(self, team_name: str, site: Sites, team_id: Tuple[str]) -> NoReturn:
-        self.teams[team_name].removeConsidered(site, team_id)
+        try:
+            self.teams[team_name].removeConsidered(site, team_id)
+        except KeyError:
+            raise DrawfitError(TeamNotFound(team_name))
     
     def activateTeam(self, team_name: str) -> NoReturn:
-        with self.db_store as db:
-            db.activateTeam(team_name)
-    
-        self.teams[team_name].active = True
+        try:
+            with self.db_store as db:
+                db.activateTeam(team_name)
+        
+            self.teams[team_name].active = True
+        except KeyError:
+            raise DrawfitError(TeamNotFound(team_name))
 
-    def deactivateTeam(self, team_id: str) -> NoReturn:
-        with self.db_store as db:
-            db.deactivateTeam(team_name)
-            if not (game := self.teams[team_name].current_game) is None:
-                db.deleteGameIds(game.name, game.date)
-                db.deleteGameOdds(game.name, game.date)
-                db.deleteGame(game.name, game.date)
-    
-        self.teams[team_name].active = False
-        self.teams[team_name].current_game = None
+    def deactivateTeam(self, team_name: str) -> NoReturn:
+        try:
+            with self.db_store as db:
+                db.deactivateTeam(team_name)
+                if not (game := self.teams[team_name].current_game) is None:
+                    db.deleteGameIds(game.name, game.date)
+                    db.deleteGameOdds(game.name, game.date)
+                    db.deleteGame(game.name, game.date)
+        
+            self.teams[team_name].current_game = None
+            self.teams[team_name].active = False
+        except KeyError:
+            raise DrawfitError(TeamNotFound(team_name))
     
     def eraseTeam(self, team_name: str) -> NoReturn:
         try:
@@ -329,7 +375,7 @@ class DomainStore:
     #--- Read Methods
     def getTotalTeamGames(self, team_name: str) -> int:
         with self.db_store as db:
-            return db.getTeamTotalGames(team_name)
+            return db.getTotalTeamGames(team_name)
         
     #----------------------------------------------------------------------
     #-------------- Other Methods

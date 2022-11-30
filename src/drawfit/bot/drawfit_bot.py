@@ -113,6 +113,7 @@ class DrawfitBot(commands.Bot):
             print(f'Update ended. With {len(notifications)} notifications')
 
             for notification in notifications:
+                await asyncio.sleep(1)
                 self.notify(notification)
 
             print('All notification tasks created')

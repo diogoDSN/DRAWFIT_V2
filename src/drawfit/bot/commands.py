@@ -435,6 +435,8 @@ async def eraseLeague(ctx: commands.Context, *, league_name = ''):
         number_of_games = ctx.bot.store.getTotalLeagueGames(league_name)
 
         await ctx.send(eraseLeagueConfirmation(league_name, number_of_games))
+
+        m_check = MessageCheck(ctx)
         
         while True:
             try:
@@ -477,6 +479,8 @@ async def eraseTeam(ctx: commands.Context, *, team_name = ''):
         
         number_of_games = ctx.bot.store.getTotalTeamGames(team_name)
         await ctx.send(eraseTeamConfirmation(team_name, number_of_games))
+
+        m_check = MessageCheck(ctx)
         
         while True:
             try:

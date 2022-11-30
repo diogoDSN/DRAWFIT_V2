@@ -174,6 +174,8 @@ class Page:
 
         try:
             await self.page_message.edit(content=None, embed=self.makeEmbed())
+        except ValueError:
+            pass
         except Exception:
             print(traceback.format_exc())
             await self.page_message.reply('Error generating page!')
@@ -198,7 +200,6 @@ class Page:
 
             return await self.select(number)
         except Exception:
-            print(traceback.format_exc())
             return self
     
     

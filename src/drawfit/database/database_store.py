@@ -21,7 +21,7 @@ class DatabaseStore:
         self._db_connection = None
     
     def __enter__(self) -> DatabaseStore:
-        self._db_connection = connect(dbname='drawfit_mock', user='drawfit_bot', host='localhost', password='McMahaeWsNoBeat')
+        self._db_connection = connect(dbname='drawfit', user='drawfit_bot', host='localhost', password='McMahaeWsNoBeat')
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback) -> NoReturn:
@@ -331,11 +331,11 @@ class DatabaseStore:
     
     def activateTeam(self, team_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE team SET active=true WHERE name=(%s);", team_name)
+            cursor.execute("UPDATE team SET active=true WHERE name=(%s);", (team_name, ))
     
     def deactivateTeam(self, team_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE team SET active=false WHERE name=(%s);", team_name)
+            cursor.execute("UPDATE team SET active=false WHERE name=(%s);", (team_name,))
     
     def deleteGameIds(self, game_name: str, game_date: datetime) -> NoReturn:
         with self.db_connection.cursor() as cursor:
@@ -351,7 +351,7 @@ class DatabaseStore:
     
     def deleteGame(self, game_name: str, game_date: datetime) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("DELETE FROM game WHERE game_name=(%s) AND game_date=(%s);", (game_name, to_utc(game_date)))
+            cursor.execute("DELETE FROM game WHERE name=(%s) AND date=(%s);", (game_name, to_utc(game_date)))
     
     def getTotalLeagueGames(self, league_name: str) -> int:
         with self.db_connection.cursor() as cursor:
@@ -375,10 +375,12 @@ class DatabaseStore:
 
     def deleteLeague(self, league_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
+            cursor.execute("DELETE FROM plays_in WHERE league_name=(%s);", (league_name,))
             cursor.execute("DELETE FROM league WHERE name=(%s);", (league_name,))
     
     def deleteTeam(self, team_name: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:
+            cursor.execute("DELETE FROM plays_in WHERE team_name=(%s);", (team_name,))
             cursor.execute("DELETE FROM team WHERE name=(%s);", (team_name,))
     
     def deleteTeamIds(self, team_name: str) -> NoReturn:

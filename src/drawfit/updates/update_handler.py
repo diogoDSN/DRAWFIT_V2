@@ -16,7 +16,7 @@ from drawfit.utils import Sites
 
 class UpdateHandler:
 
-    requests_interval = 1
+    requests_interval = 0.1
 
     def __init__(self, store: DomainStore):
         self.store: DomainStore = store
@@ -45,11 +45,11 @@ class UpdateHandler:
                 tasks[site] = asyncio.create_task(self.sites[site].getOddsLeague(session, league_codes[site]))
 
             for site in Sites:
-
                 results[league][site] = await tasks[site]
 
             await asyncio.sleep(UpdateHandler.requests_interval)
                 
+        print("Processing Results")
 
         return self.store.updateLeaguesOdds(results)
         
