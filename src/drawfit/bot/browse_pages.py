@@ -651,7 +651,7 @@ class GamePage(Page):
 
 class OddsHistoryPage(SubPagedPage):
 
-    page_size = 2
+    page_size = 10
 
     sites_emojis = {Sites.Bwin :   'bwin',
                     Sites.Betano:  'betano',
@@ -696,7 +696,7 @@ class OddsHistoryPage(SubPagedPage):
             # Generate line of each column
             self.columns[OddsHistoryPage.time].append(f'{min_odd.hours_left:05.1f}')
             for site in Sites:
-                self.columns[site].append('----' if not site in odds_buffer else f'{odds_aux[site].pop(0).value:04.1f}')
+                self.columns[site].append('----' if not site in odds_buffer else f'{odds_aux[site].pop(0).value:0<4.2f}')
 
         super().__init__(user, page_message, emojis, set(), toggle_chars, OddsHistoryPage.page_size, len(self.columns[OddsHistoryPage.time]))
         self.toggles_on = self.toggles_on.union(OddsHistoryPage.sites_emojis.values())
