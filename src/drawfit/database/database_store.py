@@ -21,7 +21,7 @@ class DatabaseStore:
         self._db_connection = None
     
     def __enter__(self) -> DatabaseStore:
-        self._db_connection = connect(dbname='drawfit', user='drawfit_bot', host='localhost', password='McMahaeWsNoBeat')
+        self._db_connection = connect(dbname='drawfit', user='drawfit_bot', host='localhost', password='+Y5AeW#l>,mi$F3p1jWV')
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback) -> NoReturn:
@@ -283,7 +283,7 @@ class DatabaseStore:
     
     def updateLeagueColor(self, league_name: str, color: int) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE league SET color=(%s) WHERE name=(%s);", (color, league_name))
+            cursor.execute("UPDATE league SET color_code=(%s) WHERE name=(%s);", (color, league_name))
     
     def updateLeagueCode(self, league_name: str, site: Site, code: str) -> NoReturn:
         with self.db_connection.cursor() as cursor:

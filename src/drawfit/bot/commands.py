@@ -156,7 +156,7 @@ async def changeLeagueColor(ctx: commands.Context, *, arguments = ''):
                 await message.reply('Invalid color number.')
                 continue
 
-        ctx.bot.store.changeLeagueColor(arguments, options[n-1][0])
+        ctx.bot.store.setLeagueColor(arguments, options[n-1][0])
         await ctx.send('Color successfully changed!')
         
     except DrawfitError as e:

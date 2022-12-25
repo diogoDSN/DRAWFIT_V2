@@ -85,10 +85,11 @@ class Solverde(Site):
                         await websocket.send(self.game_query(event['id']))
                         game = self.parse_stomp_msg(await websocket.recv())
 
-                        await websocket.send(self.market_query(game['marketTypesToIds']['1'][0]))
-                        market = self.parse_stomp_msg(await websocket.recv())
-                                
-                        odds.append(OddSample(self.getTeams(game['name']), float(self.extract_odds(market)), convertDate(event['startTime']), now_lisbon()))
+                        if '1' in game['marketTypesToIds']:
+                            await websocket.send(self.market_query(game['marketTypesToIds']['1'][0]))
+                            market = self.parse_stomp_msg(await websocket.recv())
+                                    
+                            odds.append(OddSample(self.getTeams(game['name']), float(self.extract_odds(market)), convertDate(event['startTime']), now_lisbon()))
 
                 return odds
 

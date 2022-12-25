@@ -148,8 +148,34 @@ EXECUTE PROCEDURE check_odd_sampled_before_game();
 DROP TRIGGER IF EXISTS check_only_current_game_update_trigger ON game;
 DROP TRIGGER IF EXISTS check_only_current_game_insert_trigger ON game;
 
---(IC-2) Each team can only have one game registered in the future--
-CREATE OR REPLACE FUNCTION check_only_current_game() 
+--(IC-2) Each team can only have one game registered in the future-- (update)
+CREATE OR REPLACE FUNCTION check_only_current_game_update() 
+RETURNS TRIGGER AS
+$$
+DECLARE unidades_var INTEGER;
+
+BEGIN
+    -- Checks if the inserted/updated game is in the future and if there exists another game in the future for the same team
+    IF NEW.date > current_timestamp and 
+       EXISTS(SELECT * FROM game WHERE team_name = NEW.team_name AND name != NEW.name AND date > current_timestamp) 
+    THEN
+        RAISE EXCEPTION 'Tried insertign/updating game %. The new games date is invalid: %. There is another current game for the same team.',
+                        NEW.name, NEW.date;
+    END IF;
+
+    RETURN new;
+END
+$$
+LANGUAGE plpgsql;
+
+
+CREATE TRIGGER check_only_current_game_update_trigger 
+BEFORE UPDATE OF date ON game
+FOR EACH ROW WHEN (OLD.* IS DISTINCT FROM NEW.*)
+EXECUTE PROCEDURE check_only_current_game_update();
+
+--(IC-3) Each team can only have one game registered in the future-- (insert)
+CREATE OR REPLACE FUNCTION check_only_current_game_insert() 
 RETURNS TRIGGER AS
 $$
 DECLARE unidades_var INTEGER;
@@ -168,16 +194,10 @@ END
 $$
 LANGUAGE plpgsql;
 
-
-CREATE TRIGGER check_only_current_game_update_trigger 
-BEFORE UPDATE OF date ON game
-FOR EACH ROW WHEN (OLD.* IS DISTINCT FROM NEW.*)
-EXECUTE PROCEDURE check_only_current_game();
-
 CREATE TRIGGER check_only_current_game_insert_trigger 
 BEFORE INSERT ON game
 FOR EACH ROW
-EXECUTE PROCEDURE check_only_current_game();
+EXECUTE PROCEDURE check_only_current_game_insert();
 
 ----------------------------------------
 -- Role Creation
