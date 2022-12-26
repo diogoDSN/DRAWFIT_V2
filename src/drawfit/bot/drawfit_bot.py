@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import asyncio
-
+import logging
 from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn
 
 import discord
@@ -14,7 +14,7 @@ import drawfit.domain.domain_store as store
 import drawfit.updates.update_handler as updates
 
 from drawfit.bot.permissions import Permissions
-from drawfit.utils import Sites, valid_sites
+from drawfit.utils import Sites, valid_sites, create_new_logger
 
 if TYPE_CHECKING:
     import drawfit.domain.notifications as notf
@@ -23,13 +23,12 @@ if TYPE_CHECKING:
 class DrawfitBot(commands.Bot):
 
     greeting = '**Hello there!** - Obi-Wan Kenobi'
+    logger_name = 'bot'
     update_cycle = 30
     
     def __init__(self):
 
         intents = discord.Intents.all()
-        #TODO maybe retirar esta intention?
-        intents.members = True
         super().__init__(command_prefix='.', intents=intents)
 
         global valid_sites
@@ -41,6 +40,8 @@ class DrawfitBot(commands.Bot):
         self.pending_queries: List[asyncio.Task] = []
         self.routines: List[asyncio.Task] = []
         self.setup = False
+
+        self.logger = create_new_logger(DrawfitBot.logger_name)
 
         self.configureCommands()
     
@@ -106,17 +107,18 @@ class DrawfitBot(commands.Bot):
 
         while(True):
 
-            print('Update Started')
+            self.logger.debug('Update Started.')
 
             notifications = await handler.update()
 
-            print(f'Update ended. With {len(notifications)} notifications')
+            if len(notifications) != 0:
+                self.logger.debug(f'Creating {len(notifications)} notifications.')
 
             for notification in notifications:
                 await asyncio.sleep(1)
                 self.notify(notification)
 
-            print('All notification tasks created')
+            self.logger.debug('Update Ended.')
 
             await asyncio.sleep(DrawfitBot.update_cycle)
     
@@ -126,9 +128,8 @@ class DrawfitBot(commands.Bot):
         elif error.__class__ == commands.CommandNotFound:
             pass
         else:
-            raise error
+            self.logger.error(f'{error} on command error.', exc_info=True)
     
-
     def notify(self, notification: notf.Notification) -> NoReturn:
         self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
 
@@ -174,14 +175,3 @@ class DrawfitBot(commands.Bot):
                 channels.append(channel)
 
         return channels  
-    
-    def save(self) -> bool:
-        try:
-            with open(SAVE_PATH, 'wb') as f:
-                pickle.dump(self.store, f)
-            
-            return True
-        except Exception:
-            pass
-        
-        return False
