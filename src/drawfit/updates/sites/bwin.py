@@ -4,7 +4,6 @@ from typing import Dict, List, NoReturn
 from requests_html import AsyncHTMLSession
 
 from drawfit.updates.sites.site import Site
-from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
 from drawfit.utils import Sites, OddSample, BwinCode, now_lisbon
 
@@ -22,25 +21,17 @@ class Bwin(Site):
         Arguments:
             session - the async session through which the request is made
             leagueId - a dictionary with the following structure {"regionId" : id, "competitionId" : id}
-        Throws:
-            SiteError - when an error during parsing ocurred
         """
         if self.active and league_code is not None:
 
-            try:
+            # Creates the request url
+            bwin_url = self.buildUrl(region_id=league_code.region_id, competition_id=league_code.competition_id)
 
-                # Creates the request url
-                bwin_url = self.buildUrl(region_id=league_code.region_id, competition_id=league_code.competition_id)
+            # Makes request to api
+            request = await session.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
 
-                # Makes request to api
-                request = await session.get(bwin_url, headers={"User-Agent": "Mozilla/5.0"})
-
-                # Gets the odds from the info
-                return self.parseResponse(request.json())
-
-            except:
-                return None
-                #raise SiteError(Sites.Bwin.name)
+            # Gets the odds from the info
+            return self.parseResponse(request.json())
 
         else:
             return None

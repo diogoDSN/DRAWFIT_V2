@@ -12,15 +12,18 @@ import drawfit.domain.domain_store as ds
 
 from drawfit.updates.sites import Site, Bwin, Betano, Solverde, Moosh, Betway, Betclic
 
-from drawfit.utils import Sites
+from drawfit.utils import Sites, create_new_logger
 
 class UpdateHandler:
 
     requests_interval = 0.1
+    logger_name = 'updates'
 
     def __init__(self, store: DomainStore):
         self.store: DomainStore = store
         self.sites: Dict[Sites, Optional[Site]] = {site: None for site in Sites}
+        self.logger = create_new_logger(UpdateHandler.logger_name)
+        
         self.sites[Sites.Bwin] = Bwin()
         self.sites[Sites.Betano] = Betano()
         self.sites[Sites.Solverde] = Solverde()
@@ -45,11 +48,12 @@ class UpdateHandler:
                 tasks[site] = asyncio.create_task(self.sites[site].getOddsLeague(session, league_codes[site]))
 
             for site in Sites:
-                results[league][site] = await tasks[site]
+                try:
+                    results[league][site] = await tasks[site]
+                except:
+                    self.logger.error(f'Exception occurred when trying to parse odds from {site.name}', exc_info=True)
 
             await asyncio.sleep(UpdateHandler.requests_interval)
-                
-        print("Processing Results")
 
         return self.store.updateLeaguesOdds(results)
         

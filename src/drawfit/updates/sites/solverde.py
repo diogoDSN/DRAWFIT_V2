@@ -7,7 +7,6 @@ from requests_html import AsyncHTMLSession
 
 
 from drawfit.updates.sites.site import Site
-from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
 from drawfit.utils import Sites, OddSample, SolverdeCode, now_lisbon
 
@@ -45,58 +44,49 @@ class Solverde(Site):
         Arguments:
             session - the async session through which the request is made
             leagueId - a dictionary with the following structure {"regionId" : id, "competitionId" : id}
-        Throws:
-            SiteError - when an error during parsing ocurred
         """
         if self.active and league_code is not None:
 
-            try:
+            odds = []
 
-                odds = []
+            async with ws.connect("wss://apostas.solverde.pt/api/735/palzf22q/websocket", open_timeout=Solverde.timeout) as websocket:
 
-                async with ws.connect("wss://apostas.solverde.pt/api/735/palzf22q/websocket", open_timeout=Solverde.timeout) as websocket:
+                # get "o" to confirm connetion
+                await websocket.recv() 
 
-                    # get "o" to confirm connetion
-                    await websocket.recv() 
+                # Trade CONNECT messages to establish protocol (I think)
+                await websocket.send(Solverde.CONNECT)
+                await websocket.recv() 
 
-                    # Trade CONNECT messages to establish protocol (I think)
-                    await websocket.send(Solverde.CONNECT)
-                    await websocket.recv() 
+                # Subscribe to user/error to get error messages and to user/request-response to be updated on data (most responses sent to this destination, i think
+                await websocket.send(Solverde.SUB_REQRES)
+                await websocket.send(Solverde.SUB_ERR)
+                answer = await websocket.recv()
+            
+                # Get league prefix
+                await websocket.send(self.country_prefix_query(league_code.country_code))
 
-                    # Subscribe to user/error to get error messages and to user/request-response to be updated on data (most responses sent to this destination, i think
-                    await websocket.send(Solverde.SUB_REQRES)
-                    await websocket.send(Solverde.SUB_ERR)
-                    answer = await websocket.recv()
+                if (competition := self.parse_stomp_msg(await websocket.recv())) == {}:
+                    return []
                 
-                    # Get league prefix
-                    await websocket.send(self.country_prefix_query(league_code.country_code))
+                # Subscribe to league api and obtain event codes
+                await websocket.send(self.league_query(league_code.league_id, league_code.country_code, competition["prefix"]))
 
-                    if (competition := self.parse_stomp_msg(await websocket.recv())) == {}:
-                        return []
-                    
-                    # Subscribe to league api and obtain event codes
-                    await websocket.send(self.league_query(league_code.league_id, league_code.country_code, competition["prefix"]))
+                if (events := self.parse_stomp_msg(await websocket.recv())) == {} or len(events["groups"]) == 0:
+                    return []
 
-                    if (events := self.parse_stomp_msg(await websocket.recv())) == {} or len(events["groups"]) == 0:
-                        return []
+                # Extract odds of all games in league
+                for event in events["groups"][0]["events"]:
+                    await websocket.send(self.game_query(event['id']))
+                    game = self.parse_stomp_msg(await websocket.recv())
 
-                    # Extract odds of all games in league
-                    for event in events["groups"][0]["events"]:
-                        await websocket.send(self.game_query(event['id']))
-                        game = self.parse_stomp_msg(await websocket.recv())
+                    if '1' in game['marketTypesToIds']:
+                        await websocket.send(self.market_query(game['marketTypesToIds']['1'][0]))
+                        market = self.parse_stomp_msg(await websocket.recv())
+                                
+                        odds.append(OddSample(self.getTeams(game['name']), float(self.extract_odds(market)), convertDate(event['startTime']), now_lisbon()))
 
-                        if '1' in game['marketTypesToIds']:
-                            await websocket.send(self.market_query(game['marketTypesToIds']['1'][0]))
-                            market = self.parse_stomp_msg(await websocket.recv())
-                                    
-                            odds.append(OddSample(self.getTeams(game['name']), float(self.extract_odds(market)), convertDate(event['startTime']), now_lisbon()))
-
-                return odds
-
-            except Exception:
-                print(traceback.format_exc())
-                return None
-                #raise SiteError(Sites.Solverde.name)
+            return odds
 
         else:
             return None

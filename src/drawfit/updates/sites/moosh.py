@@ -6,7 +6,6 @@ from requests_html import AsyncHTMLSession
 
 
 from drawfit.updates.sites.site import Site
-from drawfit.updates.exceptions import SiteError
 from drawfit.updates.utils import convertDate
 from drawfit.utils import Sites, OddSample, MooshCode, now_lisbon
 
@@ -27,31 +26,21 @@ class Moosh(Site):
         Arguments:
             session - the async session through which the request is made
             leagueId - a dictionary with the following structure {"regionId" : id, "competitionId" : id}
-        Throws:
-            SiteError - when an error during parsing ocurred
         """
         if self.active and league_code is not None:
 
-            try:
+            async with ws.connect(await self.build_url(session), open_timeout=Moosh.timeout) as websocket:
 
-                async with ws.connect(await self.build_url(session), open_timeout=Moosh.timeout) as websocket:
+                await websocket.send(self.prepSportsRequest())
+                sportID = self.getSportID(await websocket.recv())
 
-                    await websocket.send(self.prepSportsRequest())
-                    sportID = self.getSportID(await websocket.recv())
+                await websocket.send(self.prepLeaguesRequest(sportID))
+                leagueID, ptID = self.getLeaguePTID(await websocket.recv(), league_code.name)
 
-                    await websocket.send(self.prepLeaguesRequest(sportID))
-                    leagueID, ptID = self.getLeaguePTID(await websocket.recv(), league_code.name)
+                await websocket.send(self.prepEventsRequest(sportID, leagueID, ptID))
+                odds = self.getLeagueOdds(await websocket.recv())
 
-                    await websocket.send(self.prepEventsRequest(sportID, leagueID, ptID))
-                    odds = self.getLeagueOdds(await websocket.recv())
-
-
-
-                return odds
-
-            except:
-                return None
-                #raise SiteError(Sites.Moosh.name)
+            return odds
 
         else:
             return None
