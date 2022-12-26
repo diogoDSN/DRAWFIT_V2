@@ -161,4 +161,5 @@ cython_debug/
 
 src/drawfit/parameters.py
 src/drawfit/token.txt
+log/*
 .DS_Store
