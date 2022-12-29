@@ -357,6 +357,7 @@ class DomainStore:
                     db.deleteGameIds(game_name, game_date)
                     db.deleteGame(game_name, game_date)
                 
+                db.deleteTeamIds(team_name)
                 db.deleteTeam(team_name)
                 self.teams[team_name].current_game = None
             
