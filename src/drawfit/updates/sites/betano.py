@@ -41,7 +41,7 @@ class Betano(Site):
     def parseResponse(self, leaguesInfo) -> List[OddSample]:
         oddsList = []
         
-        if leaguesInfo["errorCode"] == 301 or leaguesInfo["data"] is None:
+        if "data" not in leaguesInfo or leaguesInfo["data"] is None:
             return oddsList
 
         for league in leaguesInfo["data"]["blocks"]:
