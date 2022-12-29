@@ -18,7 +18,7 @@ class Betano(Site):
     
     async def getOddsLeague(self, session: AsyncHTMLSession, league_code: BetanoCode) -> List[OddSample]:
         if self.active and league_code is not None:
-
+            
             # Creates the request url
             betano_url = self.buildUrl(league_code.id)
 
@@ -40,8 +40,8 @@ class Betano(Site):
 
     def parseResponse(self, leaguesInfo) -> List[OddSample]:
         oddsList = []
-
-        if leaguesInfo["data"] is None:
+        
+        if leaguesInfo["errorCode"] == 301 or leaguesInfo["data"] is None:
             return oddsList
 
         for league in leaguesInfo["data"]["blocks"]:
