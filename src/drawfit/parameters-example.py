@@ -19,5 +19,7 @@ PERMISSIONS = {Permissions.OWNER: ['UserOwner#1234'], \
 # Input the bots timezone (pytz name)
 TIME_ZONE = 'Example/Timezone'
 
-# Logs Folder Path
+# Logs config
 LOGS_PATH = '/your/path/to/logs'
+DEBUG_MODE = False
+SHELL_MODE = False

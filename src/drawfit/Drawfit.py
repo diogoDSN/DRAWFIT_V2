@@ -6,9 +6,8 @@ sys.path.append(dirname(abspath(__file__)))
 
 
 import drawfit.bot.drawfit_bot as dbot
-from drawfit.parameters import TOKEN_PATH
+import drawfit.parameters as prm
 from discord.errors import LoginFailure
-from drawfit.utils import DEBUG_MODE, SHELL_MODE
 
 def main():
 
@@ -18,13 +17,11 @@ def main():
     parser.add_argument('-s', '--shell', action='store_true')
     
     args = parser.parse_args()
-    
-    DEBUG_MODE = args.debug
-    SHELL_MODE = args.shell
-        
+    prm.DEBUG_MODE = (not prm.DEBUG_MODE) if args.debug else prm.DEBUG_MODE
+    prm.SHELL_MODE = (not prm.SHELL_MODE) if args.shell else prm.SHELL_MODE
     
     # Run bot
-    with open(TOKEN_PATH, 'r') as f:
+    with open(prm.TOKEN_PATH, 'r') as f:
         TOKEN = f.readline()[:-1]
 
     bot = dbot.DrawfitBot()

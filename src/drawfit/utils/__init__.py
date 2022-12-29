@@ -7,4 +7,4 @@ from .league_codes.league_code_error import LeagueCodeError
 
 from .time import *
 
-from .loggers import create_new_logger, DEBUG_MODE, SHELL_MODE
+from .loggers import create_new_logger
