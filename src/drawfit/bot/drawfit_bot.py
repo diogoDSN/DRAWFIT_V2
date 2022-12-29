@@ -128,7 +128,7 @@ class DrawfitBot(commands.Bot):
         elif error.__class__ == commands.CommandNotFound:
             pass
         else:
-            self.logger.error(f'{error} on command error.', exc_info=True)
+            self.logger.error(f'Command error on: [{ctx.message.content}].\n{error}', exc_info=True)
     
     def notify(self, notification: notf.Notification) -> NoReturn:
         self.notify_tasks.append(asyncio.create_task(notification.accept(self.notification_visitor)))
