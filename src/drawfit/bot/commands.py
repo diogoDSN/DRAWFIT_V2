@@ -500,7 +500,7 @@ async def eraseTeam(ctx: commands.Context, *, team_name = ''):
                 await ctx.reply('Timeout')
                 return
             except ValueError:
-                await message.reply('Invalid reply. (yes/no)')
+                await message.reply('Invalid reply. (reply with yes/no)')
                 continue
             
     except DrawfitError as e:
