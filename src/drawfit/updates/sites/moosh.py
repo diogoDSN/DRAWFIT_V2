@@ -123,6 +123,10 @@ class Moosh(Site):
     def getLeagueOdds(self, info):
         odds = []
         info = json.loads(info)
+        
+        
+        if "result" not in info:
+            return odds
 
         for market in info["result"]["markets"]:
             

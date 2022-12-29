@@ -24,7 +24,7 @@ class Betclic(Site):
             leagueId - a dictionary with the following structure {"regionId" : id, "competitionId" : id}
         """
         if self.active and league_code is not None:
-
+            
             # Creates the request url
             betclic_url = self.buildUrl(league_id=league_code.id)
 
@@ -40,6 +40,10 @@ class Betclic(Site):
 
     def parseResponse(self, leaguesInfo) -> List[OddSample]:
         oddsList = []
+        
+        if "unifiedEvents" not in leaguesInfo:
+            return oddsList
+        
         for event in leaguesInfo["unifiedEvents"]:
             
             for market in event["markets"]:
