@@ -28,7 +28,7 @@ class Betway(Site):
             leagueId - a dictionary with the following structure {"regionId" : id, "competitionId" : id}
         """
         if self.active and league_code is not None:
-
+            
             async with ws.connect(await self.build_url(session), open_timeout=Betway.timeout) as websocket:
 
                 await websocket.send(self.prepSportsRequest())
@@ -79,7 +79,6 @@ class Betway(Site):
         return json.dumps(res)
 
     def prepEventsRequest(self, sportID="1", leagueID="42884", ptID='180'):
-        #TODO might want to to bulk all league requests in this one query
         res={}
         res["jsonrpc"] = "2.0"
         res["params"] = {"eventState": "Mixed", "eventTypes": [], "ids":[], "regionIds":[], "pagination":{}, "marketTypeRequests":[]}
@@ -124,7 +123,6 @@ class Betway(Site):
     def getLeagueOdds(self, info):
         odds = []
         info = json.loads(info)
-
 
         for market in info["result"]["markets"]:
             

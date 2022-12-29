@@ -26,11 +26,13 @@ class UpdateHandler:
         
         self.sites[Sites.Bwin] = Bwin()
         self.sites[Sites.Betano] = Betano()
+        self.sites[Sites.Betclic] = Betclic()
         self.sites[Sites.Solverde] = Solverde()
         self.sites[Sites.Moosh] = Moosh()
+        # Betway deactivated for now
         self.sites[Sites.Betway] = Betway()
-        self.sites[Sites.Betclic] = Betclic()
-
+        self.sites[Sites.Betway].active = False
+        
     async def update(self) -> List[Notification]:
 
         codes_by_league = self.store.getAllLeagueCodes()
