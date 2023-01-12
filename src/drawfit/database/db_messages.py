@@ -45,3 +45,9 @@ def DuplicateTeamId(team_name: str, site_name: str) -> str:
 
 def DuplicateGameId(game_name: str, game_date: str, site_name: str) -> str:
     return f'The game [{game_name}] at date [{game_date}] already has an id registered for the site [{site_name}].'
+
+def TeamAlreadyDeactivated(team_name: str) -> str:
+    return f'The team [{team_name}] has already been deactivated.'
+
+def TeamAlreadyActivated(team_name: str) -> str:
+    return f'The team [{team_name}] has already been activated.'

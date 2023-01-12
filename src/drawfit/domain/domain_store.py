@@ -12,7 +12,7 @@ import drawfit.domain.followables as f
 import drawfit.database.database_store as d
 from drawfit.dtos import LeagueDto, DomainDto
 from drawfit.database.drawfit_error import DrawfitError
-from drawfit.database.db_messages import TeamNotFound, LeagueNotFound, GameAlreadyRegistered
+from drawfit.database.db_messages import TeamNotFound, LeagueNotFound, GameAlreadyRegistered, TeamAlreadyDeactivated, TeamAlreadyActivated
 
 from drawfit.utils import Sites, OddSample, LeagueCode, now_lisbon, str_dates
 
@@ -327,6 +327,9 @@ class DomainStore:
     
     def activateTeam(self, team_name: str) -> NoReturn:
         try:
+            if not self.teams[team_name].active:
+                raise DrawfitError(TeamAlreadyActivated(team_name))
+            
             with self.db_store as db:
                 db.activateTeam(team_name)
         
@@ -336,6 +339,9 @@ class DomainStore:
 
     def deactivateTeam(self, team_name: str) -> NoReturn:
         try:
+            if not self.teams[team_name].active:
+                raise DrawfitError(TeamAlreadyDeactivated(team_name))
+        
             with self.db_store as db:
                 db.deactivateTeam(team_name)
                 if not (game := self.teams[team_name].current_game) is None:
