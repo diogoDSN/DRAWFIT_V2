@@ -359,7 +359,17 @@ class DomainStore:
                 
                 db.deleteTeamIds(team_name)
                 db.deleteTeam(team_name)
-                self.teams[team_name].current_game = None
+                
+                team = self.teams[team_name]
+                
+                team.current_game = None
+                
+                for league in team.leagues:
+                    del league.teams[team_name]
+                    if team in league.inactive_teams:
+                        league.inactive_teams.remove(team)
+                
+                del self.teams[team_name]
             
         except KeyError:
             raise DrawfitError(TeamNotFound(team_name))
