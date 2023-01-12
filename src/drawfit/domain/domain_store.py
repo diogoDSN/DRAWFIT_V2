@@ -327,7 +327,7 @@ class DomainStore:
     
     def activateTeam(self, team_name: str) -> NoReturn:
         try:
-            if not self.teams[team_name].active:
+            if self.teams[team_name].active:
                 raise DrawfitError(TeamAlreadyActivated(team_name))
             
             with self.db_store as db:
