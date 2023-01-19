@@ -520,7 +520,7 @@ async def resetIds(ctx: commands.Context, *, team_name = ''):
     checkAnyArguments(team_name, resetIdsCorrectUsage())
 
     try:
-        ctx.bot.store.eraseId(team_name)
+        ctx.bot.store.resetTeamIds(team_name)
         await ctx.send(f'The following team had all its ids erased: `{team_name}`')
     except DrawfitError as e:
         await ctx.send(f'The given id couldn\'t be erased!\n{e.error_message}')
