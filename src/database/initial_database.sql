@@ -9,7 +9,6 @@ DROP TABLE IF EXISTS game cascade;
 DROP TABLE IF EXISTS game_id cascade;
 DROP TABLE IF EXISTS odd cascade;
 
-
 ----------------------------------------
 -- Table Creation
 ----------------------------------------
@@ -204,15 +203,64 @@ EXECUTE PROCEDURE check_only_current_game_insert();
 ----------------------------------------
 
 DROP ROLE IF EXISTS drawfit_bot;
-CREATE ROLE drawfit_bot WITH LOGIN ENCRYPTED PASSWORD 'example-password';
+CREATE ROLE drawfit_bot WITH LOGIN ENCRYPTED PASSWORD :drawfit_bot_pass;
 
-GRANT SELECT ON color TO drawfit_bot;
-GRANT SELECT ON site TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON game TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON league TO drawfit_bot;
+GRANT SELECT                         ON color       TO drawfit_bot;
+GRANT SELECT                         ON site        TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON game        TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON league      TO drawfit_bot;
 GRANT SELECT, INSERT, UPDATE, DELETE ON league_code TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON odd TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON plays_in TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON team TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON team_id TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON game_id TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON odd         TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON plays_in    TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON team        TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON team_id     TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON game_id     TO drawfit_bot;
+
+DROP ROLE IF EXISTS drawfit_power_bi;
+CREATE ROLE drawfit_power_bi WITH LOGIN ENCRYPTED PASSWORD :drawfit_power_bi_pass;
+
+GRANT SELECT ON color       TO drawfit_power_bi;
+GRANT SELECT ON site        TO drawfit_power_bi;
+GRANT SELECT ON game        TO drawfit_power_bi;
+GRANT SELECT ON league      TO drawfit_power_bi;
+GRANT SELECT ON league_code TO drawfit_power_bi;
+GRANT SELECT ON odd         TO drawfit_power_bi;
+GRANT SELECT ON plays_in    TO drawfit_power_bi;
+GRANT SELECT ON team        TO drawfit_power_bi;
+GRANT SELECT ON team_id     TO drawfit_power_bi;
+GRANT SELECT ON game_id     TO drawfit_power_bi;
+
+-------------------------------
+---- Sites
+-------------------------------
+
+INSERT INTO site VALUES ('Bwin')     ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Betano')   ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Betclic')  ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Solverde') ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Moosh')    ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Betway')   ON CONFLICT DO NOTHING;
+
+
+-------------------------------
+---- Colors
+-------------------------------
+
+INSERT INTO color VALUES ('White',    16777215) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Red',      16711680) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Orange',   16740352) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Yellow',   16776960) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Cyan',      4379892) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Blue',      4416472) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Navy',          117) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Green',     3978315) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Lime',     12578629) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Mint',     11206595) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Pink',     15741670) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Purple',    8388736) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Lavender', 14466815) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Maroon',    8388608) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Olive',     8421376) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Apricot',  16767153) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Brown',    10117924) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Gray',      8421504) ON CONFLICT DO NOTHING;
