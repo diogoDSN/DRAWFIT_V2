@@ -1,0 +1,5 @@
+.venv
+.vscode
+README.md
+.gitignore
+src/drawfit/parameters-example.py
