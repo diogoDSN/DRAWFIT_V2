@@ -1,5 +1,8 @@
-websockets==10.3
 discord==1.7.3
-requests-html==0.10.0
-pytz>=2022.1
+discord.py==2.1.0
 psycopg2==2.9.5
+pytest==7.1.2
+pytz==2022.6
+requests-html==0.10.0
+urllib3==1.26.13
+websockets==10.3
