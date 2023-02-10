@@ -29,7 +29,7 @@ class UpdateHandler:
         self.sites[Sites.Betclic] = Betclic()
         self.sites[Sites.Solverde] = Solverde()
         self.sites[Sites.Moosh] = Moosh()
-        # Betway deactivated for now
+        # Betway and Moosh deactivated for now
         self.sites[Sites.Betway] = Betway()
         self.sites[Sites.Betway].active = False
         

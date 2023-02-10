@@ -27,22 +27,25 @@ class Moosh(Site):
             session - the async session through which the request is made
             leagueId - a dictionary with the following structure {"regionId" : id, "competitionId" : id}
         """
-        if self.active and league_code is not None:
+        try:
+            if self.active and league_code is not None:
 
-            async with ws.connect(await self.build_url(session), open_timeout=Moosh.timeout) as websocket:
+                async with ws.connect(await self.build_url(session), open_timeout=Moosh.timeout) as websocket:
 
-                await websocket.send(self.prepSportsRequest())
-                sportID = self.getSportID(await websocket.recv())
+                    await websocket.send(self.prepSportsRequest())
+                    sportID = self.getSportID(await websocket.recv())
 
-                await websocket.send(self.prepLeaguesRequest(sportID))
-                leagueID, ptID = self.getLeaguePTID(await websocket.recv(), league_code.name)
+                    await websocket.send(self.prepLeaguesRequest(sportID))
+                    leagueID, ptID = self.getLeaguePTID(await websocket.recv(), league_code.name)
 
-                await websocket.send(self.prepEventsRequest(sportID, leagueID, ptID))
-                odds = self.getLeagueOdds(await websocket.recv())
+                    await websocket.send(self.prepEventsRequest(sportID, leagueID, ptID))
+                    odds = self.getLeagueOdds(await websocket.recv())
 
-            return odds
+                return odds
 
-        else:
+            else:
+                return None
+        except:
             return None
         
     
