@@ -1,13 +1,24 @@
-DROP TABLE IF EXISTS site cascade;
-DROP TABLE IF EXISTS team cascade;
-DROP TABLE IF EXISTS team_id cascade;
-DROP TABLE IF EXISTS color cascade;
-DROP TABLE IF EXISTS league cascade;
-DROP TABLE IF EXISTS league_code cascade;
-DROP TABLE IF EXISTS plays_in cascade;
-DROP TABLE IF EXISTS game cascade;
-DROP TABLE IF EXISTS game_id cascade;
-DROP TABLE IF EXISTS odd cascade;
+----------------------------------------
+-- Database Setup
+----------------------------------------
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+----------------------------------------
+-- Create Database and Connect
+----------------------------------------
+
+CREATE DATABASE drawfit WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_US.UTF-8';
+\connect drawfit
 
 ----------------------------------------
 -- Table Creation
@@ -203,7 +214,7 @@ EXECUTE PROCEDURE check_only_current_game_insert();
 ----------------------------------------
 
 DROP ROLE IF EXISTS drawfit_bot;
-CREATE ROLE drawfit_bot WITH LOGIN ENCRYPTED PASSWORD :drawfit_bot_pass;
+CREATE ROLE drawfit_bot WITH LOGIN PASSWORD :drawfit_bot_pass;
 
 GRANT SELECT                         ON color       TO drawfit_bot;
 GRANT SELECT                         ON site        TO drawfit_bot;
@@ -216,19 +227,19 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON team        TO drawfit_bot;
 GRANT SELECT, INSERT, UPDATE, DELETE ON team_id     TO drawfit_bot;
 GRANT SELECT, INSERT, UPDATE, DELETE ON game_id     TO drawfit_bot;
 
-DROP ROLE IF EXISTS drawfit_power_bi;
-CREATE ROLE drawfit_power_bi WITH LOGIN ENCRYPTED PASSWORD :drawfit_power_bi_pass;
+DROP ROLE IF EXISTS drawfit_read_only;
+CREATE ROLE drawfit_read_only;
 
-GRANT SELECT ON color       TO drawfit_power_bi;
-GRANT SELECT ON site        TO drawfit_power_bi;
-GRANT SELECT ON game        TO drawfit_power_bi;
-GRANT SELECT ON league      TO drawfit_power_bi;
-GRANT SELECT ON league_code TO drawfit_power_bi;
-GRANT SELECT ON odd         TO drawfit_power_bi;
-GRANT SELECT ON plays_in    TO drawfit_power_bi;
-GRANT SELECT ON team        TO drawfit_power_bi;
-GRANT SELECT ON team_id     TO drawfit_power_bi;
-GRANT SELECT ON game_id     TO drawfit_power_bi;
+GRANT SELECT ON color       TO drawfit_read_only;
+GRANT SELECT ON site        TO drawfit_read_only;
+GRANT SELECT ON game        TO drawfit_read_only;
+GRANT SELECT ON league      TO drawfit_read_only;
+GRANT SELECT ON league_code TO drawfit_read_only;
+GRANT SELECT ON odd         TO drawfit_read_only;
+GRANT SELECT ON plays_in    TO drawfit_read_only;
+GRANT SELECT ON team        TO drawfit_read_only;
+GRANT SELECT ON team_id     TO drawfit_read_only;
+GRANT SELECT ON game_id     TO drawfit_read_only;
 
 -------------------------------
 ---- Sites
