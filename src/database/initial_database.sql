@@ -1,14 +1,24 @@
-DROP TABLE IF EXISTS site cascade;
-DROP TABLE IF EXISTS team cascade;
-DROP TABLE IF EXISTS team_id cascade;
-DROP TABLE IF EXISTS color cascade;
-DROP TABLE IF EXISTS league cascade;
-DROP TABLE IF EXISTS league_code cascade;
-DROP TABLE IF EXISTS plays_in cascade;
-DROP TABLE IF EXISTS game cascade;
-DROP TABLE IF EXISTS game_id cascade;
-DROP TABLE IF EXISTS odd cascade;
+----------------------------------------
+-- Database Setup
+----------------------------------------
 
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+----------------------------------------
+-- Create Database and Connect
+----------------------------------------
+
+CREATE DATABASE drawfit WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE = 'en_US.UTF-8';
+\connect drawfit
 
 ----------------------------------------
 -- Table Creation
@@ -204,15 +214,64 @@ EXECUTE PROCEDURE check_only_current_game_insert();
 ----------------------------------------
 
 DROP ROLE IF EXISTS drawfit_bot;
-CREATE ROLE drawfit_bot WITH LOGIN ENCRYPTED PASSWORD 'example-password';
+CREATE ROLE drawfit_bot WITH LOGIN PASSWORD :drawfit_bot_pass;
 
-GRANT SELECT ON color TO drawfit_bot;
-GRANT SELECT ON site TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON game TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON league TO drawfit_bot;
+GRANT SELECT                         ON color       TO drawfit_bot;
+GRANT SELECT                         ON site        TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON game        TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON league      TO drawfit_bot;
 GRANT SELECT, INSERT, UPDATE, DELETE ON league_code TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON odd TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON plays_in TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON team TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON team_id TO drawfit_bot;
-GRANT SELECT, INSERT, UPDATE, DELETE ON game_id TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON odd         TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON plays_in    TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON team        TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON team_id     TO drawfit_bot;
+GRANT SELECT, INSERT, UPDATE, DELETE ON game_id     TO drawfit_bot;
+
+DROP ROLE IF EXISTS drawfit_read_only;
+CREATE ROLE drawfit_read_only;
+
+GRANT SELECT ON color       TO drawfit_read_only;
+GRANT SELECT ON site        TO drawfit_read_only;
+GRANT SELECT ON game        TO drawfit_read_only;
+GRANT SELECT ON league      TO drawfit_read_only;
+GRANT SELECT ON league_code TO drawfit_read_only;
+GRANT SELECT ON odd         TO drawfit_read_only;
+GRANT SELECT ON plays_in    TO drawfit_read_only;
+GRANT SELECT ON team        TO drawfit_read_only;
+GRANT SELECT ON team_id     TO drawfit_read_only;
+GRANT SELECT ON game_id     TO drawfit_read_only;
+
+-------------------------------
+---- Sites
+-------------------------------
+
+INSERT INTO site VALUES ('Bwin')     ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Betano')   ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Betclic')  ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Solverde') ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Moosh')    ON CONFLICT DO NOTHING;
+INSERT INTO site VALUES ('Betway')   ON CONFLICT DO NOTHING;
+
+
+-------------------------------
+---- Colors
+-------------------------------
+
+INSERT INTO color VALUES ('White',    16777215) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Red',      16711680) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Orange',   16740352) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Yellow',   16776960) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Cyan',      4379892) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Blue',      4416472) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Navy',          117) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Green',     3978315) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Lime',     12578629) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Mint',     11206595) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Pink',     15741670) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Purple',    8388736) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Lavender', 14466815) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Maroon',    8388608) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Olive',     8421376) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Apricot',  16767153) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Brown',    10117924) ON CONFLICT DO NOTHING;
+INSERT INTO color VALUES ('Gray',      8421504) ON CONFLICT DO NOTHING;

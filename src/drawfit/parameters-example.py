@@ -1,5 +1,3 @@
-# System path to your discord bot token
-TOKEN_PATH = "/path/to/token/token.txt"
 # System path to where your save will be
 SAVE_PATH = "/path/where/to/save" + "drawfit_save.pickle"
 
@@ -20,6 +18,5 @@ PERMISSIONS = {Permissions.OWNER: ['UserOwner#1234'], \
 TIME_ZONE = 'Example/Timezone'
 
 # Logs config
-LOGS_PATH = '/your/path/to/logs'
 DEBUG_MODE = False
 SHELL_MODE = False

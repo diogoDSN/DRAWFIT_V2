@@ -4,6 +4,7 @@ from typing import Dict, List, Tuple, NoReturn, TYPE_CHECKING, Optional
 from psycopg2 import connect
 from psycopg2.errors import UniqueViolation, ForeignKeyViolation, RaiseException
 from datetime import datetime
+from os import environ
 
 import drawfit.domain.notifications as notf
 import drawfit.domain.league as l
@@ -21,7 +22,12 @@ class DatabaseStore:
         self._db_connection = None
     
     def __enter__(self) -> DatabaseStore:
-        self._db_connection = connect(dbname='drawfit', user='drawfit_bot', host='localhost', password='+Y5AeW#l>,mi$F3p1jWV')
+        self._db_connection = connect(
+            dbname='drawfit', 
+            user='drawfit_bot',
+            host=environ['DB_HOSTNAME'], 
+            password=environ['BOT_PASSWORD']
+            )
         return self
 
     def __exit__(self, exc_type, exc_value, exc_traceback) -> NoReturn:

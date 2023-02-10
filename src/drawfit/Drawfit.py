@@ -1,5 +1,6 @@
 import argparse
 import sys
+from os import environ
 from os.path import dirname, abspath
 
 sys.path.append(dirname(abspath(__file__)))
@@ -20,15 +21,12 @@ def main():
     prm.DEBUG_MODE = (not prm.DEBUG_MODE) if args.debug else prm.DEBUG_MODE
     prm.SHELL_MODE = (not prm.SHELL_MODE) if args.shell else prm.SHELL_MODE
     
-    # Run bot
-    with open(prm.TOKEN_PATH, 'r') as f:
-        TOKEN = f.readline()[:-1]
-
     bot = dbot.DrawfitBot()
+    TOKEN = environ['BOT_TOKEN']
     try:
         bot.run(TOKEN)
     except LoginFailure:
-        print(f"The login failed! Token passed (between \"\"):\n\"{TOKEN}\"")
+        print(f"The login failed! Token passed (between \"\"):\"{TOKEN}\"")
 
 if __name__ == "__main__":
     main()
