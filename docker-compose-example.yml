@@ -1,0 +1,45 @@
+# START EDIT HERE YOUR PARAMETERS
+x-postgres-password: &postgres_password your_password
+x-bot-password: &bot_password bot_password
+x-bot-token: &bot_token bot_token
+# END
+version: '3.7'
+
+services:
+  drawfit_bot:
+    container_name: drawfit-bot
+    build: 
+      context: .
+      dockerfile: docker/bot/Dockerfile
+    depends_on:
+      - drawfit_db
+    environment:
+      LOGS_PATH: /drawfit/log
+      DB_HOSTNAME: drawfit-db
+      BOT_PASSWORD: *bot_password
+      BOT_TOKEN: *bot_token
+    volumes:
+      - drawfit-logs:/drawfit/log
+
+  drawfit_db:
+    container_name: drawfit-db
+    build:
+      context: .
+      dockerfile: docker/db/Dockerfile
+      args:
+        POSTGRES_PASSWORD: *postgres_password
+        BOT_PASSWORD: *bot_password
+    ports:
+      - "45370:5432"
+    volumes:
+      - drawfit-data:/var/lib/postgresql/data
+
+volumes:
+  drawfit-data:
+    name: "drawfit-data"
+  drawfit-logs:
+    name: "drawfit-logs"
+
+networks:
+  default:
+    name: drawfit-net
