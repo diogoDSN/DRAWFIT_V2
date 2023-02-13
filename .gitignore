@@ -163,3 +163,4 @@ src/drawfit/parameters.py
 src/drawfit/token.txt
 log/*
 .DS_Store
+docker-compose.yml
