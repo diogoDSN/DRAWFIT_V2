@@ -106,21 +106,25 @@ class DrawfitBot(commands.Bot):
         handler = updates.UpdateHandler(self.store)
 
         while(True):
+            try:
 
-            self.logger.debug('Update Started.')
+                self.logger.debug('Update Started.')
 
-            notifications = await handler.update()
+                notifications = await handler.update()
 
-            if len(notifications) != 0:
-                self.logger.debug(f'Creating {len(notifications)} notifications.')
+                if len(notifications) != 0:
+                    self.logger.debug(f'Creating {len(notifications)} notifications.')
 
-            for notification in notifications:
-                await asyncio.sleep(1)
-                self.notify(notification)
+                for notification in notifications:
+                    await asyncio.sleep(1)
+                    self.notify(notification)
 
-            self.logger.debug('Update Ended.')
+                self.logger.debug('Update Ended.')
 
-            await asyncio.sleep(DrawfitBot.update_cycle)
+                await asyncio.sleep(DrawfitBot.update_cycle)
+            
+            except:
+                self.logger.critical(f'Exception occurred in update cycle:', exc_info=True)
     
     async def on_command_error(self, ctx, error):
         if error.__class__ == commands.BadArgument:
