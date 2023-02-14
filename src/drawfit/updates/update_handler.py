@@ -34,7 +34,6 @@ class UpdateHandler:
         self.sites[Sites.Betway].active = False
         
     async def update(self) -> List[Notification]:
-
         codes_by_league = self.store.getAllLeagueCodes()
         session = AsyncHTMLSession()
         results = {}
@@ -53,7 +52,7 @@ class UpdateHandler:
                 try:
                     results[league][site] = await tasks[site]
                 except:
-                    self.logger.error(f'Exception occurred when trying to parse odds from {site.name}', exc_info=True)
+                    self.logger.info(f'Exception occurred when trying to parse odds from {site.name}', exc_info=True)
 
             await asyncio.sleep(UpdateHandler.requests_interval)
 
