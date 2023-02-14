@@ -99,7 +99,7 @@ class Game(Followable):
     
     @date.setter
     def date(self, date: datetime) -> NoReturn:
-        self.date = date
+        self._date = date
     
     @property
     def odds(self) -> Dict[Sites, List[o.Odd]]:

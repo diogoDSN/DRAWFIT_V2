@@ -1,6 +1,7 @@
 from __future__ import annotations
 import asyncio
 from typing import Dict, List, Tuple, NoReturn, TYPE_CHECKING, Optional
+from datetime import datetime
 
 if TYPE_CHECKING:
     from drawfit.domain.league import League
@@ -419,13 +420,13 @@ class DomainStore:
             db.updateGameDate(game, new_date)
             
             # reregister deleted data
-            for site, odds_list in game.odds.itmes():
+            for site, odds_list in game.odds.items():
                 for odd in odds_list:
                     db.registerOdd(game.name, new_date, site, odd.value, odd.date)
                     
-            for game_id in game.ids.values():
+            for site, game_id in game.ids.items():
                 if not game_id is None:
-                    db.addGameId(game.name, game.date, site, game_id)
+                    db.addGameId(game.name, new_date, site, game_id)
                     
         game.date = new_date
     
