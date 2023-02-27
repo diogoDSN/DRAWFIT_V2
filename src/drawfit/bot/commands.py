@@ -365,7 +365,7 @@ async def activateTeam(ctx: commands.Context, *, arguments = ''):
 
     try: 
         ctx.bot.store.activateTeam(team_id)
-        await ctx.send(f'The following team was activated `{team_id}`:\n')
+        await ctx.send(f'The following team was activated: `{team_id}`\n')
     except DrawfitError as e:
         await ctx.send(f'Team couldn\'t be activated.\n{e.error_message}')
 
