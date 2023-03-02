@@ -164,3 +164,4 @@ src/drawfit/token.txt
 log/*
 .DS_Store
 docker-compose.yml
+.certificates
