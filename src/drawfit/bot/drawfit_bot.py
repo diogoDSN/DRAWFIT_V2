@@ -9,7 +9,7 @@ from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn, Optional
 import discord
 from discord.ext import commands
 
-from drawfit.parameters import PERMISSIONS, COMMAND_CHANNELS, UPDATES_CHANNELS, QUERIES_CHANNELS
+from drawfit.parameters import COMMAND_CHANNELS, UPDATES_CHANNELS, QUERIES_CHANNELS
 
 import drawfit.database.database_store as db_store
 import drawfit.domain.domain_store as store
