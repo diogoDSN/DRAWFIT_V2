@@ -19,4 +19,7 @@ FROM postgres:14.6
 
 COPY --from=populate /data $PGDATA
 
+# Copy configuration files into image
 COPY src/database/pg_hba.conf $PGDATA
+
+COPY src/database/postgresql.conf $PGDATA
