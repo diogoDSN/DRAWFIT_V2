@@ -26,6 +26,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 WORKDIR /drawfit
 
+RUN mkdir permissions
+
 COPY . .
 
 RUN pip install -e .

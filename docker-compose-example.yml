@@ -1,7 +1,22 @@
 # START EDIT HERE YOUR PARAMETERS
+
+# Database Security Parameters
 x-postgres-password: &postgres_password your_password
 x-bot-password: &bot_password bot_password
 x-bot-token: &bot_token bot_token
+
+# Discord Server and Channel Names
+x-server-name: &server_name your_server
+x-commands-channel: &commands_channel your_commands_channel
+x-updates-channel: &updates_channel your_updates_channel
+x-queries-channel: &queries_channel your_queries_channel
+
+# Bot timezone. Go to https://gist.github.com/heyalexej/8bf688fd67d7199be4a1682b3eec7568 to check for yours
+x-drawfit-time-zone: &drawfit_time_zone your_time_zone
+
+# Bot Permissions (example: john#1111)
+x-owner-username: &owner_user_name your_discord_username
+
 # END
 version: '3.7'
 
@@ -16,11 +31,19 @@ services:
     environment:
       LOGS_PATH: /drawfit/log
       DB_HOSTNAME: drawfit-db
+      SERVER_NAME: *server_name
+      COMMANDS_CHANNEL: *commands_channel
+      UPDATES_CHANNEL: *updates_channel
+      QUERIES_CHANNEL: *queries_channel
+      DRAWFIT_TIME_ZONE: *drawfit_time_zone
+      OWNER_USERNAME: *owner_user_name
       BOT_PASSWORD: *bot_password
       BOT_TOKEN: *bot_token
     restart: unless-stopped
     volumes:
+      - drawfit-perms:/drawfit/permissions
       - ./log:/drawfit/log
+      
 
   drawfit_db:
     container_name: drawfit-db
@@ -32,13 +55,16 @@ services:
         BOT_PASSWORD: *bot_password
     restart: unless-stopped
     ports:
-      - "45370:5432"
+      - "45371:5432"
     volumes:
       - drawfit-data:/var/lib/postgresql/data
+      - ./.certificates:/var/lib/postgresql/data/certificates
 
 volumes:
   drawfit-data:
     name: "drawfit-data"
+  drawfit-perms:
+    name: "drawfit-perms"
 
 networks:
   default:

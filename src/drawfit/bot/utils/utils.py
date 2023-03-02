@@ -9,11 +9,30 @@ import discord
 from discord.ext import commands
 
 from drawfit.bot.messages import Yes, No
-from drawfit.bot.permissions import Permissions
+from drawfit.bot.permissions import Permissions, nextPermission, previousPermission
 
 def hasPermission(ctx: commands.Context, permission: Permissions) -> bool:
     return ctx.author in ctx.bot.getUsersWithPermission(permission)
 
+def upPermission(ctx: commands.Context, username_to_up: str) -> bool:
+    
+    upgrade_perm = nextPermission(ctx.bot.getPermission(username_to_up))
+    if hasPermission(ctx, upgrade_perm) and upgrade_perm != Permissions.OWNER:
+        ctx.bot.setPermission(upgrade_perm, username_to_up)
+        return True
+
+    return False
+
+def downPermission(ctx: commands.Context, username_to_down: str) -> bool:
+    
+    downgrade_perm = previousPermission(ctx.bot.getPermission(username_to_down))
+    if hasPermission(ctx, nextPermission(ctx.bot.getPermission(username_to_down))):
+        ctx.bot.setPermission(downgrade_perm, username_to_down)
+        return True
+
+    return False
+    
+    
 
 class MessageCheck:
 

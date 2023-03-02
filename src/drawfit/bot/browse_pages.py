@@ -5,7 +5,7 @@ import traceback
 from math import ceil
 from datetime import datetime, timedelta, MAXYEAR
 from pytz import timezone
-from typing import NoReturn, List, Optional, Set, Union
+from typing import NoReturn, List, Optional, Set, Union, Dict
 import asyncio
 
 
@@ -14,6 +14,7 @@ from discord.ext import commands
 
 import drawfit.bot.drawfit_bot as bot
 from drawfit.bot.utils import MessageCheck, ReactionCheck
+from drawfit.bot.permissions import Permissions
 
 from drawfit.dtos.domain_dto import DomainDto
 from drawfit.dtos.league_dto import LeagueDto
@@ -744,3 +745,35 @@ class OddsHistoryPage(SubPagedPage):
     @property
     def shownSites(self) -> List[Sites]:
         return [site for site in Sites if OddsHistoryPage.sites_emojis[site] in self.toggles_on]
+
+class PermissionsPage(Page):
+    
+    def __init__(self, user: User, page_message: Message, permissions: Dict[Permissions, List[User]]) -> NoReturn:
+        super().__init__(user, page_message, \
+                [], \
+                set(), \
+                set())
+        
+        self.permissions = permissions
+    
+    
+    @abstractmethod
+    def makeEmbed(self) -> Embed:
+        
+        embed = Embed(title='Permissions', description=f'Current bot permissions.')
+        
+        for perm in Permissions:
+            value = ''
+            for user in self.permissions[perm]:
+                value += f'- {str(user)}\n'
+            embed.add_field(name=perm.value, value=value, inline=False)
+        
+        return embed
+        
+    
+    @abstractmethod
+    async def buttons(self, emoji: str) -> Page:
+        return self
+
+    async def select(self, number: int) -> Page:
+        return self

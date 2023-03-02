@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn
+import json
+from os import environ
+from typing import List, Dict, Tuple, TYPE_CHECKING, NoReturn, Optional
 
 import discord
 from discord.ext import commands
@@ -42,24 +44,57 @@ class DrawfitBot(commands.Bot):
         self.setup = False
 
         self.logger = create_new_logger(DrawfitBot.logger_name)
+        
+        self.perms: Dict[Permissions, List[discord.User]] = {perm: [] for perm in Permissions}
 
         self.configureCommands()
     
     def setInitialPermissions(self):
 
-        perms = {}
+        try:
+            with open('./permissions/perms.json', 'r') as perm_file:
+                permissions_string = json.load(perm_file)
+                permissions = {perm: permissions_string[perm.value] for perm in Permissions}
+                
+                if permissions[Permissions.OWNER] == []:
+                    raise FileNotFoundError()
+                
+                self.logger.debug(f'Booting from file permissions')
+        except FileNotFoundError or KeyError:
+            permissions = {perm: [] for perm in Permissions}
+            permissions[Permissions.OWNER] = [environ['OWNER_USERNAME']]
+            self.logger.debug(f'Booting from default permissions')
+        except:
+            self.logger.critical(f'An error occurred when trying to read the permissions file.', exc_info=True)
+            return
 
-        for permission, perms_list in PERMISSIONS.items():
+        for permission, perms_list in permissions.items():
             
-            current_perms = []
-
-            for user in self.get_all_members():
-                if str(user) in perms_list:
-                    current_perms.append(user)
-            
-            perms[permission] = current_perms
+            for username in perms_list:
+                self.setPermission(permission, username)
         
-        return perms
+        if self.perms[Permissions.OWNER] == []:
+            self.logger.critical(f'No owner set in permissions!')
+    
+    def setPermission(self, permission: Optional[Permissions], username: str) -> NoReturn:
+        
+        if (perm:=self.getPermission(username)) is not None:
+            self.perms[perm] = [user for user in self.perms[perm] if str(user) != username]
+        
+        
+        if permission is not None:
+            for member in self.get_all_members():
+            
+                if str(member) == username:
+                    self.perms[permission].append(member)
+                    break
+        
+        serializable_perms = {perm.value: [str(user) for user in self.perms[perm]] for perm in Permissions}
+        
+        json_perms = json.JSONEncoder().encode(serializable_perms)
+        
+        with open('./permissions/perms.json', 'w') as perm_file:
+            perm_file.write(json_perms)
     
     def configureCommands(self):
         import drawfit.bot.commands as cmd
@@ -86,8 +121,8 @@ class DrawfitBot(commands.Bot):
             return
         
         self.setup = True
-
-        self.perms: Dict[Permissions, List[discord.User]] = self.setInitialPermissions()
+        
+        self.setInitialPermissions()
 
         # prepare visitor
         from drawfit.bot.notify import Notify
@@ -142,6 +177,16 @@ class DrawfitBot(commands.Bot):
     
     def endTask(self, task: asyncio.Task):
         self.notify_tasks.remove(task)
+
+    def getPermission(self, username: str) -> Optional[Permissions]:
+        if username in [str(user) for user in self.perms[Permissions.NORMAL]]:
+            return Permissions.NORMAL
+        elif username in [str(user) for user in self.perms[Permissions.MODERATOR]]:
+            return Permissions.MODERATOR
+        elif username in [str(user) for user in self.perms[Permissions.OWNER]]:
+            return Permissions.OWNER
+        
+        return None
 
     def getUsersWithPermission(self, perm: Permissions) -> List[discord.User]:
 

@@ -45,3 +45,9 @@ def setBetclicLeagueCodeUsage():
 
 def resetIdsCorrectUsage():
     return 'Correct usage:\n```.resetIds (team_name)```'
+
+def promoteCorrectUsage():
+    return 'Correct usage:\n```.promote (user_name#0000)```'
+
+def demoteCorrectUsage():
+    return 'Correct usage:\n```.demote (user_name#0000)```'

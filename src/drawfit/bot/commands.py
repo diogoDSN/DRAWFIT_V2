@@ -5,9 +5,9 @@ from discord.ext import commands
 from drawfit.bot.permissions import Permissions
 from drawfit.bot.messages.commands import *
 from drawfit.bot.messages import NoPermission, eraseLeagueConfirmation, eraseTeamConfirmation
-from drawfit.bot.utils import hasPermission, MessageCheck, ReactionCheck
+from drawfit.bot.utils import hasPermission, MessageCheck, ReactionCheck, upPermission, downPermission
 from drawfit.bot.utils.commands import *
-from drawfit.bot.browse_pages import menu, LeaguesPage, TeamsPage, GamesPage
+from drawfit.bot.browse_pages import menu, LeaguesPage, TeamsPage, GamesPage, PermissionsPage
 
 from drawfit.database.drawfit_error import DrawfitError
 
@@ -44,7 +44,6 @@ async def browseLeagues(ctx: commands.Context, *, arguments = ''):
     
     checkEmptyArguments(arguments, 'browse')
     
-
     browse_message = await ctx.send('*Loading...*')
     domain_dto = ctx.bot.store.getDomain()
     page = LeaguesPage(ctx.author, browse_message, domain_dto.leagues)
@@ -524,3 +523,47 @@ async def resetIds(ctx: commands.Context, *, team_name = ''):
         await ctx.send(f'The following team had all its ids erased: `{team_name}`')
     except DrawfitError as e:
         await ctx.send(f'The given id couldn\'t be erased!\n{e.error_message}')
+
+@commands.command(aliases=['p', 'P'])
+async def promote(ctx: commands.Context, *, user_name = ''):
+    
+    if not isCommand(ctx):
+        return
+    
+    checkAnyArguments(user_name, promoteCorrectUsage())
+    
+    if upPermission(ctx, user_name):
+        await ctx.send(f'`{user_name}` was successfully pomoted!')
+    else:
+        await ctx.send(f'Couldn\'t promote `{user_name}`')
+
+
+@commands.command(aliases=['d', 'D'])
+async def demote(ctx: commands.Context, *, user_name = ''):
+    
+    if not isCommand(ctx):
+        return
+    
+    checkAnyArguments(user_name, demoteCorrectUsage())
+    
+    if downPermission(ctx, user_name):
+        await ctx.send(f'`{user_name}` was successfully demoted!')
+    else:
+        await ctx.send(f'Couldn\'t demote `{user_name}`')
+
+@commands.command(aliases=['bp', 'bP'])
+async def browsePermissions(ctx: commands.Context, *, user_name = ''):
+    
+    if not isCommand(ctx):
+        return
+    
+    if not hasPermission(ctx, Permissions.NORMAL):
+        await ctx.send(NoPermission(Permissions.NORMAL.value))
+        return
+    
+    checkEmptyArguments(user_name, 'browsePermissions')
+    
+    browse_message = await ctx.send('*Loading...*')
+    page = PermissionsPage(ctx.author, browse_message, ctx.bot.perms)
+    
+    await menu(ctx, page, ctx.bot.perms)
