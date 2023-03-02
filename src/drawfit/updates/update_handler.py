@@ -52,7 +52,7 @@ class UpdateHandler:
                 try:
                     results[league][site] = await tasks[site]
                 except:
-                    self.logger.info(f'Exception occurred when trying to parse odds from {site.name}', exc_info=True)
+                    self.logger.debug(f'Exception occurred when trying to parse odds from {site.name}', exc_info=True)
 
             await asyncio.sleep(UpdateHandler.requests_interval)
 
