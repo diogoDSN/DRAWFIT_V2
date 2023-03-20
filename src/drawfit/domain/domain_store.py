@@ -371,7 +371,7 @@ class DomainStore:
                 
                 team.current_game = None
                 
-                for league in team.leagues:
+                for league in team.leagues.values():
                     del league.teams[team_name]
                     if team in league.inactive_teams:
                         league.inactive_teams.remove(team)
