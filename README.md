@@ -1,49 +1,48 @@
-# DRAWFIT_V2
-Upgraded DRAWFIT robot using HTTP requests
 
-Still developing the backbone, don't judge
+# **DRAWFIT_V2**
+## Upgraded DRAWFIT bot using HTTP requests and discord.py
+The Drawfit project deploys a fully functional programmable discord bot for following draw odds on any soccer game.  
+Currently 5 options:
 
+- Bwin
+- Betano
+- Betclic
+- Solverde
+- Moosh
 
-## Virtual Environment [recomended]
+## Deploying with docker
 
-Create a virtual environment the first time running the project.
-Use this command in the project's root directory:
+1. Create your own discord bot  
+To create your own discord bot go to [discord developer portal](https://discord.com/login?redirect_to=%2Fdevelopers) and follow the instructions [here](https://www.pythondiscord.com/pages/guides/pydis-guides/contributing/setting-test-server-and-bot-account/) under ***Setting up a Bot Account*** to create your bot and add it to your server.
 
-```
-python3 -m venv .venv
-```
+2. Fill your bot parameters  
+To parametrize the bot copy the ***docker-compose-example.yml*** file and rename it to ***docker-compose.yml***. In the new file fill the first lines, between the START and END comments, with your parameters.
 
-To enter the created virtual environment use command:
-
-```
-source .venv/bin/activate
-```
-
-Next install the project's dependencies you need with:
-
-```
-pip -r install Requirements.txt
-or
-pip -r install DevRequirements.txt
-```
-
-
-
-## Running
-
-To run the bot just use the command in the project's root directory:
+3. Create your ssl certificates  
+The certificates should be placed within a ***.certificates*** folder in the root of the project. If you haven't run the project yet you can use the utility script in the root of the project in the following way:
 
 ```
-python src/main/Drawfit.py
+sh src/ssl/make_certificates.sh
 ```
 
-## Unit Tests
-
-To run the full unit test package use the following command in the project's root directory:
-
+4. Turn the bot on  
+After the certificates have been created run the boot with:
 ```
-pytest --rootdir=src/test
+sudo docker-compose up -d
 ```
+
+## Accessing the database
+
+The database is exposed on port 45371 of your local machine. If you want o access it there are two available users:
+1. drawfit_read_only  
+Some of this user's intended uses are backups and data analysis tools.  
+Permissions: SELECT on all database tables.
+
+2. postgres  
+This user is available as a way to restore your database, but aside from this specific use case it is not recomended.  
+Permissions: SUPERUSER.  
+
+If you want to connect with any of these users you will have to create a certidicate with a common name, CN, equal to that of the specific user, drawfit_read_only or postgres, signed by the root CA in the ***.certicates*** folder.
 
 ## Notes
 
