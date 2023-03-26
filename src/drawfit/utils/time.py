@@ -10,8 +10,9 @@ def now_lisbon():
     return datetime.now(timezone(TIME_ZONE))
 
 def tz_aware(t: datetime) -> datetime:
-    tz = timezone(TIME_ZONE)
-    return tz.localize(t)
+    date_in_utc = timezone('UTC').localize(t)
+
+    return date_in_utc.astimezone(timezone(TIME_ZONE))
 
 def to_utc(t: datetime) -> datetime:
     return t.astimezone(timezone('UTC'))

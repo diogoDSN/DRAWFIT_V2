@@ -218,7 +218,7 @@ class DatabaseStore:
     def registerGame(self, team_name: str, game_name: str, game_date: datetime, league_name: str) -> NoReturn:
         try:
             with self.db_connection.cursor() as cursor:
-                cursor.execute("INSERT INTO game VALUES ((%s), (%s), (%s), (%s));", (team_name, game_name, game_date, league_name))
+                cursor.execute("INSERT INTO game VALUES ((%s), (%s), (%s), (%s));", (team_name, game_name, to_utc(game_date), league_name))
                 
         except UniqueViolation as e:
             if game_name in e.pgerror:
@@ -241,7 +241,7 @@ class DatabaseStore:
         try:
             with self.db_connection.cursor() as cursor:
                 cursor.execute("INSERT INTO odd VALUES ((%s), (%s), (%s), (%s), (%s));", \
-                    (game_name, game_date, site.value, value, date))
+                    (game_name, to_utc(game_date), site.value, value, to_utc(date)))
                 
         except UniqueViolation:
             raise DrawfitError(DuplicateOdd(game_name, site.value, str_dates(date)))
@@ -313,7 +313,7 @@ class DatabaseStore:
         try:
             with self.db_connection.cursor() as cursor:
                 cursor.execute("INSERT INTO game_id VALUES ((%s), (%s), (%s), (%s), (%s));",\
-                        (game_name, game_date, site.value, id[0], id[1]))
+                        (game_name, to_utc(game_date), site.value, id[0], id[1]))
             
         except UniqueViolation:
             raise DrawfitError(DuplicateGameId(game_name, str_dates(game_date), site.value))
@@ -327,7 +327,7 @@ class DatabaseStore:
     def updateGameDate(self, game: f.Game, new_date: datetime):
         try:
             with self.db_connection.cursor() as cursor:
-                cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s);", (new_date, game.name, to_utc(game.date)))
+                cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s);", (to_utc(new_date), game.name, to_utc(game.date)))
         
         except UniqueViolation as e:
             if game.name in e.pgerror:
@@ -353,7 +353,7 @@ class DatabaseStore:
     
     def updateGameDate(self, game: f.Game, new_date: datetime) -> NoReturn:
         with self.db_connection.cursor() as cursor:
-            cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s);", (new_date, game.name, to_utc(game.date)))
+            cursor.execute("UPDATE game SET date=(%s) WHERE name=(%s) AND date=(%s);", (to_utc(new_date), game.name, to_utc(game.date)))
     
     def deleteGame(self, game_name: str, game_date: datetime) -> NoReturn:
         with self.db_connection.cursor() as cursor:
