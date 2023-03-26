@@ -142,8 +142,8 @@ class DomainStore:
                     if game.canAddOdd(sample.odd, sample.sample_time, site):
                         db.registerOdd(game.name, game.date, site, sample.odd, sample.sample_time)
                 
-                team.current_game.setId(site, sample.game_id)
-                team.current_game.addOdd(sample.odd, sample.sample_time, site)
+                    team.current_game.setId(site, sample.game_id)
+                    team.current_game.addOdd(sample.odd, sample.sample_time, site)
 
                 return notf.NewOddNotification(team.current_game, site, league.color)
 
