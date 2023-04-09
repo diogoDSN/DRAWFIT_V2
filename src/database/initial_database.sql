@@ -169,7 +169,7 @@ BEGIN
     IF NEW.date > current_timestamp and 
        EXISTS(SELECT * FROM game WHERE team_name = NEW.team_name AND name != NEW.name AND date > current_timestamp) 
     THEN
-        RAISE EXCEPTION 'Tried insertign/updating game %. The new games date is invalid: %. There is another current game for the same team.',
+        RAISE EXCEPTION 'Tried inserting/updating game %. The new game\' date is invalid: %. There is another current game for the same team.',
                         NEW.name, NEW.date;
     END IF;
 
