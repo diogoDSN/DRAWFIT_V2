@@ -84,8 +84,7 @@ class DrawfitBot(commands.Bot):
         
         if permission is not None:
             for member in self.get_all_members():
-            
-                if str(member) == username:
+                if member.global_name == username:
                     self.perms[permission].append(member)
                     break
         

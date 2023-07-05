@@ -765,7 +765,7 @@ class PermissionsPage(Page):
         for perm in Permissions:
             value = ''
             for user in self.permissions[perm]:
-                value += f'- {str(user)}\n'
+                value += f'- {user.display_name}\n'
             embed.add_field(name=perm.value, value=value, inline=False)
         
         return embed
