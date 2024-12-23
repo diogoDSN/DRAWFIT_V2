@@ -99,3 +99,24 @@ class DateChangeNotification(Notification):
     
     def __str__(self) -> str:
         return f'```\n❗️New Date:❗️\n{str_dates(self.game.date)}\n```'
+    
+class TeamDeativateNotification:
+    
+    def __init__(self, team: followables.Team, game_name: str):
+        self.team = team
+        self.game_name = game_name
+    
+    def __eq__(self, o) -> bool:
+        if isinstance(o, TeamDeativateNotification):
+            return self.team == o.team and self.game_name == o.game_name
+        
+        return False
+    
+    def mergeNotifications(self, new_notf: Notification) -> NoReturn:
+        pass
+    
+    async def accept(self, visitor: v.Notify):
+        await visitor.visitTeamDeactivate(self)
+    
+    def __str__(self) -> str:
+        return f'```\n{self.game_name} just ended. Do tou wish to deactivate:\n{self.team.name}\n```'

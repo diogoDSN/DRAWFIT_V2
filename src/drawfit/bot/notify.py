@@ -111,3 +111,21 @@ class Notify:
         finally:
             self.bot.endTask(asyncio.current_task())
     
+    async def visitTeamDeactivate(self, notification: notf.TeamDeactivateNotification) -> NoReturn:
+        
+        try:
+
+            embed = Embed(title=notification.team.name, color=notification.color)
+
+            embed.add_field(name='Deactivate?', value=str(notification))
+
+            for channel in self.queries_channels:
+                await channel.send(embed=embed)
+            
+        except Exception as e:
+            print("Exception raised in visitTeamDeactivate!")
+            print(e)
+        
+        finally:
+            self.bot.endTask(asyncio.current_task())
+    

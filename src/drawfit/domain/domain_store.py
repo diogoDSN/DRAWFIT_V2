@@ -20,6 +20,7 @@ from drawfit.utils import Sites, OddSample, LeagueCode, now_lisbon, str_dates
 class DomainStore:
     
     remove_routine_time = 900
+    deactivate_team_notification = 60 * 60 * 3
 
     #----------------------------------------------------------------------
     #-------------- Initialization Methods and Properties
@@ -33,6 +34,8 @@ class DomainStore:
         # fetch all leagues and teams
         self.leagues = {league.name: league for league in self.loadAllLeagues()}
         self.teams = {team.name: team for team in self.loadAllTeams()}
+        self.notifications: List[Notification] = []
+        self.tasks: List[Task] = []
 
         # fetch current game for each team if any
         with self.db_store as db:
@@ -73,12 +76,15 @@ class DomainStore:
     
     def updateLeaguesOdds(self, results: Dict[str, Dict[Sites, List[OddSample]]]) -> List[notf.Notification]:
 
-        notifications = []
+        newNotifications = []
 
         for league_name, odd_samples in results.items():
-            notifications.extend(self.updateOdds(self.leagues[league_name], odd_samples))
+            newNotifications.extend(self.updateOdds(self.leagues[league_name], odd_samples))
         
-        return notifications
+        newNotifications.extend(self.notifications)
+        self.notifications = []
+                
+        return newNotifications
     
     def updateOdds(self, league: l.League, samples_by_site: Dict[Sites, List[OddSample]]) -> List[notf.Notification]:
 
@@ -213,6 +219,7 @@ class DomainStore:
     async def removeRoutine(self) -> NoReturn:
         while True:
             await asyncio.sleep(DomainStore.remove_routine_time)
+            
             # TODO add exception logging
             for team in self.teams.values():
                 if team.current_game is None:
@@ -221,7 +228,14 @@ class DomainStore:
                 if team.current_game.date < now_lisbon():
                     with self.db_store as db:
                         db.deleteGameIds(team.current_game.name, team.current_game.date)
-                    team.current_game = None
+                        self.tasks.append(asyncio.create_task(self.deactivateNotice(team, team.current_game.name)))
+                        team.current_game = None
+        
+    async def deactivateNotice(self, team: f.Team, game_name: str) -> NoReturn:
+        await asyncio.sleep(DomainDto.deactivate_team_notification)
+        self.notifications.append(notf.TeamDeactivateNotification(team, game_name))
+        self.tasks.remove(asyncio.current_task())
+        
     
     #----------------------------------------------------------------------
     #-------------- League Methods
